@@ -2,15 +2,28 @@
 
 #include <map>
 #include <string>
+#include <iostream>
+#include <algorithm>
+#include "include/tinyutf8.h"
+#include <unordered_map>
+
+using std::cout
 
 //#include "include/selene.h"
 //#include "SkColor.h"
 //#include "Filesystem.h"
 
+#include "Colors.h"
+
 extern int controlKeysDown;
 
 using BubbleId = int;
 using WindowId = int;
+
+static std::unordered_map<std::string, double>      gNums;
+static std::unordered_map<std::string, Color>     gColors;
+static std::unordered_map<std::string, utf8_string> gStrings;
+static std::unordered_map<std::string, bool>        gBool;
 
 
 #include <utility>
@@ -24,6 +37,9 @@ const double PI  = 3.141592653589793238463;
 
 // use it like:
 //    cout << "thing's type is: "<< type_name<decltype( thing )>() << '\n';
+// or possibly
+//    SHOW_TYPE( thing )
+// (see below)
 
 #include <type_traits>
 #include <typeinfo>
@@ -64,7 +80,7 @@ std::string type_name() {
 	#define ITALIC    "" << 
 	#define UNDERLINE "" << 
 	#define NORMAL    "" << 
-#else //make terminals more colorful using special control codes
+#else //make terminals more colorful using special ANSI control codes
 	#define BOLD      "\033[1m" << 
 	#define ITALIC    "\033[3m" << 
 	#define UNDERLINE "\033[4m" << 
@@ -74,25 +90,9 @@ std::string type_name() {
 #pragma GCC diagnostic push
 	#pragma GCC diagnostic ignored "-Waddress"
 
-	#define SHOW_TYPE(...) std::cout << "Variable " BOLD UNDERLINE << #__VA_ARGS__ NORMAL << " is of type " ITALIC << type_name<decltype( __VA_ARGS__ )>() NORMAL << std::endl;
+	#define SHOW_TYPE(...) std::cout << ITALIC "Variable " << NORMAL BOLD UNDERLINE #__VA_ARGS__ << NORMAL ITALIC " is of type " << NORMAL BOLD UNDERLINE type_name<decltype( __VA_ARGS__ )>() << NORMAL std::endl;
 #pragma GCC diagnostic pop
 
-#include <string>
-
-void complain(std::string s) {
-	#ifdef __EMSCRIPTEN__
-		EM_ASM({
-			var str = Pointer_stringify($0);
-			var txt = document.createTextNode(str);
-			var sp = document.createElement('span');
-			sp.appendChild(txt);
-			var bod = document.getElementById('canvas').parentNode;
-			bod.insertBefore(sp, bod.childNodes[0]); 
-
-		}, s.c_str());
-	#endif
-	cout << s << '\n';
-}
 
 // from https://stackoverflow.com/questions/3378560/how-to-disable-gcc-warnings-for-a-few-lines-of-code
 #define DIAG_STR(s) #s
@@ -122,18 +122,42 @@ void complain(std::string s) {
 	#endif
 #endif
 
-DISABLE_WARNING(unknown-pragmas, unknown-pragmas, unknown-pragmas)
 DISABLE_WARNING(pragmas, pragmas, pragmas)
 	// far too tedious to wrap every use of EM_ASM_ et al in these
 	// i know turning off a warning globally is a v bad idea, but this one seems so obscure it can't hurt
-	#pragma GCC diagnostic ignored "-Wdollar-in-identifier-extension"
+	DISABLE_WARNING(dollar-in-identifier-extension, dollar-in-identifier-extension, dollar-in-identifier-extension)
 ENABLE_WARNING(pragmas, pragmas, pragmas)
-ENABLE_WARNING(unknown-pragmas, unknown-pragmas, unknown-pragmas)
+
+#ifdef __EMSCRIPTEN__
+	DISABLE_WARNING(dollar-in-identifier-extension, dollar-in-identifier-extension, dollar-in-identifier-extension)
+#endif
+
+#ifdef __EMSCRIPTEN__
+	#include <emscripten/emscripten.h>
+
+#endif
 
 static int wemadeit_counter = 0;
 
-void wemadeit() {
+DISABLE_WARNING(unused-function, unused-function, unused-function)
+static void wemadeit() {
 	cout << "WE MADE IT! " << ++wemadeit_counter << '\n';
 }
 
+#include <string>
 
+static void complain(std::string s) {
+	#ifdef __EMSCRIPTEN__
+		EM_ASM({
+			var str = Pointer_stringify($0);
+			var txt = document.createTextNode(str);
+			var sp = document.createElement('span');
+			sp.appendChild(txt);
+			var bod = document.getElementById('canvas').parentNode;
+			bod.insertBefore(sp, bod.childNodes[0]); 
+
+		}, s.c_str());
+	#endif
+	cout << s << '\n';
+}
+ENABLE_WARNING(unused-function, unused-function, unused-function)

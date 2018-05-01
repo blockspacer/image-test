@@ -1,0 +1,72 @@
+#include "Configuration.h"
+
+#include <iostream>
+
+#include <boost/filesystem.hpp>
+//using namespace boost::filesystem;
+
+//using namespace std;
+using std::cout;
+using std::endl;
+
+Configuration::Configuration() {
+  
+  cout<<"config created !"<<std::endl;
+
+  //	mNumbers["hi"] = 20.0;
+}
+
+Configuration::~Configuration() {
+
+  std::cout<<"config destroyed !"<<std::endl;
+}
+
+double Configuration::number(std::string &&name) {
+  auto&& elem = mNumbers.find(name);
+
+	if (elem != mNumbers.end())
+	 	return elem->second;
+
+	cout << "Unable to find user-configurable number \"" << name << "\""<<endl;
+	return 1.0;
+}
+
+SkColor Configuration::color(std::string &&name) {
+	auto&& elem = mColors.find(name);
+
+	if (elem != mColors.end())
+	 	return elem->second;
+
+	cout << "Unable to find user-configurable color \"" << name << "\""<<endl;
+	return SK_ColorMAGENTA;
+}
+
+std::string& Configuration::string(std::string &&name) {
+	auto&& elem = mStrings.find(name);
+
+	if (elem != mStrings.end())
+	 	return elem->second;
+
+	cout << "Unable to find user-configurable string \"" << name << "\""<<endl;
+	return fallback_empty_string;
+}
+
+bool Configuration::boolean(std::string &&name) {
+	auto&& elem = mBooleans.find(name);
+
+	if (elem != mBooleans.end())
+	 	return elem->second;
+
+	cout << "Unable to find user-configurable boolean \"" << name << "\""<<endl;
+	return false;
+}
+
+void Configuration::load_user_settings(sel::State& luaInterpreter) {
+
+	luaInterpreter["register_string"] = [&](std::string key, std::string value) {mStrings.emplace(key, value);};
+
+	if (boost::filesystem::exists("hi.txt"))
+		std::cout<<"hi exists\n";
+	else
+		std::cout<<"hi does not exist\n";
+}

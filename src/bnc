@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# builds the native version
+make -f makefile_for_native_release clean
+make -f makefile_for_native_release

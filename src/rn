@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# runs the native version
+../native_version/juxt_edit

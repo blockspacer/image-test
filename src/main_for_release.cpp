@@ -14,7 +14,9 @@ using std::endl;
 
 #endif
 
-#include "globals.h"
+//#include "globals.h"
+
+#include "configuration.h"
 
 void glfw_error_callback(int error, const char* description) {
 	cout << BOLD "GLFW error " << error << NORMAL " : " << description << std::endl;
@@ -22,8 +24,10 @@ void glfw_error_callback(int error, const char* description) {
 
 GLFWwindow *pWin;
 
+
+static int framenum = 0;
 void draw_frame() {
-cout<<"drew frame";wemadeit();
+	cout<<"Drew frame " << ++framenum << '\n';
 	glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
 
 	glClear( GL_COLOR_BUFFER_BIT );
@@ -90,6 +94,8 @@ int main() {
         exit(-1);
     }
 
+    read_in_global_configuration();
+
     glfwMakeContextCurrent(pWin);
     glfwSwapInterval(1);
 
@@ -106,7 +112,7 @@ int main() {
 				glfwPollEvents();
 			else
 				glfwPollEvents();
-			
+
 		}
 	#endif
 

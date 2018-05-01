@@ -1,0 +1,6 @@
+#!/bin/sh
+
+
+# builds the web version
+make -f makefile_for_web_release clean
+make -f makefile_for_web_release 

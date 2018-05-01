@@ -31,8 +31,9 @@
 *.out
 *.app
 
-web_release/web_release.js
-web_release/web_release.js.mem
+web_version/web_release.js
+web_version/web_release.js.mem
 
-native_release/native_release
+native_version/native_release
+native_version/juxt_edit
 
