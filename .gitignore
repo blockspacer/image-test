@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+web_release/web_release.js
+web_release/web_release.js.mem
+
+native_release/native_release
+

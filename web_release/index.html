@@ -1,0 +1,68 @@
+﻿<!doctype html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>image-test</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+
+<!--        <script type='text/javascript' src='http://code.jquery.com/jquery-2.0.2.min.js'></script>
+        <script type='text/javascript' src='jquery.mousewheel.js'></script>
+    -->    <link rel="stylesheet" href="styles/main.css">
+
+<style>
+html, body {
+    /* get rid of default spacing on the edges */
+    margin: 0;
+    padding: 0;
+
+    /* get rid of that 2px window border in Internet Explorer 6 */
+    border: 0;
+
+    /* fill the height of the browser */
+    height: 100%;
+
+    /* no more scroll bar */
+/*    overflow: hidden;
+*/
+}
+
+canvas {
+    background-color: khaki; /* demo purposes */
+    display: block;
+}
+</style>
+    </head>
+    <body id=bod>
+    <span id=message>Please wait while the code loads.</span>
+    <canvas class="topleft" id="canvas"></canvas>
+
+    <script type="text/javascript">
+        var canvas = document.getElementById("canvas");
+        //make the canvas fullscreen
+        canvas.width = window.innerWidth 
+        canvas.height = window.innerHeight 
+
+// var ctx = canvas.getContext('2d');
+// ctx.fillStyle = 'rgb(200,0,0)'; // sets the color to fill in the rectangle with
+// //ctx.fillRect(0, 0, canvas.width, canvas.height);   // draws the rectangle at position 10, 10 with a width of 55 and a height of 50
+
+        //show Emscripten environment where the canvas is
+        var Module = {};
+        Module.canvas = canvas;
+    </script>
+
+<!--        <script type="text/javascript" src="web_release.js.mem"></script> -->
+        <script async type="text/javascript" src="web_release.js"></script>
+
+<!-- 
+        var canvasFullScreen
+
+
+
+       <script type="text/javascript">
+            var program = Module.run();
+        </script>
+-->
+    </body>
+</html>

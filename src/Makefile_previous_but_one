@@ -1,0 +1,128 @@
+#valgrind -g to include debugging information so that Memcheck's error messages include exact line numbers. Using -O0 is also a good idea, if you can tolerate the slowdown. With -O1 line numbers in error messages can be inaccurate, although generally speaking running Memcheck on code compiled at -O1 works fairly well, and the speed improvement compared to running -O0 is quite significant. Use of -O2 and above is not recommended as Memcheck occasionally reports uninitialised-value errors which don't really exist.
+# 3. Running your program under Memcheck
+
+# If you normally run your program like this:
+
+#   myprog arg1 arg2
+
+# Use this command line:
+
+#   valgrind --leak-check=yes myprog arg1 arg2
+
+
+OS := $(shell uname)
+ifeq ($(OS),Darwin)
+	export stuff = -std=c++11 -O2 -stdlib=libc++ -Wfatal-errors -I/Users/oliver/github/skia/include/core/ -I/Users/oliver/github/skia/include/config/ -I/Users/oliver/github/skia/include/effects/ -I/Users/oliver/github/skia/include/ports/ -L./ -llua
+
+	export booststuff=-L /usr/lib/ -lboost_filesystem -lboost_system -lboost_iostreams ../../skia/out/Static/libskia.a 
+
+	export morestuff=-framework OpenGL
+
+	export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/
+	export debug = -g
+	# -g for debug mode
+else
+	export debug = -g
+	export stuff = -std=c++11 -O0 -Wfatal-errors -I/home/lucky/github/skia/include/core/ -I/home/lucky/github/skia/include/config/ -I/home/lucky/github/skia/include/effects/  -I/home/lucky/github/skia/include/ports/ 
+	#-L./ -llua 
+
+	#-L /usr/lib/ -lboost_filesystem -lboost_system -lboost_iostreams
+	export booststuff = ../../skia/out/Static/libskia.a ../../lua-5.3.4/src/liblua.a /usr/lib/libboost_filesystem.a /usr/lib/libboost_system.a /usr/lib/libboost_iostreams.a -licuuc 
+#whereis libicuuc
+
+endif
+
+# http://www.lurklurk.org/linkers/linkers.html#windowsdlls
+
+# https://bbs.archlinux.org/viewtopic.php?id=107297
+
+
+objects := objects/main.o objects/opengl.o objects/Filesystem.o objects/Bubble.o objects/Window.o objects/GapBuffer.o objects/Image.o objects/Workspace.o objects/VertexGathering.o objects/Rect.o objects/PanningBar.o objects/InputEvents.o objects/tinyutf8.o objects/TextBubble.o objects/TextView.o objects/Reader.o objects/Animation.o objects/Menus.o objects/ListingView.o objects/HyperTreeView.o objects/NotesBubble.o objects/NotesCollection.o objects/FileLocationBar.o objects/Scrollbar.o objects/pdf_output.o
+
+virt.bin: $(objects)
+	g++ $(debug) $(stuff) `pkg-config --cflags fontconfig --static --libs  glew glfw3 ` -Wall $(objects) $(booststuff) -o virt.bin $(morestuff)
+	cp virt.bin ../release/virt
+
+objects/main.o: main.cpp opengl.h
+	g++ $(debug) $(stuff) -I/usr/include/ -Iinclude/ `pkg-config --cflags   fontconfig` -c -Wall main.cpp -o objects/main.o
+
+objects/tinyutf8.o: tinyutf8.cpp tinyutf8.h
+	g++ $(debug) $(stuff) -Iinclude/  -c tinyutf8.cpp -o objects/tinyutf8.o
+
+objects/opengl.o: opengl.h opengl.cpp shader.cpp shader.h
+	g++ $(debug) $(stuff) -c -I/usr/include/ -Iinclude/  `pkg-config --cflags glfw3 glew   ` opengl.cpp -o objects/opengl.o
+
+objects/VertexGathering.o: VertexGathering.h VertexGathering.cpp
+	g++ $(debug) $(stuff) -c `pkg-config --cflags  glfw3 glew ` VertexGathering.cpp -o objects/VertexGathering.o
+
+objects/Filesystem.o: Filesystem.h Filesystem.cpp
+	g++ $(debug) $(stuff) -c `pkg-config --cflags  glfw3 glew ` -I/usr/include/ -Iinclude/ -c Filesystem.cpp -o objects/Filesystem.o
+
+objects/Scrollbar.o: Scrollbar.h Scrollbar.cpp
+	g++ $(debug) $(stuff) `pkg-config --cflags  glfw3 glew ` -I/usr/include/ -Iinclude/ -c Scrollbar.cpp -o objects/Scrollbar.o
+
+objects/NotesCollection.o: NotesCollection.h NotesCollection.cpp
+	g++ $(debug) $(stuff) -c `pkg-config --cflags  glfw3 glew ` -I/usr/include/ -Iinclude/ -c NotesCollection.cpp -o objects/NotesCollection.o
+
+# objects/EditingOps.o: EditingOps.h EditingOps.cpp
+# 	g++ $(debug) $(stuff) -c `pkg-config --cflags  glfw3 glew ` -I/usr/include/ -Iinclude/ -c EditingOps.cpp -o objects/EditingOps.o
+
+objects/HyperTreeView.o: HyperTreeView.h HyperTreeView.cpp
+	g++ $(debug) $(stuff) -c `pkg-config --cflags  glfw3 glew ` -I/usr/include/ -Iinclude/ -c HyperTreeView.cpp -o objects/HyperTreeView.o
+
+objects/ListingView.o: ListingView.h ListingView.cpp
+	g++ $(debug) $(stuff) -c `pkg-config --cflags glfw3 glew  ` -I/usr/include/ -Iinclude/ -c ListingView.cpp -o objects/ListingView.o
+
+objects/NotesBubble.o: NotesBubble.h NotesBubble.cpp TextView.h TextView.cpp
+	g++ $(debug) $(stuff) -c `pkg-config --cflags glfw3 glew  ` -I/usr/include/ -Iinclude/ -c NotesBubble.cpp -o objects/NotesBubble.o
+
+objects/GapBuffer.o: GapBuffer.h GapBuffer.cpp
+	g++ $(debug) $(stuff) `pkg-config --cflags glfw3 glew  ` -I/usr/include/ -Iinclude/ -c GapBuffer.cpp -o objects/GapBuffer.o
+
+#objects/BubbleHalo.o: BubbleHalo.h BubbleHalo.cpp
+#	g++ $(stuff) -I/usr/include/ -Iinclude/ -c BubbleHalo.cpp -o objects/BubbleHalo.o
+
+objects/Bubble.o: Bubble.h Bubble.cpp
+	g++ $(debug) $(stuff) -I/usr/include/ -Iinclude/ `pkg-config --cflags fontconfig  ` -c Bubble.cpp -o objects/Bubble.o
+
+objects/TextBubble.o: TextBubble.h TextBubble.cpp
+	g++ $(debug) $(stuff) -I/usr/include/ -Iinclude/ `pkg-config --cflags fontconfig  ` -c TextBubble.cpp -o objects/TextBubble.o
+
+objects/pdf_output.o: pdf_output.h pdf_output.cpp
+	g++ $(debug) $(stuff) -I/usr/include/ -Iinclude/ `pkg-config --cflags fontconfig glfw3 glew ` -c pdf_output.cpp -o objects/pdf_output.o
+
+objects/TextView.o: TextView.h TextView.cpp EditingOps.cpp GapBuffer.h GapBuffer.cpp
+	g++ $(debug) $(stuff) -I/usr/include/ -Iinclude/ `pkg-config --cflags glfw3 glew fontconfig ` -c TextView.cpp -o objects/TextView.o
+
+objects/Window.o: Window.h Window.cpp
+	g++ $(debug) $(stuff) -I/usr/include/ -Iinclude/ `pkg-config --cflags  fontconfig ` -c Window.cpp -o objects/Window.o
+
+objects/FileLocationBar.o: FileLocationBar.h FileLocationBar.cpp
+	g++ $(debug) $(stuff) -I/usr/include/ -Iinclude/ `pkg-config --cflags  fontconfig ` -c FileLocationBar.cpp -o objects/FileLocationBar.o
+
+objects/Rect.o: Rect.h Rect.cpp
+	g++ $(debug) $(stuff) -I/usr/include/ -Iinclude/ -c Rect.cpp -o objects/Rect.o
+
+objects/Reader.o: Reader.h Reader.cpp
+	g++ $(debug) $(stuff) -I/usr/include/ -Iinclude/ -c Reader.cpp -o objects/Reader.o
+
+objects/Workspace.o: Workspace.h Workspace.cpp
+	g++ $(debug) $(stuff) -I/usr/include/ -Iinclude/ `pkg-config --cflags  fontconfig ` -c Workspace.cpp -o objects/Workspace.o
+
+objects/InputEvents.o: InputEvents.h InputEvents.cpp
+	g++ $(debug) $(stuff) -I/usr/include/ -Iinclude/ -c `pkg-config --cflags fontconfig` InputEvents.cpp -o objects/InputEvents.o
+
+objects/PanningBar.o: PanningBar.h PanningBar.cpp
+	g++ $(debug) $(stuff) -I/usr/include/ -Iinclude/ -c `pkg-config --cflags fontconfig` PanningBar.cpp -o objects/PanningBar.o
+
+objects/Animation.o: Animation.h Animation.cpp
+	g++ $(debug) $(stuff) -I/usr/include/ -Iinclude/ -c `pkg-config --cflags fontconfig` Animation.cpp -o objects/Animation.o
+
+objects/Menus.o: Menus.h Menus.cpp
+	g++ $(debug) $(stuff) -I/usr/include/ -Iinclude/ `pkg-config --cflags fontconfig  ` -c Menus.cpp -o objects/Menus.o
+
+objects/Image.o: Image.h Image.cpp
+	g++ $(debug) $(stuff) -I/usr/include/ -Iinclude/ `pkg-config --cflags  fontconfig ` -c Image.cpp -o objects/Image.o
+
+clean:
+	rm objects/*.o ../release/virt virt.bin
