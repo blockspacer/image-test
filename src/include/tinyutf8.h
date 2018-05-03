@@ -40,7 +40,14 @@
 #include <intrin.h> // for __lzcnt
 #endif
 
-#pragma GCC diagnostic ignored "-Wimplicit-fallthrough="
+
+#pragma GCC diagnostic push
+
+#ifdef __APPLE__
+	#pragma GCC diagnostic ignored "-Wunknown-attributes"
+#else
+	#pragma GCC diagnostic ignored "-Wimplicit-fallthrough="
+#endif
 
 namespace detail
 {
@@ -1888,3 +1895,5 @@ extern std::ostream& operator<<( std::ostream& stream , const utf8_string& str )
 extern std::istream& operator>>( std::istream& stream , utf8_string& str );
 
 #endif
+
+#pragma GCC diagnostic pop

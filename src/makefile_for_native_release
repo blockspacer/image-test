@@ -33,18 +33,38 @@ $(shell mkdir -p $(dir $(DEPS)) >/dev/null)
 
 EXPORTS_FILE := web_exports.txt
 
-LINKBITS := \
-	`pkg-config --libs glfw3` \
-	`pkg-config --libs glew` \
-	~/github/lua-5.3*/src/liblua.a \
-	-ldl
 #***
 
+OS := $(shell uname)
 
 ifeq ($(OS),Darwin)
-else
+# C compiler
+CC := clang
+# C++ compiler
+CXX := clang++
+# linker
+LD := clang++
+# tar
+TAR := tar
 
-endif
+CXXFLAGS = -std=c++11 -stdlib=libc++ \
+	~/github/lua-5.3*/src/liblua.a \
+	-isystem /usr/local/Cellar/glfw/3.2.1/include/
+	# may need to change location of glfw for your system -- i can't get pkg-config to find it
+	# using `-isystem foo` instead of `-Ifoo` suppresses warnings
+
+
+export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/
+
+LINKBITS := \
+	~/github/lua-5.3*/src/liblua.a \
+	`pkg-config --static --libs glfw3` \
+	-framework OpenGL
+#\
+	`pkg-config --libs glfw3` \
+	`pkg-config --libs glew` \
+	~/github/lua-5.3*/src/liblua.a 
+else
 
 # C compiler
 CC := g++
@@ -54,6 +74,17 @@ CXX := g++
 LD := g++
 # tar
 TAR := tar
+
+LINKBITS := \
+	`pkg-config --libs glfw3` \
+	`pkg-config --libs glew` \
+	~/github/lua-5.3*/src/liblua.a \
+	-ldl
+
+endif
+
+
+
 
 # C flags
 CFLAGS := -std=c11

@@ -9,14 +9,13 @@
 #ifdef __EMSCRIPTEN__ // web version uses Fengari.js to execute Lua
 	void read_in_user_settings_web_version();
 #else	
-	// #pragma GCC diagnostic ignored "-Wunused-variable"
-	// #pragma GCC diagnostic ignored "-Wunused-parameter"
-	// #pragma GCC diagnostic ignored "-Wunknown-pragmas"
-	#include "selene.h"
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wunused-variable"
+	#pragma GCC diagnostic ignored "-Wunused-parameter"
+	#pragma GCC diagnostic ignored "-Wunknown-pragmas"
+		#include "selene.h"
 	// turn the warnings back on
-	// #pragma GCC diagnostic pop
-	// #pragma GCC diagnostic pop
-	// #pragma GCC diagnostic pop
+	#pragma GCC diagnostic pop
 	void read_in_user_settings_native_version(sel::State& luaInterpreter);
 #endif
 

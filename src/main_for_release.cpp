@@ -71,7 +71,9 @@ int main() {
 
 	glfwSetErrorCallback(glfw_error_callback);
 
-	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
+	#ifndef __APPLE__
+		glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
+	#endif
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
