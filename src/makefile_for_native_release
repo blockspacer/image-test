@@ -35,7 +35,9 @@ EXPORTS_FILE := web_exports.txt
 
 LINKBITS := \
 	`pkg-config --libs glfw3` \
-	`pkg-config --libs glew`
+	`pkg-config --libs glew` \
+	~/github/lua-5.3*/src/liblua.a \
+	-ldl
 #***
 
 

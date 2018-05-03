@@ -94,7 +94,16 @@ int main() {
         exit(-1);
     }
 
-    read_in_global_configuration();
+    #ifdef __EMSCRIPTEN__
+		read_in_user_settings_web_version();
+	#else
+		sel::State luaInterpreterState{true};
+		luaInterpreterState("os = nil; io = nil; package = nil; debug = nil; require = nil");
+		// would be better to start an environment without *any* standard libraries and only add stuff as needed, but unsure how to do that
+
+		read_in_user_settings_native_version(luaInterpreterState);
+	#endif
+
 
     glfwMakeContextCurrent(pWin);
     glfwSwapInterval(1);

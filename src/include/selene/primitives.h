@@ -7,9 +7,9 @@
 #include "MetatableRegistry.h"
 
 extern "C" {
-#include <lua.h>
-#include <lauxlib.h>
-#include <lualib.h>
+#include "lua.h"
+#include "lauxlib.h"
+#include "lualib.h"
 }
 
 /* The purpose of this header is to handle pushing and retrieving

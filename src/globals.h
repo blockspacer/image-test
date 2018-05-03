@@ -20,7 +20,7 @@ extern int controlKeysDown;
 using BubbleId = int;
 using WindowId = int;
 
-enum gNumberNames {version, second_thing, maximumNumber};
+enum gNumberNames {version_number, second_thing, maximumNumber};
 static double gNums[maximumNumber];
 
 enum gStringNames {workspace_menu_notes, maximumString};

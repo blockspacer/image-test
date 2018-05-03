@@ -1,5 +1,5 @@
 #pragma once
-;
+
 class Color {
 	uint8_t red;
 	uint8_t green;

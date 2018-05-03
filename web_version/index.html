@@ -37,7 +37,7 @@ canvas {
 </style>
     </head>
     <body id=bod>
-    <span id=message>Please wait while the code loads.</span>
+    <span id=message>Please wait while the code loads, this should only happen once as your browser will cache it.<br />Loading it is slow because this program was written expecting it to be downloaded and run on your local machine (where it will work about ten or twenty times faster than running it in a browser), and making a browser-capable version was kinda an afterthought.</span>
     <canvas class="topleft" id="canvas"></canvas>
 
     <script type="text/javascript">
@@ -57,26 +57,26 @@ canvas {
         // these get called by the Lua configuration files
 		function pass_number_to_cpp() {
 			var ptr = allocate(intArrayFromString(juxt_setting_name), 'i8', ALLOC_NORMAL)
-			_receive_number_from_js(ptr, juxt_numbers);
+			_receive_number(ptr, juxt_numbers);
 			_free(ptr)
 		}
 
 		function pass_boolean_to_cpp() {
 			var ptr = allocate(intArrayFromString(juxt_setting_name), 'i8', ALLOC_NORMAL)
-			_receive_boolean_from_js(ptr, juxt_numbers);
+			_receive_boolean(ptr, juxt_numbers);
 			_free(ptr)
 		}
 
 		function pass_color_to_cpp() {
 			var ptr = allocate(intArrayFromString(juxt_setting_name), 'i8', ALLOC_NORMAL)
-			_receive_color_from_js(ptr, juxt_color_r, juxt_color_g, juxt_color_b, juxt_color_a);
+			_receive_color(ptr, juxt_color_r, juxt_color_g, juxt_color_b, juxt_color_a);
 			_free(ptr)
 		}
 
 		function pass_string_to_cpp() {
 			var ptr  = allocate(intArrayFromString(juxt_setting_name), 'i8', ALLOC_NORMAL)
 			var ptr2 = allocate(intArrayFromString(juxt_strings), 'i8', ALLOC_NORMAL)
-			_receive_string_from_js(ptr, ptr2);
+			_receive_string(ptr, ptr2);
 			_free(ptr2)
 			_free(ptr)
 		}

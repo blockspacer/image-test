@@ -5,8 +5,8 @@
 #include <unordered_map>
 
 extern "C" {
-#include <lua.h>
-#include <lauxlib.h>
+#include "lua.h"
+#include "lauxlib.h"
 }
 
 namespace sel {
