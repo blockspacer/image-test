@@ -1,4 +1,4 @@
-local_language_strings = {
+ local_language_strings = {
 
 -- Please translate the strings to the right of the equals signs, and rename this file with your language's ISO 639-1 two letter code in place of "en".
 

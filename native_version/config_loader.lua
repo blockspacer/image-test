@@ -1,9 +1,3 @@
-function register_strings()
-	for k,v in pairs(local_language_strings) do
-		register_string(k,v)
-	end
-end
-
 function gray(brightness)
 	b = 255 * brightness
 	return {"rgba",b,b,b,255}
@@ -35,6 +29,15 @@ end
 function merge_settings() 
 	for k,v in pairs(user_settings) do
 		default_settings[k] = v
+	end
+end
+
+
+
+
+function register_strings()
+	for k,v in pairs(local_language_strings) do
+		register_string(k,v)
 	end
 end
 

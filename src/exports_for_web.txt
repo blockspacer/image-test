@@ -1,1 +1,1 @@
-["_main", "_web_window_size_callback"]
+["_main", "_web_window_size_callback", "_receive_number_from_js", "_receive_color_from_js", "_receive_string_from_js", "_receive_boolean_from_js", "_free"]

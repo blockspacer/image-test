@@ -40,6 +40,7 @@
 #include <intrin.h> // for __lzcnt
 #endif
 
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough="
 
 namespace detail
 {

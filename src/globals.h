@@ -7,7 +7,7 @@
 #include "include/tinyutf8.h"
 #include <unordered_map>
 
-using std::cout
+using std::cout;
 
 //#include "include/selene.h"
 //#include "SkColor.h"
@@ -20,10 +20,17 @@ extern int controlKeysDown;
 using BubbleId = int;
 using WindowId = int;
 
-static std::unordered_map<std::string, double>      gNums;
-static std::unordered_map<std::string, Color>     gColors;
-static std::unordered_map<std::string, utf8_string> gStrings;
-static std::unordered_map<std::string, bool>        gBool;
+enum gNumberNames {version, second_thing, maximumNumber};
+static double gNums[maximumNumber];
+
+enum gStringNames {workspace_menu_notes, maximumString};
+static utf8_string gStrings[maximumString];
+
+enum gColorNames {bupl, maximumColor};
+static Color gColors[maximumColor];
+
+enum gBoolNames {bob, maximumBoolean};
+static bool gBools[maximumBoolean];
 
 
 #include <utility>
@@ -161,3 +168,5 @@ static void complain(std::string s) {
 	cout << s << '\n';
 }
 ENABLE_WARNING(unused-function, unused-function, unused-function)
+
+

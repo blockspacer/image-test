@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -10,6 +10,9 @@
         <script type='text/javascript' src='jquery.mousewheel.js'></script>
     -->    <link rel="stylesheet" href="styles/main.css">
 
+        <script src="fengari-web.js" type="text/javascript" async=false></script>
+        <script type="text/javascript" async=false>
+        </script>
 <style>
 html, body {
     /* get rid of default spacing on the edges */
@@ -50,10 +53,43 @@ canvas {
         //show Emscripten environment where the canvas is
         var Module = {};
         Module.canvas = canvas;
+
+        // these get called by the Lua configuration files
+		function pass_number_to_cpp() {
+			var ptr = allocate(intArrayFromString(juxt_setting_name), 'i8', ALLOC_NORMAL)
+			_receive_number_from_js(ptr, juxt_numbers);
+			_free(ptr)
+		}
+
+		function pass_boolean_to_cpp() {
+			var ptr = allocate(intArrayFromString(juxt_setting_name), 'i8', ALLOC_NORMAL)
+			_receive_boolean_from_js(ptr, juxt_numbers);
+			_free(ptr)
+		}
+
+		function pass_color_to_cpp() {
+			var ptr = allocate(intArrayFromString(juxt_setting_name), 'i8', ALLOC_NORMAL)
+			_receive_color_from_js(ptr, juxt_color_r, juxt_color_g, juxt_color_b, juxt_color_a);
+			_free(ptr)
+		}
+
+		function pass_string_to_cpp() {
+			var ptr  = allocate(intArrayFromString(juxt_setting_name), 'i8', ALLOC_NORMAL)
+			var ptr2 = allocate(intArrayFromString(juxt_strings), 'i8', ALLOC_NORMAL)
+			_receive_string_from_js(ptr, ptr2);
+			_free(ptr2)
+			_free(ptr)
+		}
+
     </script>
 
 <!--        <script type="text/javascript" src="web_release.js.mem"></script> -->
+
+        <script type="text/javascript">
+        </script>
+
         <script async type="text/javascript" src="web_release.js"></script>
+
 
 <!-- 
         var canvasFullScreen

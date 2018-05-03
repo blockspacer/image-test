@@ -27,7 +27,7 @@ GLFWwindow *pWin;
 
 static int framenum = 0;
 void draw_frame() {
-	cout<<"Drew frame " << ++framenum << '\n';
+//	cout<<"Drew frame " << ++framenum << '\n';
 	glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
 
 	glClear( GL_COLOR_BUFFER_BIT );
