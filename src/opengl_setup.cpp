@@ -6,7 +6,10 @@ using std::cout;
 using std::string;
 using std::endl;
 
-#include <GL/glew.h>
+#ifdef __APPLE__
+#else
+	#include <GL/glew.h>
+#endif
 
 #include <GLFW/glfw3.h>
 
@@ -98,10 +101,10 @@ GLFWwindow* initialise_glfw_and_compile_shader() {
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	#ifdef __APPLE__
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 	#else
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 	#endif
 
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); 
