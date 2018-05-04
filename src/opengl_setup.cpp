@@ -176,6 +176,28 @@ GLFWwindow* initialise_glfw_and_compile_shader() {
 
 
 
+GLfloat vertices[] = {
+ 0, 0, 2,
+ 
+ 1, 0, 1,
+ 0, 1, 1,
+-1, 0, 1,
+ 0,-1, 1,
+
+ 1,-1, 0,
+ 1, 1, 0,
+-1, 1, 0,
+-1,-1, 0,
+
+ 1, 0,-1,
+ 0, 1,-1,
+-1, 0,-1,
+ 0,-1,-1,
+
+ 0, 0,-2
+};
+
+
 // int compile_shader() {
 // 	// copied this from http://www.opengl-tutorial.org/
 
