@@ -2,12 +2,9 @@
 using std::cout;
 using std::endl;
 
-//#include "GLES3/gl3.h"
+#include <GL/glew.h>
 
-//#define GLFW_INCLUDE_ES3
-
-#include "GL/glew.h"
-#include "GLFW/glfw3.h"
+#include <GLFW/glfw3.h>
 
 #ifdef __EMSCRIPTEN__
 	#include <emscripten/emscripten.h>
@@ -17,10 +14,8 @@ using std::endl;
 //#include "globals.h"
 
 #include "configuration.h"
+#include "opengl_setup.h"
 
-void glfw_error_callback(int error, const char* description) {
-	cout << BOLD "GLFW error " << error << NORMAL " : " << description << std::endl;
-}
 
 GLFWwindow *pWin;
 
@@ -61,40 +56,9 @@ void draw_frame() {
 
 
 int main() {
-    std::cout << "Hello, World!\n";
+    std::cout << BOLD "Hello, World!" << NORMAL '\n';
 
-	if (!glfwInit()) {
-		complain("GLFW init failed :(");
-		exit(-1);
-    // Initialization failed
-	}
-
-	glfwSetErrorCallback(glfw_error_callback);
-
-	#ifndef __APPLE__
-		glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
-	#endif
-
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); 
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-    int width = 1024,
-             height = 633;
-
-	#ifdef __EMSCRIPTEN__
-			// Your function
-			width = EM_ASM_INT( {return window.innerWidth;}, 0 );
-			height = EM_ASM_INT( {return window.innerHeight;}, 0 );
-			EM_ASM({var el = document.getElementById("message");el.parentNode.removeChild(el);}, 0);
-	#endif
-
-	pWin = glfwCreateWindow(width, height, "image test", NULL, NULL);
-    if (!pWin) {
-        complain("glfwCreateWindow() failed");
-        exit(-1);
-    }
+	pWin = initialise_glfw_and_compile_shader();
 
     #ifdef __EMSCRIPTEN__
 		read_in_user_settings_web_version();
@@ -106,9 +70,6 @@ int main() {
 		read_in_user_settings_native_version(luaInterpreterState);
 	#endif
 
-
-    glfwMakeContextCurrent(pWin);
-    glfwSwapInterval(1);
 
     #ifdef __EMSCRIPTEN__
 		EM_ASM(document.getElementById("bod").onresize = Module._web_window_size_callback, 0);

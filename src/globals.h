@@ -152,8 +152,9 @@ static void wemadeit() {
 }
 
 #include <string>
+using std::string;
 
-static void complain(std::string s) {
+static void complain(string s) {
 	#ifdef __EMSCRIPTEN__
 		EM_ASM({
 			var str = Pointer_stringify($0);
@@ -165,8 +166,14 @@ static void complain(std::string s) {
 
 		}, s.c_str());
 	#endif
-	cout << s << '\n';
+	cout << s << std::endl;
 }
+
+static void complain(string s, char *c_s) {
+	s.append(c_s);
+	complain(s);
+}
+
 ENABLE_WARNING(unused-function, unused-function, unused-function)
 
 

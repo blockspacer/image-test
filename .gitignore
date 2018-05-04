@@ -1,5 +1,6 @@
 # Prerequisites
 *.d
+*.Td
 
 # Compiled Object files
 *.slo
@@ -36,3 +37,5 @@ web_version/web_release.js.mem
 
 native_version/native_release
 native_version/juxt_edit
+
+src/.d_web_release/main_for_release.Td

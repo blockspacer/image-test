@@ -28,6 +28,15 @@
 #include <istream>
 #include <algorithm>
 
+#pragma GCC diagnostic push
+
+#ifdef __APPLE__
+	#pragma GCC diagnostic ignored "-Wunknown-attributes"
+#else
+	#pragma GCC diagnostic ignored "-Wimplicit-fallthrough="
+#endif
+
+
 inline utf8_string::width_type utf8_string::get_lut_width( size_type buffer_size ){
 	return buffer_size <= std::numeric_limits<std::uint8_t>::max()
 		? sizeof(std::uint8_t)
@@ -2424,3 +2433,5 @@ std::istream& operator>>( std::istream& stream , utf8_string& str ){
 }
 
 constexpr utf8_string::size_type utf8_string::npos;
+
+#pragma GCC diagnostic pop
