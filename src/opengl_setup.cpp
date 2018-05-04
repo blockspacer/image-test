@@ -7,9 +7,10 @@ using std::string;
 using std::endl;
 
 #ifdef __APPLE__
+
 #else
-	#include <GL/glew.h>
 #endif
+	#include <GL/glew.h>
 
 #include <GLFW/glfw3.h>
 
@@ -133,13 +134,11 @@ GLFWwindow* initialise_glfw_and_compile_shader() {
     glfwMakeContextCurrent(pWin);
     glfwSwapInterval(1);
 
-    #ifndef __APPLE__
-		glewExperimental = true; // Needed for core profile or something
-		if (glewInit() != GLEW_OK) {
-			std::cout << "Failed to initialize GLEW\n";
-			glfwTerminate();
-		}
-	#endif
+	glewExperimental = true; // Needed for core profile or something
+	if (glewInit() != GLEW_OK) {
+		std::cout << "Failed to initialize GLEW\n";
+		glfwTerminate();
+	}
 
 
 	int major=0; int minor=0;
@@ -182,9 +181,11 @@ GLFWwindow* initialise_glfw_and_compile_shader() {
 
 	glUseProgram(program);
 
+int n = glGetAttribLocation(program, "vPosition");
+cout<<"nnn "<<n<<endl;
 	glViewport(0,0, 1000, 1000);
-	loaddemodata(program);
 
+	loaddemodata(program);
 	return pWin;
 }
 
@@ -218,22 +219,34 @@ void loaddemodata(GLuint program) {
 
 	GLushort indices[3] = {0,1,2};
 
+	GLuint vao = 0;
+	glGenVertexArrays(1,&vao);
+	glBindVertexArray(vao);
+
 	GLuint vboIds[2] = {0, 0};
+check_gl_errors("mm12");
 	glGenBuffers(2, vboIds);
+check_gl_errors("mm22");
 
 	glBindBuffer(GL_ARRAY_BUFFER, vboIds[0]);
+check_gl_errors("mm32");
 	glBufferData(GL_ARRAY_BUFFER, 3*3*sizeof(GLfloat), verts, GL_STATIC_DRAW);
+check_gl_errors("mm42");
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIds[1]);
+check_gl_errors("mm52");
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLushort)*3, indices, GL_STATIC_DRAW);
 glEnable(GL_CULL_FACE);
+check_gl_errors("mm27");
 	glEnableVertexAttribArray(0);
 
+check_gl_errors("mm62");
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), (const void*) 0);
+check_gl_errors("mm28");
 
 
 //	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, verts);
-check_gl_errors("mm2");
+check_gl_errors("mm29");
 //	glEnableVertexAttribArray(0);
 	check_gl_errors("3mm");
 

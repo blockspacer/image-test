@@ -59,7 +59,7 @@ export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/
 
 LINKBITS := \
 	~/github/lua-5.3*/src/liblua.a \
-	`pkg-config --static --libs glfw3` \
+	`pkg-config --static --libs glfw3 glew` \
 	-framework OpenGL
 #\
 	`pkg-config --libs glfw3` \
