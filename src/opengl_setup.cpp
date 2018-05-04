@@ -13,7 +13,7 @@ using std::endl;
 
 #include <GLFW/glfw3.h>
 
-
+#include "opengl_setup.h"
 
 void glfw_error_callback(int error, const char* description) {
 	cout << BOLD "GLFW error " << error << NORMAL " : " << description << std::endl;
@@ -142,6 +142,15 @@ GLFWwindow* initialise_glfw_and_compile_shader() {
 	#endif
 
 
+	int major=0; int minor=0;
+
+	glGetIntegerv(GL_MAJOR_VERSION, &major);
+	glGetIntegerv(GL_MINOR_VERSION, &minor);
+
+	cout << "OpenGL version " << major << "."<<minor<<"\n";
+
+
+
 	#ifdef __APPLE__
 		string vert = "#version 330\n";
 		string frag = "#version 330\n";
@@ -173,36 +182,96 @@ GLFWwindow* initialise_glfw_and_compile_shader() {
 
 	glUseProgram(program);
 
+	glViewport(0,0, 1000, 1000);
+	loaddemodata(program);
+
 	return pWin;
 }
 
 
+void loaddemodata(GLuint program) {
+
+	GLfloat vertices[] = {
+	 0.0f,  0.0f,  2.0f, 
+
+	 1.0f,  0.0f,  1.0f, 
+	 0.0f,  1.0f,  1.0f, 
+	-1.0f,  0.0f,  1.0f, 
+	 0.0f, -1.0f,  1.0f, 
+
+	 1.0f, -1.0f,  0.0f, 
+	 1.0f,  1.0f,  0.0f, 
+	-1.0f,  1.0f,  0.0f, 
+	-1.0f, -1.0f,  0.0f, 
+
+	 1.0f,  0.0f, -1.0f, 
+	 0.0f,  1.0f, -1.0f, 
+	-1.0f,  0.0f, -1.0f, 
+	 0.0f, -1.0f, -1.0f, 
+
+	 0.0f,  0.0f, -2.0f
+	};
+
+	GLfloat verts[] = {0.0f, 0.5f, 0.0f,
+		-0.5f, -0.5f, 0.0f,
+		 0.4f, -0.5f, 0.0f};
+
+	GLushort indices[3] = {0,1,2};
+
+	GLuint vboIds[2] = {0, 0};
+	glGenBuffers(2, vboIds);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vboIds[0]);
+	glBufferData(GL_ARRAY_BUFFER, 3*3*sizeof(GLfloat), verts, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIds[1]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLushort)*3, indices, GL_STATIC_DRAW);
+glEnable(GL_CULL_FACE);
+	glEnableVertexAttribArray(0);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), (const void*) 0);
 
 
-GLfloat vertices[] = {
- 0, 0, 2,
- 
- 1, 0, 1,
- 0, 1, 1,
--1, 0, 1,
- 0,-1, 1,
+//	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, verts);
+check_gl_errors("mm2");
+//	glEnableVertexAttribArray(0);
+	check_gl_errors("3mm");
 
- 1,-1, 0,
- 1, 1, 0,
--1, 1, 0,
--1,-1, 0,
-
- 1, 0,-1,
- 0, 1,-1,
--1, 0,-1,
- 0,-1,-1,
-
- 0, 0,-2
-};
-
+//	glDrawArrays(GL_TRIANGLES, 0, 3);
+}
 
 // int compile_shader() {
 // 	// copied this from http://www.opengl-tutorial.org/
 
 
 // }
+
+bool checkglerror(int err, int errnum, string errname, string label) {
+    if (err == errnum) {
+        cout << "ERROR at label << " << label << ">:" << errnum << " " << errname << endl;
+        return true;
+    } else
+        return false;
+}
+
+void check_gl_errors(string label) {
+    bool errs = false;
+    int err = -1;
+
+    while ((err = glGetError()) != GL_NO_ERROR){
+        errs=true;
+        if (true==checkglerror(err,GL_INVALID_ENUM,"GL_INVALID_ENUM",label))
+            continue;
+        else if (checkglerror(err,GL_INVALID_VALUE,"GL_INVALID_VALUE",label))
+            continue;
+        else if (checkglerror(err,GL_INVALID_OPERATION,"GL_INVALID_OPERATION",label))
+            continue;
+        else 
+            cout<<"UNKNOWN ERROR number "<< err <<" at marker <"<<label<<"> (see https://www.opengl.org/wiki/OpenGL_Error )"<<endl;
+    }
+
+    if (!errs)
+        cout << "No Errors at marker <"<<label<<">"<<endl;
+}
+
+void check_gl_errors() {check_gl_errors("unknown");}

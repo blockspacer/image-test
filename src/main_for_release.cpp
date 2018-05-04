@@ -22,10 +22,15 @@ GLFWwindow *pWin;
 
 static int framenum = 0;
 void draw_frame() {
-//	cout<<"Drew frame " << ++framenum << '\n';
 	glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
 
 	glClear( GL_COLOR_BUFFER_BIT );
+
+//glDrawArrays(GL_TRIANGLES, 0, 3);//-works! and no need to load a GL_ELEMENT_ARRAY_BUFFER if there's no complex geometry
+	
+glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
+
+
 	glfwSwapBuffers(pWin);
 //	glClear();
 }
@@ -60,6 +65,7 @@ int main() {
 
 	pWin = initialise_glfw_and_compile_shader();
 
+
     #ifdef __EMSCRIPTEN__
 		read_in_user_settings_web_version();
 	#else
@@ -71,19 +77,20 @@ int main() {
 	#endif
 
 
+
     #ifdef __EMSCRIPTEN__
 		EM_ASM(document.getElementById("bod").onresize = Module._web_window_size_callback, 0);
 		emscripten_set_main_loop(draw_frame, 0, 1);
 	#else
-    	glfwSetWindowSizeCallback(pWin, native_window_size_callback);
+//    	glfwSetWindowSizeCallback(pWin, native_window_size_callback);
 
 		while (!glfwWindowShouldClose(pWin)) {
-				draw_frame();
-			bool anim = true;
+			draw_frame();
+			bool anim = false;
 			if (anim)
 				glfwPollEvents();
 			else
-				glfwPollEvents();
+				glfwWaitEvents();
 
 		}
 	#endif

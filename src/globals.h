@@ -4,7 +4,7 @@
 #include <string>
 #include <iostream>
 #include <algorithm>
-#include "include/tinyutf8.h"
+#include "tinyutf8.h"
 #include <unordered_map>
 
 using std::cout;

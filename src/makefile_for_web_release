@@ -35,7 +35,7 @@ EXPORTS_FILE=exports_for_web.txt
 OPTIMIZATION_LEVEL=-O2
 
 # C compiler
-CC := emcc $(OPTIMIZATION_LEVEL) -s USE_WEBGL2=1 -s FULL_ES3=1 -s USE_GLFW=3 -s EXPORTED_FUNCTIONS=@$(EXPORTS_FILE) 
+CC := emcc $(OPTIMIZATION_LEVEL) -s USE_WEBGL2=1 -s FULL_ES3=1 -s USE_GLFW=3 -s EXPORTED_FUNCTIONS=@$(EXPORTS_FILE) -Iinclude/ 
 # C++ compiler
 CXX := emcc
 # linker
