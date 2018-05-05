@@ -136,7 +136,7 @@ GLFWwindow* initialise_glfw_and_compile_shader() {
 
 	glewExperimental = true; // Needed for core profile or something
 	if (glewInit() != GLEW_OK) {
-		std::cout << "Failed to initialize GLEW\n";
+		complain("Failed to initialize GLEW");
 		glfwTerminate();
 	}
 
@@ -180,11 +180,12 @@ GLFWwindow* initialise_glfw_and_compile_shader() {
 	GLuint program = link_shaders_into_program(vertshader, fragshader);
 
 	glUseProgram(program);
+	glEnable(GL_CULL_FACE);
+
 
 int n = glGetAttribLocation(program, "vPosition");
-cout<<"nnn "<<n<<endl;
 	glViewport(0,0, 1000, 1000);
-
+glEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
 	loaddemodata(program);
 	return pWin;
 }
@@ -224,33 +225,20 @@ void loaddemodata(GLuint program) {
 	glBindVertexArray(vao);
 
 	GLuint vboIds[2] = {0, 0};
-check_gl_errors("mm12");
+
 	glGenBuffers(2, vboIds);
-check_gl_errors("mm22");
 
 	glBindBuffer(GL_ARRAY_BUFFER, vboIds[0]);
-check_gl_errors("mm32");
 	glBufferData(GL_ARRAY_BUFFER, 3*3*sizeof(GLfloat), verts, GL_STATIC_DRAW);
-check_gl_errors("mm42");
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIds[1]);
-check_gl_errors("mm52");
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLushort)*3, indices, GL_STATIC_DRAW);
-glEnable(GL_CULL_FACE);
-check_gl_errors("mm27");
+
 	glEnableVertexAttribArray(0);
 
-check_gl_errors("mm62");
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), (const void*) 0);
-check_gl_errors("mm28");
 
 
-//	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, verts);
-check_gl_errors("mm29");
-//	glEnableVertexAttribArray(0);
-	check_gl_errors("3mm");
-
-//	glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
 // int compile_shader() {
