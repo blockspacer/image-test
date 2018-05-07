@@ -2,9 +2,15 @@
 
 #include <iostream>
 using std::cout;
+
 #include <string>
 using std::string;
 using std::endl;
+
+#include <vector>
+using std::vector;
+
+#include <cmath>
 
 #ifdef __APPLE__
 
@@ -92,7 +98,7 @@ GLuint link_shaders_into_program(GLuint vertex, GLuint fragment) {
 
 
 
-GLFWwindow* initialise_glfw_and_compile_shader(ContextData &data) {
+GLFWwindow* initialise_glfw_and_compile_shader(GlContext &data) {
 	if (!glfwInit()) {
 		complain("GLFW init failed :(");
 		exit(-1);
@@ -134,14 +140,12 @@ glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
     }
 
     glfwMakeContextCurrent(pWin);
-    glfwSwapInterval(1);
 
 	glewExperimental = true; // Needed for core profile or something
 	if (glewInit() != GLEW_OK) {
 		complain("Failed to initialize GLEW");
 		glfwTerminate();
 	}
-
 
 	int major=0; int minor=0;
 
@@ -150,7 +154,41 @@ glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
 
 	cout << "OpenGL version " << major << "."<<minor<<"\n";
 
+	data.setup();
+	return pWin;
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    glfwSwapInterval(1);
 
 	#ifdef __APPLE__
 		string vert = "#version 330\n";
@@ -200,9 +238,6 @@ if (GLEW_ARB_debug_output){ // Ta-Dah !
 	return pWin;
 }
 
-#include <vector>
-using std::vector;
-#include <cmath>
 
 #define POINTS 5
 
@@ -247,8 +282,9 @@ void buildRhombicFriend() {
 
 		
 
-	}
+	};
 }
+
 
 class Vertex {
 public:
@@ -258,7 +294,7 @@ public:
 	uint8_t r,g,b,a;
 };
 
-void loaddemodata(ContextData &data) {
+void loaddemodata(GlContext &data) {
 
 
 
@@ -295,10 +331,6 @@ bup[12] = 0;
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 4*sizeof(GLfloat), (const void*) 0);
 		glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE,  GL_TRUE,  4*sizeof(GLfloat), (const void*) 12);
 
-cout<<"bype "<<std::to_string(bup[12])<<endl;
-cout<<"bype "<<std::to_string(bup[13])<<endl;
-cout<<"bype "<<std::to_string(bup[14])<<endl;
-cout<<"bype "<<std::to_string(bup[15])<<endl;
 
 	// glGenVertexArrays(1, &data.starVertexArray);
 	// glBindVertexArray(    data.starVertexArray);

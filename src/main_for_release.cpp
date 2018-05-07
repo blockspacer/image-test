@@ -15,22 +15,29 @@ using std::endl;
 
 #include "configuration.h"
 #include "opengl_setup.h"
-
+//#include "GlContext.h"
+#include "App.h"
 
 GLFWwindow *pWin;
 
-ContextData data;
+App app;
+
 
 static int framenum = 0;
+
 void draw_frame() {
 	glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
 
 	glClear( GL_COLOR_BUFFER_BIT );
 
 //glDrawArrays(GL_TRIANGLES, 0, 3);//-works! and no need to load a GL_ELEMENT_ARRAY_BUFFER if there's no complex geometry
-	glBindVertexArray(    data.triangleVertexArray);
-		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
-	glBindVertexArray(    0);
+	// glBindVertexArray(app->context.triangleVertexArray);
+	// 	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
+	// glBindVertexArray(    0);
+
+	app.bubbles.draw(app.glContext);
+
+
 
 // cout<<"Hum"<<endl;
 // 	glBindVertexArray(    data.starVertexArray);
@@ -69,9 +76,13 @@ void draw_frame() {
 
 
 int main() {
+
     std::cout << BOLD "Hello, World!" << NORMAL '\n';
 
-	pWin = initialise_glfw_and_compile_shader(data);
+	pWin = initialise_glfw_and_compile_shader(app.glContext);
+	app.bubbles.setupContext(app.glContext);
+	BubbleId newb = app.bubbles.createBubble(5.0f,5.0f,5.0f,5.0f);
+	app.bubbles.uploadBubbleVertexDataToContext(app.glContext, newb);
 
 
     #ifdef __EMSCRIPTEN__
@@ -88,12 +99,13 @@ int main() {
 
     #ifdef __EMSCRIPTEN__
 		EM_ASM(document.getElementById("bod").onresize = Module._web_window_size_callback, 0);
+
 		emscripten_set_main_loop(draw_frame, 0, 1);
 	#else
 //    	glfwSetWindowSizeCallback(pWin, native_window_size_callback);
 
 		while (!glfwWindowShouldClose(pWin)) {
-			draw_frame();
+			draw_frame(&app);
 			bool anim = false;
 			if (anim)
 				glfwPollEvents();

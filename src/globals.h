@@ -17,25 +17,10 @@ using std::cout;
 
 extern int controlKeysDown;
 
-using BubbleId = int;
-using WindowId = int;
-
 #include <GL/glew.h>
 
 #include <GLFW/glfw3.h>
 
-struct ContextData {
-	GLuint shaderProgramHandle {0};
-
-	GLuint triangleVertexArray {0};
-	GLuint triangleVertexBuffer {0};
-	GLuint triangleElementIndices {0};
-	
-	GLuint starVertexArray {0};
-	GLuint starVertexBuffer {0};
-	GLuint starElementIndices {0};
-
-};
 
 enum gNumberNames {version_number, second_thing, maximumNumber};
 static double gNums[maximumNumber];
@@ -51,7 +36,6 @@ static bool gBools[maximumBoolean];
 
 
 #include <utility>
-using SpecificBubbleInWindow = std::pair<BubbleId, WindowId>;
 
 //const double PI  = 3.141592653589793238463;
 
