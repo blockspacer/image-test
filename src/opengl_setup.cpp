@@ -10,7 +10,7 @@ using std::endl;
 
 #else
 #endif
-	#include <GL/glew.h>
+#include <GL/glew.h>
 
 #include <GLFW/glfw3.h>
 
@@ -92,13 +92,15 @@ GLuint link_shaders_into_program(GLuint vertex, GLuint fragment) {
 
 
 
-GLFWwindow* initialise_glfw_and_compile_shader() {
+GLFWwindow* initialise_glfw_and_compile_shader(ContextData &data) {
 	if (!glfwInit()) {
 		complain("GLFW init failed :(");
 		exit(-1);
 	}
 
 	glfwSetErrorCallback(glfw_error_callback);
+
+glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	#ifdef __APPLE__
@@ -180,19 +182,42 @@ GLFWwindow* initialise_glfw_and_compile_shader() {
 	GLuint program = link_shaders_into_program(vertshader, fragshader);
 
 	glUseProgram(program);
-	glEnable(GL_CULL_FACE);
+//	glEnable(GL_CULL_FACE);
 
 
-int n = glGetAttribLocation(program, "vPosition");
+int n = glGetAttribLocation(program, "vertexColor");
+
 	glViewport(0,0, 1000, 1000);
-glEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
-	loaddemodata(program);
+//glEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
+
+if (GLEW_ARB_debug_output){ // Ta-Dah ! 
+	cout<<"ARB yes"<<'\n';
+}
+
+	data.shaderProgramHandle = program;
+
+	loaddemodata(data);
 	return pWin;
 }
 
+#include <vector>
+using std::vector;
+#include <cmath>
 
-void loaddemodata(GLuint program) {
+#define POINTS 5
 
+vector<GLfloat> drawStar (GLfloat x, GLfloat y, GLfloat r) {
+	vector<GLfloat> verts = {x, y, 0.0};
+	for (int i=0; i < 12; i++) {
+		verts.push_back(x + cos( (2.0f* PI / 12.0f) * i )*r);
+		verts.push_back(y + sin( (2.0f* PI / 12.0f) * i )*r);
+		verts.push_back(0.0);
+	}
+	return verts;
+}
+
+void buildRhombicFriend() {
+//output format x,y,z (half floats)
 	GLfloat vertices[] = {
 	 0.0f,  0.0f,  2.0f, 
 
@@ -214,31 +239,83 @@ void loaddemodata(GLuint program) {
 	 0.0f,  0.0f, -2.0f
 	};
 
+	size_t faces[] = {
+		0,1,6,2,
+		0,2,7,3,
+		0,3,8,4,
+		0,4,5,1,
+
+		
+
+	}
+}
+
+class Vertex {
+public:
+	Vertex(float _x, float _y, float _z, uint8_t _r, uint8_t _g, uint8_t _b) : x(_x), y(_y), z(_z), r(_r), g(_g), b(_b), a(245)
+	 { };
+	float x,y,z;
+	uint8_t r,g,b,a;
+};
+
+void loaddemodata(ContextData &data) {
+
+
+
 	GLfloat verts[] = {0.0f, 0.5f, 0.0f,
 		-0.5f, -0.5f, 0.0f,
 		 0.4f, -0.5f, 0.0f};
 
 	GLushort indices[3] = {0,1,2};
 
-	GLuint vao = 0;
-	glGenVertexArrays(1,&vao);
-	glBindVertexArray(vao);
+	vector<Vertex> vertx = {Vertex(0.0f, 0.5f, 0.0f, uint8_t(200), uint8_t(200),uint8_t(0)), 
+		Vertex(-0.5f, -0.5f, 0.0f, 200, 0,200),
+		Vertex(0.4f, -0.5f, 0.0f, 0, 200,200)};
+	
 
-	GLuint vboIds[2] = {0, 0};
+	vector<GLfloat> starVerts = drawStar(0.0, 0.0, 0.5);
+	GLushort starInds[13] = {0,1,2,3,4,5,5,7,8,9,10,11,12};
 
-	glGenBuffers(2, vboIds);
+	glGenVertexArrays(1, &data.triangleVertexArray);
+	glBindVertexArray(    data.triangleVertexArray);
 
-	glBindBuffer(GL_ARRAY_BUFFER, vboIds[0]);
-	glBufferData(GL_ARRAY_BUFFER, 3*3*sizeof(GLfloat), verts, GL_STATIC_DRAW);
+		glGenBuffers(1,              &data.triangleVertexBuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, data.triangleVertexBuffer);
+uint8_t *bup = (uint8_t*)vertx.data();
+bup[12] = 0;
+		glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(GLfloat), vertx.data(), GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIds[1]);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLushort)*3, indices, GL_STATIC_DRAW);
+		glGenBuffers(1,                      &data.triangleElementIndices);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, data.triangleElementIndices);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLushort)*3, indices, GL_STATIC_DRAW);
 
-	glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), (const void*) 0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 4*sizeof(GLfloat), (const void*) 0);
+		glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE,  GL_TRUE,  4*sizeof(GLfloat), (const void*) 12);
 
+cout<<"bype "<<std::to_string(bup[12])<<endl;
+cout<<"bype "<<std::to_string(bup[13])<<endl;
+cout<<"bype "<<std::to_string(bup[14])<<endl;
+cout<<"bype "<<std::to_string(bup[15])<<endl;
 
+	// glGenVertexArrays(1, &data.starVertexArray);
+	// glBindVertexArray(    data.starVertexArray);
+
+	// 	glGenBuffers(1,              &data.starVertexBuffer);
+	// 	glBindBuffer(GL_ARRAY_BUFFER, data.starVertexBuffer);
+	// 	glBufferData(GL_ARRAY_BUFFER, 13*3*sizeof(GLfloat), starVerts.data(), GL_STATIC_DRAW);
+
+	// 	glGenBuffers(1,                      &data.starElementIndices);
+	// 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, data.starElementIndices);
+	// 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLushort)*13, starInds, GL_STATIC_DRAW);
+
+	// 	glEnableVertexAttribArray(0);
+
+	// 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), (const void*) 0);
+
+	glBindVertexArray(0);
 }
 
 // int compile_shader() {

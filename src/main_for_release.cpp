@@ -19,6 +19,7 @@ using std::endl;
 
 GLFWwindow *pWin;
 
+ContextData data;
 
 static int framenum = 0;
 void draw_frame() {
@@ -27,8 +28,15 @@ void draw_frame() {
 	glClear( GL_COLOR_BUFFER_BIT );
 
 //glDrawArrays(GL_TRIANGLES, 0, 3);//-works! and no need to load a GL_ELEMENT_ARRAY_BUFFER if there's no complex geometry
-	
-glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
+	glBindVertexArray(    data.triangleVertexArray);
+		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
+	glBindVertexArray(    0);
+
+// cout<<"Hum"<<endl;
+// 	glBindVertexArray(    data.starVertexArray);
+// //		glDrawArrays(GL_TRIANGLE_FAN, 0, 13);//3, GL_UNSIGNED_SHORT, 0);
+// 		glDrawElements(GL_TRIANGLE_FAN, 13, GL_UNSIGNED_SHORT, 0);
+// 	glBindVertexArray(    0);
 
 
 	glfwSwapBuffers(pWin);
@@ -63,7 +71,7 @@ glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
 int main() {
     std::cout << BOLD "Hello, World!" << NORMAL '\n';
 
-	pWin = initialise_glfw_and_compile_shader();
+	pWin = initialise_glfw_and_compile_shader(data);
 
 
     #ifdef __EMSCRIPTEN__

@@ -1,6 +1,11 @@
 STRINGIFY(precision mediump float;
-out vec4 fragColor;
+in  vec4 fragmentColor;
+//out vec4 fragColor;
+
+out vec4 outColor;
+
+
 void main() {
-	fragColor = vec4(0.0, 0.8, 0.0, 0.5);
+	outColor = fragmentColor;
 }
 )
