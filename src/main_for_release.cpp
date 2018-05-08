@@ -83,6 +83,12 @@ int main() {
 	app.bubbles.setupContext(app.glContext);
 	BubbleId newb = app.bubbles.createBubble(5.0f,5.0f,5.0f,5.0f);
 	app.bubbles.uploadBubbleVertexDataToContext(app.glContext, newb);
+	BubbleId newb2 = app.bubbles.createBubble(5.0f,5.0f,5.0f,5.0f);
+	app.bubbles.uploadBubbleVertexDataToContext(app.glContext, newb2);
+	BubbleId newb3 = app.bubbles.createBubble(5.0f,5.0f,5.0f,5.0f);
+	app.bubbles.uploadBubbleVertexDataToContext(app.glContext, newb3);
+cout<<"new2 "<<newb2<<endl;
+	app.bubbles.uploadBubblePositionDataToContext();
 
 
     #ifdef __EMSCRIPTEN__
@@ -105,7 +111,7 @@ int main() {
 //    	glfwSetWindowSizeCallback(pWin, native_window_size_callback);
 
 		while (!glfwWindowShouldClose(pWin)) {
-			draw_frame(&app);
+			draw_frame();
 			bool anim = false;
 			if (anim)
 				glfwPollEvents();

@@ -8,6 +8,9 @@ using std::vector;
 #define VERTICES_PER_BUBBLE_SIDE   8
 #define VERTICES_PER_BUBBLE_CORNER 6
 
+#define VERTICES_PER_BUBBLE (4 * (VERTICES_PER_BUBBLE_SIDE + VERTICES_PER_BUBBLE_CORNER) + 1)
+
+
 using BubbleGroupId = size_t;
 using BubbleId = GLuint;
 
@@ -30,30 +33,69 @@ struct BubbleGroup {
 };
 
 struct BubbleVertex {
-	GLfloat x,y;
-	GLuint  id;
-	BubbleVertex(GLfloat x, GLfloat y, GLuint id) : x {x}, y{y}, id{id} {}; 
+	GLfloat x, y, id;
+	BubbleVertex(GLfloat x, GLfloat y, GLfloat id) : x {x}, y{y}, id{id} {}; 
 };
 
 struct BubbleInfo {
 	GLfloat x, y,
 		w, h,
+		mouseOver,
 		gradientLeft, gradientRight,
-		mouseOver;
-	GLuint gradientLeftColor, gradientRightColor;
+		gradientLeftRed, gradientLeftGreen, gradientLeftBlue,
+		gradientRightRed, gradientRightGreen, gradientRightBlue;
+
+	BubbleInfo(
+		GLfloat x,
+		GLfloat y,
+		GLfloat w,
+		GLfloat h,
+
+		GLfloat mouseOver,
+		GLfloat gradientLeft, 
+		GLfloat gradientRight,
+
+		GLfloat gradientLeftRed,
+		GLfloat gradientLeftGreen, 
+		GLfloat gradientLeftBlue,
+
+		GLfloat gradientRightRed,
+		GLfloat gradientRightGreen, 
+		GLfloat gradientRightBlue
+		) :
+			x{x},
+			y{y},
+			w{w},
+			h{h},
+			mouseOver{mouseOver},
+			gradientLeft{gradientLeft}, 
+			gradientRight{gradientRight},
+			gradientLeftRed{gradientLeftRed},
+			gradientLeftGreen{gradientLeftGreen}, 
+			gradientLeftBlue{gradientLeftBlue},
+			gradientRightRed{gradientRightRed},
+			gradientRightGreen{gradientRightGreen}, 
+			gradientRightBlue{gradientRightBlue}
+		{};
 };
 
 class AllBubbles {
 	vector<Bubble>      mBubbles;
 	vector<BubbleGroup> mGroups;
 	
-	vector<BubbleVertex> mBubbleVertices; // the same for every GL context
-	vector<GLshort>      mBubbleIndices;
+	vector<BubbleVertex> mBubbleVertices; // these contain the same info for every GL context
+	vector<GLshort>      mBubbleIndices;  // but have to be uploaded to each individually
+	vector<BubbleInfo>   mBubblePositions;
+	size_t mNextBubbleIndices {0};
+
+	void setupVertexBuffer(GlContext &ctx, size_t bubbleCount);
+	void generateBubbleVertexIndices(size_t first, size_t last);
+	void enlargeVertexBuffer(GlContext &ctx);
 public:
 	AllBubbles();
 	void setupContext(GlContext &ctx);
 	BubbleId createBubble(float x, float y, float w, float h);
 	void uploadBubbleVertexDataToContext(GlContext &ctx, BubbleId id);
-	void uploadBubblePositionDataToContext(GlContext &ctx, BubbleId id);
+	void uploadBubblePositionDataToContext();
 	void draw(GlContext &ctx);
 };

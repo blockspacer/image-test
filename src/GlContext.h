@@ -28,17 +28,19 @@ struct GlContext {
 		bubblesDataTextureHandle       {0},
 		bubblesVAO                     {0},
 
+        spareHandle {0};
+        
+    size_t bubbleBufferContentsCount {0};
 
-		spareHandle {0};
-
-	int positionAttribLocation,
-		bubbleIndexAttribLocatione
+	int positionAttribLoc,
+		bubbleIndexAttribLoc
 		;
 
 	void setup();
 	GLuint linkShadersIntoProgram(GLuint vertex, GLuint fragment);
 	GLuint compileShaderFromSourceString(GLenum type, std::string source);
 
+    void enlargeBuffer(GLenum target, size_t oldSize, size_t newSize);
 
 bool checkglerror(int err, int errnum, string errname, string label) {
     if (err == errnum) {

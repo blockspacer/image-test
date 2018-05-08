@@ -110,15 +110,45 @@ void GlContext::setup() {
 //	glEnable(GL_CULL_FACE);
 
 
-	positionAttrib    = glGetAttribLocation(shaderProgramHandle, "position");
-	bubbleIndexAttrib = glGetAttribLocation(shaderProgramHandle, "bubbleId");
+
+	positionAttribLoc    = glGetAttribLocation(shaderProgramHandle, "position");
+	bubbleIndexAttribLoc = glGetAttribLocation(shaderProgramHandle, "bubbleId");
 
 	glViewport(0,0, 1000, 1000);
-//glEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
-complain("created context");
+	
+	#ifndef __EMSCRIPTEN__
+		glEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
+	#endif
+
 	if (GLEW_ARB_debug_output){ // Ta-Dah ! 
 		cout<<"ARB yes"<<'\n';
 	}
 
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
