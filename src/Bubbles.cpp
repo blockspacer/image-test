@@ -67,6 +67,8 @@ BubbleId AllBubbles::createBubble(float x, float y, float w, float h) {
 
 void AllBubbles::uploadBubbleVertexDataToContext(GlContext &ctx, BubbleId id) {
 //check that buffer is large enough, if not then double its size
+	ctx.check_gl_errors("upl");
+
 cout<<"bbcc "<<ctx.bubbleBufferContentsCount<<endl;
 cout<<"id   "<<id<<endl;
 	if (id + 1 >= ctx.bubbleBufferContentsCount)
@@ -82,6 +84,8 @@ void AllBubbles::uploadBubblePositionDataToContext() {
 
 
 void AllBubbles::setupVertexBuffer(GlContext &ctx, size_t bubbleCount) {
+	ctx.check_gl_errors("rrr");
+
 	glGenBuffers(1,              &ctx.bubblesVertexBufferHandle);
 	glBindBuffer(GL_ARRAY_BUFFER, ctx.bubblesVertexBufferHandle);
 	glBufferData(GL_ARRAY_BUFFER, bubbleCount * VERTICES_PER_BUBBLE * sizeof(BubbleVertex), nullptr, GL_STATIC_DRAW);
@@ -91,6 +95,7 @@ void AllBubbles::setupVertexBuffer(GlContext &ctx, size_t bubbleCount) {
 
 	glEnableVertexAttribArray(ctx.bubbleIndexAttribLoc);
 	glVertexAttribPointer(ctx.bubbleIndexAttribLoc, 1,  GL_FLOAT, GL_FALSE, sizeof(BubbleVertex), (const void*) (2*sizeof(GLfloat)));
+ctx.check_gl_errors("sss");
 
 }
 
@@ -120,6 +125,7 @@ cout<<"vertex laaaaaaaaaaaaaaaaaaaaaaast "<<mBubbleIndices.size()<<endl;
 
 void AllBubbles::enlargeVertexBuffer(GlContext &ctx) {
 cout<<"ENLARGE"<<endl;
+ctx.check_gl_errors("h8888888u");
 	ctx.spareHandle =                 ctx.bubblesVertexBufferHandle;
 	glBindBuffer(GL_COPY_READ_BUFFER, ctx.bubblesVertexBufferHandle);
 	setupVertexBuffer(ctx, ctx.bubbleBufferContentsCount * 2);
@@ -151,23 +157,33 @@ ctx.check_gl_errors("hiiiiiun");
 
 void AllBubbles::setupContext(GlContext &ctx) {
 	// compile program here? has to be redone for every context...
+ctx.check_gl_errors("hua");
 
 	glGenVertexArrays(1, &ctx.bubblesVAO);
+ctx.check_gl_errors("hub");
+
 	glBindVertexArray(    ctx.bubblesVAO);
+ctx.check_gl_errors("huc");
 
 	setupVertexBuffer(ctx, 1);
+ctx.check_gl_errors("hud");
 
 	ctx.positionAttribLoc    = glGetAttribLocation(ctx.shaderProgramHandle, "position");
+ctx.check_gl_errors("hue");
 	ctx.bubbleIndexAttribLoc = glGetAttribLocation(ctx.shaderProgramHandle, "bubbleId");
 
+ctx.check_gl_errors("hu2");
 	glGenBuffers(1,                      &ctx.bubblesVertexIndexBufferHandle);
+ctx.check_gl_errors("hu3");
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx.bubblesVertexIndexBufferHandle);
+ctx.check_gl_errors("hu4");
 
 	generateBubbleVertexIndices(size_t(0), size_t(1));
+ctx.check_gl_errors("hu5");
 
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, (VERTICES_PER_BUBBLE + 2) * sizeof(GLushort), mBubbleIndices.data(), GL_STATIC_DRAW);
-ctx.check_gl_errors("hu");
-	glBufferSubData(GL_ARRAY_BUFFER, 0, VERTICES_PER_BUBBLE * sizeof(BubbleVertex), (void*) mBubbleVertices.data());
+ctx.check_gl_errors("hu6");
+//	glBufferSubData(GL_ARRAY_BUFFER, 0, VERTICES_PER_BUBBLE * sizeof(BubbleVertex), mBubbleVertices.data());
 ctx.check_gl_errors("mu");
 
 	ctx.bubbleBufferContentsCount = 1;

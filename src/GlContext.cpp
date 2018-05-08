@@ -2,6 +2,8 @@
 
 #include "globals.h"
 
+using std::endl;
+
 GLuint GlContext::compileShaderFromSourceString(GLenum type, std::string source) {
 	GLuint shader;
 	GLint compiled;
@@ -116,14 +118,22 @@ void GlContext::setup() {
 
 	glViewport(0,0, 1000, 1000);
 	
-	#ifndef __EMSCRIPTEN__
-		glEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
+
+	#ifdef __APPLE__
+		glEnable(GL_PRIMITIVE_RESTART);
+		glPrimitiveRestartIndex(0xffff);
+	#else
+		#ifndef __EMSCRIPTEN__
+			glEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
+		#endif
+
 	#endif
+
 
 	if (GLEW_ARB_debug_output){ // Ta-Dah ! 
 		cout<<"ARB yes"<<'\n';
 	}
-
+cout<<"jlu"<<endl;
 
 }
 

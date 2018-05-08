@@ -80,11 +80,18 @@ int main() {
     std::cout << BOLD "Hello, World!" << NORMAL '\n';
 
 	pWin = initialise_glfw_and_compile_shader(app.glContext);
+	app.glContext.check_gl_errors("hu");
+
 	app.bubbles.setupContext(app.glContext);
+app.glContext.check_gl_errors("hu");
 	BubbleId newb = app.bubbles.createBubble(5.0f,5.0f,5.0f,5.0f);
+app.glContext.check_gl_errors("hu");
 	app.bubbles.uploadBubbleVertexDataToContext(app.glContext, newb);
+app.glContext.check_gl_errors("hu");
 	BubbleId newb2 = app.bubbles.createBubble(5.0f,5.0f,5.0f,5.0f);
+app.glContext.check_gl_errors("hu");
 	app.bubbles.uploadBubbleVertexDataToContext(app.glContext, newb2);
+app.glContext.check_gl_errors("hu");
 	BubbleId newb3 = app.bubbles.createBubble(5.0f,5.0f,5.0f,5.0f);
 	app.bubbles.uploadBubbleVertexDataToContext(app.glContext, newb3);
 cout<<"new2 "<<newb2<<endl;

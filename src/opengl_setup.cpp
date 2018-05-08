@@ -154,6 +154,9 @@ glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
 
 	cout << "OpenGL version " << major << "."<<minor<<"\n";
 
+
+data.check_gl_errors("neio");
+
 	data.setup();
 	return pWin;
 
