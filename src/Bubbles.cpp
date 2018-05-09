@@ -13,6 +13,14 @@ AllBubbles::AllBubbles() {
 //	createBubble(-100, -100,10,10);
 cout<<"CREATING BUBBLES"<<endl;
 
+
+	#ifdef DEBUG
+cout<<"debug defined\n";
+	#else
+cout<<"debug undefined\n";
+	#endif
+
+
 }
 
 BubbleId AllBubbles::createBubble(float x, float y, float w, float h) {

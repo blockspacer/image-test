@@ -21,6 +21,7 @@ extern int controlKeysDown;
 
 #include <GLFW/glfw3.h>
 
+//#define DEBUG 1
 
 enum gNumberNames {version_number, second_thing, maximumNumber};
 static double gNums[maximumNumber];
