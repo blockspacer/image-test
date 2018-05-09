@@ -19,6 +19,7 @@ using std::endl;
 #include "App.h"
 
 GLFWwindow *pWin;
+GLFWwindow *pWin2;
 
 App app;
 
@@ -37,8 +38,6 @@ void draw_frame() {
 
 	app.bubbles.draw(app.glContext);
 
-
-
 // cout<<"Hum"<<endl;
 // 	glBindVertexArray(    data.starVertexArray);
 // //		glDrawArrays(GL_TRIANGLE_FAN, 0, 13);//3, GL_UNSIGNED_SHORT, 0);
@@ -48,6 +47,17 @@ void draw_frame() {
 
 	glfwSwapBuffers(pWin);
 //	glClear();
+
+
+    glfwMakeContextCurrent(pWin2);
+
+	glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
+	glClear( GL_COLOR_BUFFER_BIT );
+	app.bubbles.draw(app.glContext);
+	glfwSwapBuffers(pWin2);
+
+	glfwMakeContextCurrent(pWin);
+
 }
 
 
@@ -80,22 +90,24 @@ int main() {
     std::cout << BOLD "Hello, World!" << NORMAL '\n';
 
 	pWin = initialise_glfw_and_compile_shader(app.glContext);
-	app.glContext.check_gl_errors("hu");
 
 	app.bubbles.setupContext(app.glContext);
-app.glContext.check_gl_errors("hu");
 	BubbleId newb = app.bubbles.createBubble(5.0f,5.0f,5.0f,5.0f);
-app.glContext.check_gl_errors("hu");
 	app.bubbles.uploadBubbleVertexDataToContext(app.glContext, newb);
-app.glContext.check_gl_errors("hu");
 	BubbleId newb2 = app.bubbles.createBubble(5.0f,5.0f,5.0f,5.0f);
-app.glContext.check_gl_errors("hu");
 	app.bubbles.uploadBubbleVertexDataToContext(app.glContext, newb2);
-app.glContext.check_gl_errors("hu");
 	BubbleId newb3 = app.bubbles.createBubble(5.0f,5.0f,5.0f,5.0f);
 	app.bubbles.uploadBubbleVertexDataToContext(app.glContext, newb3);
-cout<<"new2 "<<newb2<<endl;
-	app.bubbles.uploadBubblePositionDataToContext();
+	BubbleId newb4 = app.bubbles.createBubble(5.0f,5.0f,5.0f,5.0f);
+	app.bubbles.uploadBubbleVertexDataToContext(app.glContext, newb4);
+
+
+	pWin2 = app.glContext.setupSharedContext(pWin);
+	app.bubbles.setupSharedContext(app.glContext);
+
+    glfwMakeContextCurrent(pWin);
+
+//	app.bubbles.uploadBubblePositionDataToContext();
 
 
     #ifdef __EMSCRIPTEN__

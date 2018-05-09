@@ -73,6 +73,41 @@ GLuint GlContext::linkShadersIntoProgram(GLuint vertex, GLuint fragment) {
 	return program;
 }
 
+GLFWwindow* GlContext::setupSharedContext(GLFWwindow *pWin) {
+    int width = 1024,
+		height = 633;
+
+	GLFWwindow* pNewWin = glfwCreateWindow(width, height, "image test", NULL, pWin);
+
+	if (! pNewWin) {
+		complain("Unable to create shared context");
+		exit(-1);
+	}
+
+    glfwMakeContextCurrent(pNewWin);
+
+	glfwSwapInterval(1);
+	glViewport(0,0, 1000, 1000);
+
+	glGenVertexArrays(1, &bubblesVAO);
+	glBindVertexArray(    bubblesVAO);
+
+	glUseProgram(shaderProgramHandle);
+
+	#ifdef __APPLE__
+		glEnable(GL_PRIMITIVE_RESTART);
+		glPrimitiveRestartIndex(0xffff);
+	#else
+		#ifndef __EMSCRIPTEN__
+			glEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
+		#endif
+
+	#endif
+
+			
+	return pNewWin;
+}
+
 void GlContext::setup() {
 	glfwSwapInterval(1);
 
@@ -111,8 +146,6 @@ void GlContext::setup() {
 	glUseProgram(shaderProgramHandle);
 //	glEnable(GL_CULL_FACE);
 
-
-
 	positionAttribLoc    = glGetAttribLocation(shaderProgramHandle, "position");
 	bubbleIndexAttribLoc = glGetAttribLocation(shaderProgramHandle, "bubbleId");
 
@@ -130,10 +163,12 @@ void GlContext::setup() {
 	#endif
 
 
-	if (GLEW_ARB_debug_output){ // Ta-Dah ! 
-		cout<<"ARB yes"<<'\n';
+	if (GLEW_ARB_debug_output){ 
+		cout<<"ARB_debug_output yes"<<'\n';
 	}
-cout<<"jlu"<<endl;
+
+	glGenVertexArrays(1, &bubblesVAO);
+	glBindVertexArray(    bubblesVAO);
 
 }
 

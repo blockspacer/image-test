@@ -29,7 +29,7 @@ struct GlContext {
 		bubblesVAO                     {0},
 
         spareHandle {0};
-        
+
     size_t bubbleBufferContentsCount {0};
 
 	int positionAttribLoc,
@@ -39,7 +39,8 @@ struct GlContext {
 	void setup();
 	GLuint linkShadersIntoProgram(GLuint vertex, GLuint fragment);
 	GLuint compileShaderFromSourceString(GLenum type, std::string source);
-
+    GLFWwindow* setupSharedContext(GLFWwindow *pWin);
+    
     void enlargeBuffer(GLenum target, size_t oldSize, size_t newSize);
 
 bool checkglerror(int err, int errnum, string errname, string label) {

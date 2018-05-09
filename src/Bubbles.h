@@ -37,11 +37,21 @@ struct BubbleVertex {
 	BubbleVertex(GLfloat x, GLfloat y, GLfloat id) : x {x}, y{y}, id{id} {}; 
 };
 
+enum BubbleInfoMembers {bubbleX, bubbleY,
+		bubbleW, bubbleH,
+		bubbleMouseOver,
+		bubbleGradientLeft, bubbleGradientRight,
+		bubbleGradientYIntercept, bubbleGradientGradient,
+		bubbleGradientLeftRed, bubbleGradientLeftGreen, bubbleGradientLeftBlue,
+		bubbleGradientRightRed, bubbleGradientRightGreen, bubbleGradientRightBlue
+	};
+
 struct BubbleInfo {
 	GLfloat x, y,
 		w, h,
 		mouseOver,
 		gradientLeft, gradientRight,
+		gradientYIntercept, gradientGradient,
 		gradientLeftRed, gradientLeftGreen, gradientLeftBlue,
 		gradientRightRed, gradientRightGreen, gradientRightBlue;
 
@@ -54,6 +64,9 @@ struct BubbleInfo {
 		GLfloat mouseOver,
 		GLfloat gradientLeft, 
 		GLfloat gradientRight,
+
+		GLfloat gradientYIntercept,
+		GLfloat gradientGradient,
 
 		GLfloat gradientLeftRed,
 		GLfloat gradientLeftGreen, 
@@ -70,6 +83,10 @@ struct BubbleInfo {
 			mouseOver{mouseOver},
 			gradientLeft{gradientLeft}, 
 			gradientRight{gradientRight},
+			
+			gradientYIntercept{gradientYIntercept},
+			gradientGradient{gradientGradient},
+
 			gradientLeftRed{gradientLeftRed},
 			gradientLeftGreen{gradientLeftGreen}, 
 			gradientLeftBlue{gradientLeftBlue},
@@ -94,6 +111,8 @@ class AllBubbles {
 public:
 	AllBubbles();
 	void setupContext(GlContext &ctx);
+	void setupSharedContext(GlContext &ctx);
+
 	BubbleId createBubble(float x, float y, float w, float h);
 	void uploadBubbleVertexDataToContext(GlContext &ctx, BubbleId id);
 	void uploadBubblePositionDataToContext();
