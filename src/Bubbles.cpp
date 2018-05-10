@@ -9,6 +9,14 @@ using std::endl;
 
 Bubbles::Bubbles() {
 
+
+	#ifdef DEBUG
+cout<<"debug defined\n";
+	#else
+cout<<"debug undefined\n";
+	#endif
+
+
 }
 
 BubbleId Bubbles::createBubble(GlContext &ctx, float x, float y, float w, float h) {

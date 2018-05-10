@@ -24,7 +24,7 @@ struct GlContext {
 	GLuint shaderProgramHandle {0},
 
 
-        spareHandle {0};
+		spareHandle {0};
 
 
 	GLuint linkShadersIntoProgram(GLuint vertex, GLuint fragment);

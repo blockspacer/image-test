@@ -96,6 +96,7 @@ CFLAGS := -std=c11
 CXXFLAGS := -std=c++11 -Iinclude/ 
 # C/C++ flags
 CPPFLAGS := -g -Wall -Wextra -pedantic -Wfatal-errors
+#*** -g goes above
 # linker flags
 LDFLAGS :=
 # flags required for dependency generation; passed to compilers
