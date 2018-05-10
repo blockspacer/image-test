@@ -17,10 +17,12 @@ using std::cout;
 
 extern int controlKeysDown;
 
+#define DEBUG 1
+//#define REPORT 1
+
 #include <GL/glew.h>
 
 #include <GLFW/glfw3.h>
-
 
 enum gNumberNames {version_number, second_thing, maximumNumber};
 static double gNums[maximumNumber];

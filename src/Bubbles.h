@@ -1,9 +1,11 @@
 #pragma once
 
 #include <vector>
-using std::vector;
+//using std::vector;
 
 #include "GlContext.h"
+
+#include "Windows.h"
 
 #define VERTICES_PER_BUBBLE_SIDE   8
 #define VERTICES_PER_BUBBLE_CORNER 6
@@ -43,7 +45,8 @@ enum BubbleInfoMembers {bubbleX, bubbleY,
 		bubbleGradientLeft, bubbleGradientRight,
 		bubbleGradientYIntercept, bubbleGradientGradient,
 		bubbleGradientLeftRed, bubbleGradientLeftGreen, bubbleGradientLeftBlue,
-		bubbleGradientRightRed, bubbleGradientRightGreen, bubbleGradientRightBlue
+		bubbleGradientRightRed, bubbleGradientRightGreen, bubbleGradientRightBlue,
+		BubblePositionInfoMemberCount
 	};
 
 struct BubbleInfo {
@@ -94,27 +97,64 @@ struct BubbleInfo {
 			gradientRightGreen{gradientRightGreen}, 
 			gradientRightBlue{gradientRightBlue}
 		{};
+
+		BubbleInfo(
+		GLfloat x,
+		GLfloat y
+		) : x{x},
+			y{y},
+			w{10.0f},
+			h{10.0f},
+			mouseOver{0.0f},
+			gradientLeft{-1.0f}, 
+			gradientRight{1.0f},
+			
+			gradientYIntercept{1.0f},
+			gradientGradient{-1.0f},
+
+			gradientLeftRed{0.5f},
+			gradientLeftGreen{0.0f}, 
+			gradientLeftBlue{0.5f},
+
+			gradientRightRed{0.0f},
+			gradientRightGreen{0.5f}, 
+			gradientRightBlue{0.0f}
+		{};
 };
 
-class AllBubbles {
+class Bubbles {
 	vector<Bubble>      mBubbles;
 	vector<BubbleGroup> mGroups;
 	
 	vector<BubbleVertex> mBubbleVertices; // these contain the same info for every GL context
 	vector<GLshort>      mBubbleIndices;  // but have to be uploaded to each individually
 	vector<BubbleInfo>   mBubblePositions;
-	size_t mNextBubbleIndices {0};
 
-	void setupVertexBuffer(GlContext &ctx, size_t bubbleCount);
+    size_t mySpaceAvailable {1};
+
+	GLuint myVertexBuffer,
+			myVertexIndices,
+			myDataTexture
+			;
+
+    int myPositionVarying {-1},
+    	myBubbleIdVarying {-1},
+    	mySamplerUniform {-1},
+    	myDataTextureWidthUniform {-1}
+    ;
+
 	void generateBubbleVertexIndices(size_t first, size_t last);
-	void enlargeVertexBuffer(GlContext &ctx);
+	void setupBuffers(GlContext &ctx);
+	void setupBuffersInOtherContexts(GlContext &ctx);
+	void enlargeBuffers(GlContext &ctx);
 public:
-	AllBubbles();
-	void setupContext(GlContext &ctx);
-	void setupSharedContext(GlContext &ctx);
+	Bubbles();
+	void setupOnFirstContext(GlContext &ctx);
+	void setupOnSharedContext(GlContext &ctx, WindowId win);
+	void commonSetup();
 
-	BubbleId createBubble(float x, float y, float w, float h);
-	void uploadBubbleVertexDataToContext(GlContext &ctx, BubbleId id);
-	void uploadBubblePositionDataToContext();
-	void draw(GlContext &ctx);
+	BubbleId createBubble(GlContext &ctx, float x, float y, float w, float h);
+	void uploadVertexData(GlContext &ctx, BubbleId id);
+	void uploadBubblePositions();
+	void draw(GlContext &ctx, WindowId id);
 };

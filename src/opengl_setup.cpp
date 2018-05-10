@@ -22,9 +22,6 @@ using std::vector;
 
 #include "opengl_setup.h"
 
-void glfw_error_callback(int error, const char* description) {
-	cout << BOLD "GLFW error " << error << NORMAL " : " << description << std::endl;
-}
 
 
 GLuint compile_shader_from_source_string(GLenum type, string source) {
@@ -99,60 +96,6 @@ GLuint link_shaders_into_program(GLuint vertex, GLuint fragment) {
 
 
 GLFWwindow* initialise_glfw_and_compile_shader(GlContext &data) {
-	if (!glfwInit()) {
-		complain("GLFW init failed :(");
-		exit(-1);
-	}
-
-	glfwSetErrorCallback(glfw_error_callback);
-
-glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
-
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	#ifdef __APPLE__
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-	#else
-		glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-	#endif
-
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); 
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-
-	#ifdef __EMSCRIPTEN__
-		int width = EM_ASM_INT( {return window.innerWidth;}, 0 );
-		int height = EM_ASM_INT( {return window.innerHeight;}, 0 );
-		EM_ASM({var el = document.getElementById("message");el.parentNode.removeChild(el);}, 0);
-	#else
-	    int width = 1024,
-             height = 633;
-	#endif
-
-
-
-
-	GLFWwindow* pWin = glfwCreateWindow(width, height, "image test", NULL, NULL);
-
-    if (!pWin) {
-        complain("glfwCreateWindow() failed");
-        exit(-1);
-    }
-
-    glfwMakeContextCurrent(pWin);
-
-	glewExperimental = true; // Needed for core profile or something
-	if (glewInit() != GLEW_OK) {
-		complain("Failed to initialize GLEW");
-		glfwTerminate();
-	}
-
-	int major=0; int minor=0;
-
-	glGetIntegerv(GL_MAJOR_VERSION, &major);
-	glGetIntegerv(GL_MINOR_VERSION, &minor);
-
-	cout << "OpenGL version " << major << "."<<minor<<"\n";
 
 
 data.check_gl_errors("neio");
@@ -367,7 +310,7 @@ bool checkglerror(int err, int errnum, string errname, string label) {
         return false;
 }
 
-void check_gl_errors(string label) {
+void check_gl_errores(string label) {
     bool errs = false;
     int err = -1;
 
@@ -387,4 +330,4 @@ void check_gl_errors(string label) {
         cout << "No Errors at marker <"<<label<<">"<<endl;
 }
 
-void check_gl_errors() {check_gl_errors("unknown");}
+void check_gl_errores() {check_gl_errors("unknown");}

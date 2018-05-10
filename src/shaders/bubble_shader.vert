@@ -10,7 +10,7 @@ uniform sampler2D allBubbleData;
 //uniform float bubbleHaloDepth;
 //uniform float bubbleHilightedHaloDepth;
 
-//out vec4 color;
+out vec4 color;
 
 // no enums or #defines, seriously?
 const float bubbleX = 0.5;
@@ -40,6 +40,8 @@ void main() {
 	float yOffset = texture(allBubbleData, yDataPositionInTexture).r;
 
 	gl_Position = position + vec4(xOffset, yOffset, 0.0f, 0.0f);
+
+	color = vec4(0.5,0.0,0.5,1.0);
 
 //	color = vertexColor;
 

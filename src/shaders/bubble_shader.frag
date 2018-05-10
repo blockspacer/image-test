@@ -2,7 +2,7 @@ STRINGIFY(
 
 precision mediump float;
 
-//in vec4 color;
+in vec4 color;
 
 // in vec2 Texcoord;
 // in float Texunit;
@@ -11,7 +11,7 @@ out vec4 outColor;
 
 void main()
 {
-	outColor = vec4(0,0.5,0,0.5);
+	outColor = color;
 //	    case  -2: outColor = overlay(texture(tex1,  Texcoord), Color); break;
 //	    case  -3: outColor = overlay(texture(tex2,  Texcoord), Color); break;
 //	    case  -4: outColor = overlay(texture(tex3,  Texcoord), Color); break;
