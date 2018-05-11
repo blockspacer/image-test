@@ -32,13 +32,9 @@ struct SpritePosition {
 		width {-1}, height {-1};
 };
 
-struct FontFaceVariants {
-	SpritePosition normal,
-					bold,
-					italic,
-					bolditalic,
-					monospaced;
-};
+enum FontFace {normal, bold, italic, bolditalic, monospaced, fontFaceCount};
+
+using FontFaceVariants = SpritePosition[fontFaceCount];
 
 struct WordSprites {
 	size_t smallestSize   {0};
@@ -68,6 +64,9 @@ public:
 	// renderTempWord();
 	// copyTempWordToAtlas();
 	TextTextureAtlas();
+	
+	void uploadEntireTexture();
+	void fetchWordSprite(utf8_string word, size);
 };
 
 
