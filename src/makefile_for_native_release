@@ -53,6 +53,7 @@ LD := clang++
 TAR := tar
 
 CXXFLAGS = -std=c++11 -stdlib=libc++ \
+	-Iinclude/ \
 	-isystem ~/github/skia/include/core/ \
 	-isystem ~/github/skia/include/config/ \
 	-isystem ~/github/skia/include/effects/ \
@@ -66,10 +67,13 @@ CXXFLAGS = -std=c++11 -stdlib=libc++ \
 
 export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/
 
+LDLIBS :=  \
+	`pkg-config --static --libs fontconfig`
+
 LINKBITS := \
-	-L~/github/skia/out/Static/libskia.a  \
 	~/github/lua-5.3*/src/liblua.a \
 	`pkg-config --static --libs glfw3 glew` \
+	~/github/skia/out/Static/libskia.a  \
 	-framework OpenGL
 #\
 	`pkg-config --libs glfw3` \
@@ -90,26 +94,27 @@ LDLIBS := -L~/github/skia/out/Static/ \
 	`pkg-config --static --libs fontconfig`
 
 LINKBITS := \
-	~/github/skia/out/Static/libskia.a \
 	`pkg-config --libs glfw3` \
 	`pkg-config --libs glew` \
 	~/github/lua-5.3*/src/liblua.a \
+	~/github/skia/out/Static/libskia.a \
 	-ldl
+
+# C flags
+CFLAGS := -std=c11
+# C++ flags
+CXXFLAGS := -std=c++11 -Iinclude/ \
+	-I~/github/skia/include/core/ \
+	-I~/github/skia/include/config/ \
+	-I~/github/skia/include/effects/ \
+	-I~/github/skia/include/gpu/ \
+	-I~/github/skia/include/ports/
 
 endif
 
 
 
 
-# C flags
-CFLAGS := -std=c11
-# C++ flags
-CXXFLAGS := -std=c++11 -Iinclude/ \
-	-I/home/lucky/github/skia/include/core/ \
-	-I/home/lucky/github/skia/include/config/ \
-	-I/home/lucky/github/skia/include/effects/ \
-	-I/home/lucky/github/skia/include/gpu/ \
-	-I/home/lucky/github/skia/include/ports/
 # C/C++ flags
 CPPFLAGS := -g -Wall -Wextra -pedantic -Wfatal-errors
 #*** -g goes above
@@ -170,7 +175,10 @@ help:
 	@echo available targets: all dist clean distclean install uninstall check
 
 $(BIN): $(OBJS)
-	$(LINK.o) -Wall  $^ -L~/github/skia/out/Static/libskia.a $(LINKBITS)
+	$(LINK.o) -Wall  $^ $(LINKBITS)
+#	$(LINK.o) -Wall  $^ -L~/github/skia/out/Static/libskia.a $(LINKBITS)
+
+
 #	$(LINK.o) -Wall  $^ -lskia $(LINKBITS)
 #	$(LINK.o) $^
 
