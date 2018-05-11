@@ -117,8 +117,7 @@ vois TextTextureAtlas::initOnFirstContext() {
 #endif
 
 
-
-//#include "SkDocument.h"
+// #include "SkDocument.h"
 
 // void WritePDF(SkWStream* outputStream,
 //               const char* documentTitle,
@@ -148,5 +147,3 @@ vois TextTextureAtlas::initOnFirstContext() {
 //     }
 //     pdfDocument->close();
 // }
-
-

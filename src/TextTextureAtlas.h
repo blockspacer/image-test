@@ -35,13 +35,22 @@ struct SpritePosition {
 		width {-1}, height {-1};
 };
 
-enum FontFace {normal, bold, italic, bolditalic, monospaced, fontFaceCount};
+enum FontFacee {normal, bold, italic, bolditalic, monospaced, fontFaceCount};
 
-using FontFaceVariants = SpritePosition[fontFaceCount];
+using FontFaceVariants = SpritePosition[5];
+
+struct FontFace {SpritePosition
+ normal ,
+ bold ,
+ italic ,
+ bolditalic ,
+ monospaced ,
+ fontFaceCount ;
+};
 
 struct WordSprites {
 	size_t smallestSize   {0};
-	vector<FontFaceVariants> textSizes;
+	vector<FontFace> textSizes;
 };
 
 struct MultipartWord {
