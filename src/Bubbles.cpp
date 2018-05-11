@@ -189,9 +189,6 @@ void Bubbles::enlargeBuffers(GlContext &ctx) {
 // }
 
 void Bubbles::setupBuffers(GlContext &ctx) {
-cout<<"about"<<endl;
-ctx.check_gl_errors("setup same buffers start");
-
 	glBindBuffer(GL_ARRAY_BUFFER, myVertexBuffer);
 
 	glEnableVertexAttribArray(myPositionVarying);
@@ -201,12 +198,10 @@ ctx.check_gl_errors("setup same buffers start");
 	glVertexAttribPointer(myBubbleIdVarying, 1,  GL_FLOAT, GL_FALSE, sizeof(BubbleVertex), (const void*) (2*sizeof(GLfloat)));
 
 	glUniform1f(myDataTextureWidthUniform, float(mySpaceAvailable * BubblePositionInfoMemberCount));
-
-ctx.check_gl_errors("setup same buffers end");
+ctx.check_gl_errors("Setup same context's buffers end");
 }
 
 void Bubbles::setupBuffersInOtherContexts(GlContext &ctx) {
-ctx.check_gl_errors("setup other buffers end");
 	
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, myVertexIndices);
 	setupBuffers(ctx);
@@ -217,21 +212,16 @@ ctx.check_gl_errors("setup other buffers end");
 				glfwMakeContextCurrent(ctx.windows[i].glfwHandle);
 
 				setupBuffers(ctx);
-cout<<"here?"<<endl;
-				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, myVertexIndices);
-cout<<"gone"<<endl;
 
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, myVertexIndices);
 			}
 		}
 
 		glfwMakeContextCurrent(ctx.pCurrentContext);
-cout<<"handl"<<endl;
-
 	}
-ctx.check_gl_errors("setup other buffers end");
 }
 
-void Bubbles::commonSetup() {
+void Bubbles::commonContextSetup() {
 	glUniform1i(mySamplerUniform, 0);
 	glUniform1f(myDataTextureWidthUniform, float(mySpaceAvailable * BubblePositionInfoMemberCount));
 
@@ -250,7 +240,7 @@ void Bubbles::setupOnSharedContext(GlContext &ctx, WindowId win) {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, myVertexIndices);
 	glBindTexture(GL_TEXTURE_2D, myDataTexture);
 
-	commonSetup();
+	commonContextSetup();
 }
 
 void Bubbles::setupOnFirstContext(GlContext &ctx) {
@@ -288,7 +278,7 @@ void Bubbles::setupOnFirstContext(GlContext &ctx) {
 		0);
 
 	setupBuffers(ctx);
-	commonSetup();
+	commonContextSetup();
 
 
 

@@ -119,11 +119,13 @@ ctx.check_gl_errors("main");
 	    pWin2 = app.glContext.windows[1].glfwHandle;
 		app.bubbles.setupOnSharedContext(app.glContext, 1);
 //	    glfwMakeContextCurrent(pWin);
-		ctx.changeWindow(0);
+//		ctx.changeWindow(0);
     #endif
 
 	app.bubbles.createBubble(ctx, 0.5f, 0.3f, 10.0f, 10.0f);
 	app.bubbles.createBubble(ctx, 0.5f, -0.7f, 10.0f, 10.0f);
+ctx.changeWindow(1);
+	app.bubbles.createBubble(ctx, -0.8f, -0.7f, 10.0f, 10.0f);
 
 //	app.bubbles.uploadBubblePositionDataToContext();
 

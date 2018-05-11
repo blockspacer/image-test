@@ -20,6 +20,13 @@ extern int controlKeysDown;
 #define DEBUG 1
 //#define REPORT 1
 
+#ifdef __EMSCRIPTEN__
+	#define EM 1
+#else
+	#define NOTEM 1
+	#define NATIVE 1
+#endif
+
 #include <GL/glew.h>
 
 #include <GLFW/glfw3.h>
@@ -45,7 +52,7 @@ static bool gBools[maximumBoolean];
 
 /* the following is from http://stackoverflow.com/questions/81870/is-it-possible-to-print-a-variables-type-in-standard-c */
 
-/* Item 4 of Effective Modern C++ by Scott Meyers suggests using Boost.TypeIndex and type_id_with_cvr<decltype(NAMEOFTHINGGOESHERE)>().pretty_name() for the same purpose, but i found this first */
+/* Item 4 of Effective Modern C++ by Scott Meyers suggests using Boost.TypeIndex and type_id_with_cvr<decltype(NAME_OF_THING_GOES_HERE)>().pretty_name() for the same purpose, but i found this first */
 
 // use it like:
 //    cout << "thing's type is: "<< type_name<decltype( thing )>() << '\n';
@@ -87,16 +94,32 @@ std::string type_name() {
 	return r;
 }
 
+#define BOLDSTR      "\033[1m" 
+#define ITALICSTR    "\033[3m" 
+#define UNDERLINESTR "\033[4m" 
+#define NORMALSTR    "\033[0m" 
+
+// make terminals more colorful using special ANSI escape character control codes
 #ifdef __EMSCRIPTEN__
 	#define BOLD      "" << 
 	#define ITALIC    "" << 
 	#define UNDERLINE "" << 
 	#define NORMAL    "" << 
-#else //make terminals more colorful using special ANSI control codes
+
+	#define BOLDSTR      "" 
+	#define ITALICSTR    "" 
+	#define UNDERLINESTR "" 
+	#define NORMALSTR    "" 
+#else
 	#define BOLD      "\033[1m" << 
 	#define ITALIC    "\033[3m" << 
 	#define UNDERLINE "\033[4m" << 
 	#define NORMAL    "\033[0m" << 
+
+	#define BOLDSTR      "\033[1m" 
+	#define ITALICSTR    "\033[3m" 
+	#define UNDERLINESTR "\033[4m" 
+	#define NORMALSTR    "\033[0m" 
 #endif
 
 #pragma GCC diagnostic push

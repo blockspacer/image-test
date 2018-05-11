@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# builds the native version
+make -f makefile_for_native_release
+
+# runs the native version
+../native_version/juxt_edit

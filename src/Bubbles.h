@@ -126,8 +126,8 @@ class Bubbles {
 	vector<Bubble>      mBubbles;
 	vector<BubbleGroup> mGroups;
 	
-	vector<BubbleVertex> mBubbleVertices; // these contain the same info for every GL context
-	vector<GLshort>      mBubbleIndices;  // but have to be uploaded to each individually
+	vector<BubbleVertex> mBubbleVertices;
+	vector<GLshort>      mBubbleIndices;
 	vector<BubbleInfo>   mBubblePositions;
 
     size_t mySpaceAvailable {1};
@@ -151,7 +151,7 @@ public:
 	Bubbles();
 	void setupOnFirstContext(GlContext &ctx);
 	void setupOnSharedContext(GlContext &ctx, WindowId win);
-	void commonSetup();
+	void commonContextSetup();
 
 	BubbleId createBubble(GlContext &ctx, float x, float y, float w, float h);
 	void uploadVertexData(GlContext &ctx, BubbleId id);

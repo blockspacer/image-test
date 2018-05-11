@@ -20,7 +20,7 @@ For completeness, the other projects this program makes use of are:
 
 ## Building for Linux, Mac, and the web
 
-There are two [makefiles](https://en.wikipedia.org/wiki/Makefile) depending on whether you're building for the web or your actual computer, with convenience two-letter shell scripts `bw` and `bn` (for 'build web' and 'build native') which you might want to make executable and copy into somewhere visible to your command line's `PATH` variable.
+There are two [makefiles](https://en.wikipedia.org/wiki/Makefile) depending on whether you're building for the web or your actual computer, with convenience invocation scripts `bw` and `bn` and `rn` and `bnr` (for 'build web', 'build native executable', 'run native', and 'build and then run native') which you might want to make executable and copy into somewhere visible to your command line's `PATH` variable.
 
 The desktop versions of the makefile will work on both Mac and Linux, but you may need to edit the hardcoded library locations (i had difficulties geting `pkg-config` to find GLFW in the Mac); these are marked with a triple star *** comment in the file.
 
@@ -32,15 +32,17 @@ Currently it's set to dynamically link to GLFW and GLEW, so install those via yo
 
 # Code notes
 
-All spellings are North American, not Commonwealth.
+All spellings are North American, but measurements are in centimetres.
 
-There are four global arrays indexed by enums, used to hold user-configurable settings: `::gNums` (for doubles), `::gStrings`, `::gColors`, and `::gBools`.
+There are four global arrays indexed by enums, used to hold user-configurable settings: `::gNums` (for floats), `::gStrings`, `::gColors`, and `::gBools`. `The global.h` file also contains some debugging macros.
+
+There's a neat trick for embedding GLSL code files inside your compiled binaries near the bottom of `GlContext.cpp`.
 
 Filenames are `CamelCase` if they define classes or structs or `c_style` if not.
 
-There are several prefix letters used with variable names:
+Variable name prefixes:
+* `my` for class members
 * `g` for global
-* `m` for member of the class currently being defined
 * `p` for pointer
 
 
