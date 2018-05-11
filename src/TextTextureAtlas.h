@@ -27,6 +27,9 @@ using std::unordered_map;
 
 #include "tinyutf8.h"
 
+#define ATLAS_SIZE 2048 // 2048 is the minimum guaranteed texture size on WebGL
+#define ATLAS_BYTES (ATLAS_SIZE * ATLAS_SIZE * 4)
+
 struct SpritePosition {
 	float top {-1}, left {-1}, layer {-1},
 		width {-1}, height {-1};
@@ -50,23 +53,25 @@ using Token = size_t;
 class TextTextureAtlas {
 	unordered_map< const char *, WordSprites > myStringsToSpritesDictionary;
 
-	GLuint myTextAtlasBuffer;
+	GLuint myTextureAtlas {0},
+			myFramebuffer {0};
+	size_t myAvailablePages {1},
+		myHighestUsedPage{1};
 
 	#ifdef NATIVE
-//	std::vector<char> testpixelMemory;
-
-		char myPixelMemory[2048 * 2048 * 4];
+		char myPixelMemory[ATLAS_BYTES];
 		sk_sp<SkSurface> myDrawingSurface;
 	#endif
 
+	void createTextureAtlas();
 public:
 	void test();
 	// renderTempWord();
 	// copyTempWordToAtlas();
-	TextTextureAtlas();
-	
+	void initOnFirstContext();
+
 	void uploadEntireTexture();
-	void fetchWordSprite(utf8_string word, size);
+	void fetchWordSprite(utf8_string word);
 };
 
 

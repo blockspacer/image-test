@@ -16,6 +16,7 @@ For completeness, the other projects this program makes use of are:
 * the testing framework [Catch2](https://github.com/catchorg/Catch2)
 * [TinyUTF8](https://github.com/DuffsDevice/tinyutf8) for Unicode handling
 * [Fengari](https://fengari.io/) to run Lua code in the browser and [Selene](https://github.com/jeremyong/Selene) to talk to native Lua from C++
+
 ..but the code for these is already included in this repository.
 
 ## Building for Linux, Mac, and the web

@@ -3,14 +3,21 @@ STRINGIFY(
 precision mediump float;
 
 layout(location = 0) in vec4 position;
-layout(location = 1) in float bubbleId;
+
+layout(location = 1) in vec4 color;
+layout(location = 2) in vec3 texCoord;
+
+layout(location = 3) in float bubbleId;
 
 uniform float widthOfBubbleData;
 uniform sampler2D allBubbleData;
+uniform sampler2DArray spriteSheet;
+
 //uniform float bubbleHaloDepth;
 //uniform float bubbleHilightedHaloDepth;
 
-out vec4 color;
+out vec4 outColor;
+out vec3 outTexCoord;
 
 // no enums or #defines, seriously?
 const float bubbleX = 0.5;
@@ -41,7 +48,7 @@ void main() {
 
 	gl_Position = position + vec4(xOffset, yOffset, 0.0f, 0.0f);
 
-	color = vec4(0.5,0.0,0.5,1.0);
+	outColor = vec4(0.5,0.0,0.5,1.0);
 
 //	color = vertexColor;
 

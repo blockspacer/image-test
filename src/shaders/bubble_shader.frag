@@ -2,16 +2,18 @@ STRINGIFY(
 
 precision mediump float;
 
-in vec4 color;
+in vec4 outColor;
+in vec3 outTexCoord;
+uniform sampler2DArray spriteSheet;
 
 // in vec2 Texcoord;
 // in float Texunit;
 
-out vec4 outColor;
+out vec4 col;
 
 void main()
 {
-	outColor = color;
+	col = outColor;
 //	    case  -2: outColor = overlay(texture(tex1,  Texcoord), Color); break;
 //	    case  -3: outColor = overlay(texture(tex2,  Texcoord), Color); break;
 //	    case  -4: outColor = overlay(texture(tex3,  Texcoord), Color); break;
