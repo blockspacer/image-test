@@ -1,15 +1,69 @@
 #include "TextTextureAtlas.h"
 
-#include "SkGraphics.h"
-
 //#include "SkDocument.h"
+
+void TextTextureAtlas::test() {
+#ifdef NATIVE
+    SkPaint paint;
+    paint.setStyle(SkPaint::kFill_Style);
+    paint.setAntiAlias(true);
+    paint.setStrokeWidth(4);
+    paint.setColor(0xffFE938C);
+
+    SkCanvas *canvas = myDrawingSurface->getCanvas();
+    SkRect rect = SkRect::MakeXYWH(10, 10, 100, 160);
+    canvas->drawRect(rect, paint);
+#endif
+
+uploadEntireSurface();
+//cout<<hi[3]<<endl;
+}
+
+void TextTextureAtlas::uploadEntireSurface() {
+//glEnable(GL_TEXTURE_3D);
+int i;
+	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &i);
+cout<<"fax: "<<i<<endl;
+check_gl_errors("enum?");
+	const GLenum  target  = GL_TEXTURE_2D_ARRAY;
+	const GLint   level   = 0,
+	              xoffset = 0,
+	              yoffset = 0,
+	              zoffset = 0;
+	const GLsizei width   = ATLAS_SIZE,
+	              height  = ATLAS_SIZE,
+	              depth   = 1;
+	const GLenum  format  = GL_RGBA,
+	              type    = GL_UNSIGNED_BYTE;
+
+	const GLvoid *pixels  = myPixelMemory.data();
+	glTexSubImage3D(target,
+					level,
+					xoffset,
+					yoffset,
+					zoffset,
+					width,
+					height,
+					depth,
+					format,
+					type,
+					pixels);
+
+cout<<"pixi "<<pixels<<endl;
+#if NATIVE
+//cout<<glGetString(GL_EXTENSIONS)<<endl;
+	check_gl_errors("oh noes!");
+#else
+#endif
+}
 
 void TextTextureAtlas::createTextureAtlas() {
 
 	if (myTextureAtlas != 0) {
-		glGenFramebuffers(1, &myFramebuffer);
-		glBindFramebuffer(GL_FRAMEBUFFER, myFramebuffer);
-		GLuint spareHandle =               myTextureAtlas;
+//		glGenFramebuffers(1, &myFramebuffer);
+//		glBindFramebuffer(GL_FRAMEBUFFER, myFramebuffer);
+//		GLuint spareHandle =               myTextureAtlas;
+
 //		glBindTexture(GL_COPY_READ_BUFFER, myTextureAtlas);
 
 
@@ -44,8 +98,32 @@ void TextTextureAtlas::createTextureAtlas() {
 	glBindTexture(GL_TEXTURE_2D_ARRAY, myTextureAtlas);
 
 	// Allocate the storage.
-	glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, ATLAS_SIZE, ATLAS_SIZE, 1 + myAvailablePages);
+	// https://github.com/kripken/emscripten/issues/5747
+	// https://www.khronos.org/webgl/public-mailing-list/public_webgl/1410/msg00033.php
+//	glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, ATLAS_SIZE, ATLAS_SIZE, 1 + myAvailablePages);
 
+	const GLenum  target 	= GL_TEXTURE_2D_ARRAY;
+	const GLint   level 	= 0;
+	const GLint   internalFormat = GL_RGBA;
+	const GLsizei width 	= ATLAS_SIZE;
+	const GLsizei height 	= ATLAS_SIZE;
+	const GLsizei depth 	= 1;
+	const GLint   border 	= 0;
+	const GLenum  format 	= GL_RGBA;
+	const GLenum  type 	    = GL_UNSIGNED_BYTE;
+	const GLvoid* data 	    = &myPixelMemory[0];
+
+	glTexImage3D(target,
+				 level,
+				 internalFormat,
+				 width,
+				 height,
+				 depth,
+				 border,
+				 format,
+				 type,
+				 data);
+check_gl_errors("creating atlas texture");
 	// Always set reasonable myTextureAtlas parameters
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST); //GL_LINEAR
@@ -67,8 +145,9 @@ void TextTextureAtlas::createTextureAtlas() {
 // https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext/copyTexSubImage3D
 }
 
-#ifdef NATIVE
 void TextTextureAtlas::initOnFirstContext() {
+	myPixelMemory.resize(ATLAS_BYTES);
+#ifdef NATIVE
 cout<<"hum"<<endl;
 	SkGraphics::Init();
 
@@ -77,6 +156,7 @@ cout<<"hum"<<endl;
 	// i have no idea if i'm compiling skia wrong or it's about endianness or what
 
 	// it doesn't matter to OpenGL, though, as all text is rendered white and colored in the shader
+
 
 	SkImageInfo drawingSurfaceInfo = SkImageInfo::Make(ATLAS_SIZE, ATLAS_SIZE,
 	// kN32_SkColorType, // crash linux, safe mac
@@ -107,14 +187,10 @@ cout<<"hum"<<endl;
 		return;
 
 	cout << "Neither BGRA now RGBA drawing surfaces can be created >:O" << endl;
-}
 #else // web version
-vois TextTextureAtlas::initOnFirstContext() {
-		// obtain an html 5 canvas
-	cout<<"wub"<<endl;
-	}
-
 #endif
+}
+
 
 
 // #include "SkDocument.h"

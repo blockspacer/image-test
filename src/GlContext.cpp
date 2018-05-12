@@ -163,6 +163,32 @@ void glfw_error_callback(int error, const char* description) {
 }
 
 
+void
+MessageCallback( GLenum source,
+                 GLenum type,
+                 GLuint id,
+                 GLenum severity,
+                 GLsizei length,
+                 const GLchar* message,
+                 const void* userParam )
+{
+	cout<<"err!"<<endl;
+	if (type != GL_DEBUG_TYPE_ERROR)
+		return;
+  fprintf( stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+           ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ),
+            type, severity, message );
+//cout<<"GL CALLBACK: "<<( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" )
+//<<" type = 0x"<<type<<", severity = 0x"<<severity<<", message = "<<message<<endl;
+
+
+
+
+}
+
+// During init, enable debug output
+
+
 
 
 
@@ -311,11 +337,19 @@ glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
    	glfwSetWindowUserPointer(pCurrentContext, (void *) 0);
 
 
+
 	glewExperimental = true; // Needed for core profile or something
 	if (glewInit() != GLEW_OK) {
 		complain("Failed to initialize GLEW");
 		glfwTerminate();
 	}
+
+	#ifdef NATIVE
+		#ifdef DEBUG
+			glEnable              ( GL_DEBUG_OUTPUT );
+			glDebugMessageCallback( MessageCallback, 0 );
+		#endif
+	#endif
 
 	int major=0; int minor=0;
 

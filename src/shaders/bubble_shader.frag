@@ -1,6 +1,7 @@
 STRINGIFY(
 
 precision mediump float;
+precision mediump sampler2DArray;
 
 in vec4 outColor;
 in vec3 outTexCoord;

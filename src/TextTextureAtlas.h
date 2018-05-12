@@ -1,5 +1,14 @@
 #pragma once
 
+#include "globals.h"
+
+#include <GL/glew.h>
+
+#define GLFW_INCLUDE_ES3 1
+
+#include <GLFW/glfw3.h>
+
+
 #include "GlContext.h"
 
 #include <iostream>
@@ -27,7 +36,7 @@ using std::unordered_map;
 
 #include "tinyutf8.h"
 
-#define ATLAS_SIZE 2048 // 2048 is the minimum guaranteed texture size on WebGL
+#define ATLAS_SIZE  1024 // 2048 is the minimum guaranteed texture size on WebGL
 #define ATLAS_BYTES (ATLAS_SIZE * ATLAS_SIZE * 4)
 
 struct SpritePosition {
@@ -67,20 +76,21 @@ class TextTextureAtlas {
 	size_t myAvailablePages {1},
 		myHighestUsedPage{1};
 
+	vector<GLubyte> myPixelMemory;
 	#ifdef NATIVE
-		char myPixelMemory[ATLAS_BYTES];
 		sk_sp<SkSurface> myDrawingSurface;
 	#endif
 
-	void createTextureAtlas();
 public:
 	void test();
 	// renderTempWord();
 	// copyTempWordToAtlas();
 	void initOnFirstContext();
+	void createTextureAtlas();
 
-	void uploadEntireTexture();
-	void fetchWordSprite(utf8_string word);
+void uploadEntireTexture();
+	void uploadEntireSurface();
+void fetchWordSprite(utf8_string word);
 };
 
 

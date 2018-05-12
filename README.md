@@ -46,4 +46,8 @@ Variable name prefixes:
 * `g` for global
 * `p` for pointer
 
+## Things to come back to
+
+Switch out `glTexImage3D` for the more efficient `glTexStorage3D` [once that is supported](https://github.com/kripken/emscripten/issues/5747) (it's funny Emscripten only supports the older version, because i also found [a thread about how the WebGL working group had been controversially planning to drop support for it and only keep the newer one in the WebGL spec](https://www.khronos.org/webgl/public-mailing-list/public_webgl/1410/msg00033.php).)
+
 

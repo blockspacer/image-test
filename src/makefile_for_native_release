@@ -105,11 +105,11 @@ LINKBITS := \
 CFLAGS := -std=c11
 # C++ flags
 CXXFLAGS := -std=c++11 -Iinclude/ \
-	-I~/github/skia/include/core/ \
-	-I~/github/skia/include/config/ \
-	-I~/github/skia/include/effects/ \
-	-I~/github/skia/include/gpu/ \
-	-I~/github/skia/include/ports/
+	-isystem ~/github/skia/include/core/ \
+	-isystem ~/github/skia/include/config/ \
+	-isystem ~/github/skia/include/effects/ \
+	-isystem ~/github/skia/include/gpu/ \
+	-isystem ~/github/skia/include/ports/
 
 endif
 

@@ -1,12 +1,12 @@
 STRINGIFY(
 
 precision mediump float;
+precision mediump sampler2DArray;
 
 layout(location = 0) in vec4 position;
-
 layout(location = 1) in vec4 color;
-layout(location = 2) in vec3 texCoord;
 
+layout(location = 2) in vec3 texCoord;
 layout(location = 3) in float bubbleId;
 
 uniform float widthOfBubbleData;

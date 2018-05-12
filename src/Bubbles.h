@@ -120,15 +120,36 @@ struct BubbleInfo {
 			gradientRightGreen{0.5f}, 
 			gradientRightBlue{0.0f}
 		{};
+
+		BubbleInfo()
+		 : x{0.0f},
+			y{0.0f},
+			w{10.0f},
+			h{10.0f},
+			mouseOver{0.0f},
+			gradientLeft{-1.0f}, 
+			gradientRight{1.0f},
+			
+			gradientYIntercept{1.0f},
+			gradientGradient{-1.0f},
+
+			gradientLeftRed{0.5f},
+			gradientLeftGreen{0.0f}, 
+			gradientLeftBlue{0.5f},
+
+			gradientRightRed{0.0f},
+			gradientRightGreen{0.5f}, 
+			gradientRightBlue{0.0f}
+		{};
 };
 
 class Bubbles {
-	vector<Bubble>      mBubbles;
-	vector<BubbleGroup> mGroups;
+	vector<Bubble>      myBubbles;
+	vector<BubbleGroup> myGroups;
 	
-	vector<BubbleVertex> mBubbleVertices;
-	vector<GLshort>      mBubbleIndices;
-	vector<BubbleInfo>   mBubblePositions;
+	vector<BubbleVertex> myBubbleVertices;
+	vector<GLshort>      myBubbleIndices;
+	vector<BubbleInfo>   myBubblePositions;
 
     size_t mySpaceAvailable {1};
 

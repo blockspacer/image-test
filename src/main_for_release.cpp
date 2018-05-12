@@ -48,14 +48,14 @@ void draw_frame() {
 //	glClear();
 
 	#ifndef __EMSCRIPTEN__
-	    glfwMakeContextCurrent(pWin2);
+	 //    glfwMakeContextCurrent(pWin2);
 
-		glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
-		glClear( GL_COLOR_BUFFER_BIT );
-		gApp.bubbles.draw(gApp.glContext, 1);
-		glfwSwapBuffers(pWin2);
+		// glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
+		// glClear( GL_COLOR_BUFFER_BIT );
+		// gApp.bubbles.draw(gApp.glContext, 1);
+		// glfwSwapBuffers(pWin2);
 
-		glfwMakeContextCurrent(pWin);
+		// glfwMakeContextCurrent(pWin);
 	#endif
 
 }
@@ -96,9 +96,12 @@ int main() {
 
     gApp.glContext.createWindow(complex<float>(100.0f, 10.0f));
 
+ctx.check_gl_errors("main1");
 	gApp.bubbles.setupOnFirstContext(gApp.glContext);
+ctx.check_gl_errors("main2");
     gApp.text.initOnFirstContext(gApp.glContext);
-ctx.check_gl_errors("main");
+
+ctx.check_gl_errors("main3");
 
 	// BubbleId newb = gApp.bubbles.createBubble(5.0f,5.0f,5.0f,5.0f);
 	// gApp.bubbles.uploadBubbleVertexDataToContext(gApp.glContext, newb);
@@ -116,16 +119,17 @@ ctx.check_gl_errors("main");
     pWin  = gApp.glContext.windows[0].glfwHandle;
 
     #ifndef __EMSCRIPTEN__
-	    gApp.glContext.createWindow(complex<float>(100.0f, 10.0f));
-	    pWin2 = gApp.glContext.windows[1].glfwHandle;
-		gApp.bubbles.setupOnSharedContext(gApp.glContext, 1);
+	 //    gApp.glContext.createWindow(complex<float>(100.0f, 10.0f));
+	 //    pWin2 = gApp.glContext.windows[1].glfwHandle;
+		// gApp.bubbles.setupOnSharedContext(gApp.glContext, 1);
+
 //	    glfwMakeContextCurrent(pWin);
 //		ctx.changeWindow(0);
     #endif
 
 	gApp.bubbles.createBubble(ctx, 0.5f, 0.3f, 10.0f, 10.0f);
 	gApp.bubbles.createBubble(ctx, 0.5f, -0.7f, 10.0f, 10.0f);
-ctx.changeWindow(1);
+//ctx.changeWindow(1);
 	gApp.bubbles.createBubble(ctx, -0.8f, -0.7f, 10.0f, 10.0f);
 
 //	gApp.bubbles.uploadBubblePositionDataToContext();
@@ -150,7 +154,7 @@ ctx.changeWindow(1);
 	#else
 //    	glfwSetWindowSizeCallback(pWin, native_window_size_callback);
 
-		while (!glfwWindowShouldClose(pWin) && !glfwWindowShouldClose(pWin2)) {
+		while (!glfwWindowShouldClose(pWin) ){// && !glfwWindowShouldClose(pWin2)) {
 			draw_frame();
 			bool anim = false;
 			if (anim)
