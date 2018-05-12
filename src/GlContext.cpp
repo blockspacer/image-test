@@ -346,8 +346,10 @@ glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
 
 	#ifdef NATIVE
 		#ifdef DEBUG
-			glEnable              ( GL_DEBUG_OUTPUT );
-			glDebugMessageCallback( MessageCallback, 0 );
+			#ifndef __APPLE__
+				glEnable              ( GL_DEBUG_OUTPUT );
+				glDebugMessageCallback( MessageCallback, 0 );
+			#endif
 		#endif
 	#endif
 
