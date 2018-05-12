@@ -19,6 +19,10 @@ cout<<"debug undefined\n";
 
 }
 
+float encodeId(BubbleId id) {
+	return -1.0f - float(id);
+}
+
 BubbleId Bubbles::createBubble(GlContext &ctx, float x, float y, float w, float h) {
 	// run through bubbles and find first unused one
 	BubbleId bubbleId  = myBubbles.size();
@@ -46,11 +50,12 @@ BubbleId Bubbles::createBubble(GlContext &ctx, float x, float y, float w, float 
 
 	myBubbleVertices.clear();
 
-	myBubbleVertices.emplace_back(0.0f, 0.0f, float(bubbleId));
+	myBubbleVertices.emplace_back(0.0f, 0.0f, encodeId(bubbleId));
 	float r = 0.2f;
 	for (int i = 0; i < VERTICES_PER_BUBBLE - 1; i++) {
-		myBubbleVertices.emplace_back(float(r * cos((2.0*PI / VERTICES_PER_BUBBLE) * i)), float(r * sin((2.0*PI / VERTICES_PER_BUBBLE) * i)), float(bubbleId));
+		myBubbleVertices.emplace_back(float(r * cos((2.0*PI / VERTICES_PER_BUBBLE) * i)), float(r * sin((2.0*PI / VERTICES_PER_BUBBLE) * i)), encodeId(bubbleId));
 	}
+cout<<"\tBUBBLE ID "<<-1.0f - float(bubbleId)<<endl;
 
 	uploadVertexData(ctx, bubbleId);
 
@@ -253,7 +258,7 @@ void Bubbles::setupOnFirstContext(GlContext &ctx) {
 	glGenBuffers(1, &myVertexBuffer);
 
 	myPositionVarying = glGetAttribLocation(ctx.shaderProgramHandle, "position");
-	myBubbleIdVarying = glGetAttribLocation(ctx.shaderProgramHandle, "bubbleId");
+	myBubbleIdVarying = glGetAttribLocation(ctx.shaderProgramHandle, "texCoord");
 
 	glGenBuffers(1,                      &myVertexIndices);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, myVertexIndices);

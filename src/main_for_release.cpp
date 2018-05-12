@@ -37,6 +37,8 @@ void draw_frame() {
 
 	gApp.bubbles.draw(gApp.glContext, 0);
 
+	gApp.text.draw(gApp.glContext);
+
 // cout<<"Hum"<<endl;
 // 	glBindVertexArray(    data.starVertexArray);
 // //		glDrawArrays(GL_TRIANGLE_FAN, 0, 13);//3, GL_UNSIGNED_SHORT, 0);
@@ -100,6 +102,7 @@ ctx.check_gl_errors("main1");
 	gApp.bubbles.setupOnFirstContext(gApp.glContext);
 ctx.check_gl_errors("main2");
     gApp.text.initOnFirstContext(gApp.glContext);
+	glBindVertexArray(ctx.windows[0].bubblesVAO);
 
 ctx.check_gl_errors("main3");
 

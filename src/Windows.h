@@ -19,7 +19,8 @@ struct Window {
 	complex<float> topLeftInCM,
 				   widthHeightInCM;
 
-	GLuint 	 bubblesVAO {0};
+	GLuint bubblesVAO {0},
+			textVAO {0};
 
 	Window(WindowId id);
 

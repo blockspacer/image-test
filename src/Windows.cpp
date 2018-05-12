@@ -7,4 +7,5 @@ Window::Window(WindowId _id) {
 void Window::setupVAOs() {
 	glGenVertexArrays(1, &bubblesVAO);
 	glBindVertexArray(    bubblesVAO);
+	glGenVertexArrays(1, &textVAO);
 }

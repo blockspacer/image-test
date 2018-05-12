@@ -23,7 +23,6 @@ struct GlContext {
 
 	GLuint shaderProgramHandle {0},
 
-
 		spareHandle {0};
 
 

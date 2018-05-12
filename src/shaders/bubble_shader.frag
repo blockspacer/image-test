@@ -14,7 +14,14 @@ out vec4 col;
 
 void main()
 {
-	col = outColor;
+	if (outTexCoord.x < 0.0) {
+		col = outColor;
+		return;
+	}
+	else {
+		col = vec4(0.0, 0.9, 0.1, 1.0);
+		return;
+	}
 //	    case  -2: outColor = overlay(texture(tex1,  Texcoord), Color); break;
 //	    case  -3: outColor = overlay(texture(tex2,  Texcoord), Color); break;
 //	    case  -4: outColor = overlay(texture(tex3,  Texcoord), Color); break;

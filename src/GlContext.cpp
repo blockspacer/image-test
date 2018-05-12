@@ -395,9 +395,12 @@ glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
 
 //	glEnable(GL_CULL_FACE);
 
-		if (GLEW_ARB_debug_output){ 
+	if (GLEW_ARB_debug_output){ 
 		cout<<"ARB_debug_output yes"<<'\n';
 	}
+	else
+		cout<<"ARB_debug_output no"<<'\n';
+
 
 	return pCurrentContext;
 }
