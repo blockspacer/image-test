@@ -5,7 +5,7 @@ precision mediump sampler2DArray;
 
 in vec4 outColor;
 in vec3 outTexCoord;
-uniform sampler2DArray spriteSheet;
+uniform sampler2DArray spriteSheets;
 
 // in vec2 Texcoord;
 // in float Texunit;
@@ -19,7 +19,7 @@ void main()
 		return;
 	}
 	else {
-		col = vec4(0.0, 0.9, 0.1, 1.0);
+		col = texture(spriteSheets,  outTexCoord);vec4(0.0, 0.9, 0.1, 1.0);
 		return;
 	}
 //	    case  -2: outColor = overlay(texture(tex1,  Texcoord), Color); break;

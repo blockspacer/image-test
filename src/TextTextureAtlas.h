@@ -25,8 +25,10 @@ using std::unordered_map;
 	#include "SkData.h"
 
 	#include "SkImage.h"
-
 	#include "SkImageInfo.h"
+
+	#include "SkTypeface.h"
+
 	#include "SkStream.h"
 	#include "SkSurface.h"
 	#include "SkCanvas.h"
@@ -36,7 +38,7 @@ using std::unordered_map;
 
 #include "tinyutf8.h"
 
-#define ATLAS_SIZE  1024 // 2048 is the minimum guaranteed texture size on WebGL
+#define ATLAS_SIZE  512 // 2048 is the minimum guaranteed texture size on WebGL
 #define ATLAS_BYTES (ATLAS_SIZE * ATLAS_SIZE * 4)
 
 struct SpritePosition {
@@ -85,9 +87,9 @@ public:
 	void test();
 	// renderTempWord();
 	// copyTempWordToAtlas();
-	void initOnFirstContext();
-	void createTextureAtlas();
-
+	void initOnFirstContext(GlContext &ctx);
+	void createTextureAtlas(GlContext &ctx);
+	void crosshairs(SkCanvas* canvas, int x, int y, int len = 50);
 void uploadEntireTexture();
 	void uploadEntireSurface();
 void fetchWordSprite(utf8_string word);

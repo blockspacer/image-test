@@ -75,6 +75,8 @@ void Bubbles::uploadVertexData(GlContext &ctx, BubbleId id) {
 }
 
 void Bubbles::uploadBubblePositions() {
+	glActiveTexture(GL_TEXTURE0);
+
 	glTexSubImage2D(GL_TEXTURE_2D, //target
 		0, // mipmap level
 		0, // x offset

@@ -15,7 +15,7 @@ layout(location = 3) in vec4 bgColor;
 //layout(location = 4) in float bubbleId;
 uniform float widthOfBubbleData;
 uniform sampler2D allBubbleData;
-uniform sampler2DArray spriteSheet;
+uniform sampler2DArray spriteSheets;
 
 //uniform float bubbleHaloDepth;
 //uniform float bubbleHilightedHaloDepth;

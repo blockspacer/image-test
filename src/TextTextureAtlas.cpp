@@ -2,6 +2,36 @@
 
 //#include "SkDocument.h"
 
+void TextTextureAtlas::crosshairs(SkCanvas* canvas, int x, int y, int len) {
+#ifdef NATIVE
+	SkPaint paint;
+    paint.setStyle(SkPaint::kFill_Style);
+    paint.setColor(SK_ColorWHITE);
+    SkRect rect = SkRect::MakeXYWH(x-len, y, 2*len+1, 1);
+    canvas->drawRect(rect, paint);
+	rect = SkRect::MakeXYWH(x, y-len, 1, 2*len+1);
+    canvas->drawRect(rect, paint);
+#endif
+}
+
+#include "SkFontMgr.h"
+
+#include <iostream>
+#include <algorithm>
+#include "tinyutf8.h"
+using namespace std;
+
+int tiny()
+{
+	cout<<"HIIIII"<<endl;🌍🌍
+    utf8_string str = u8"!🌍 olleH";
+    for_each( str.rbegin() , str.rend() , []( char32_t codepoint ){
+    	cout<<int(codepoint)<<" ";;
+      cout << codepoint << endl;
+    } );
+    return 0;
+}
+
 void TextTextureAtlas::test() {
 #ifdef NATIVE
     SkPaint paint;
@@ -10,9 +40,44 @@ void TextTextureAtlas::test() {
     paint.setStrokeWidth(4);
     paint.setColor(0xffFE938C);
 
+    SkPaint paint1;
+    paint1.setTextSize(32.0f);
+    paint1.setAntiAlias(true);
+    paint1.setColor(0x8142ffA4);
+    paint1.setStyle(SkPaint::kFill_Style);
+
+	const string font = "Ubuntu";
+	paint.setTypeface(SkTypeface::MakeFromName(font.c_str(), SkFontStyle (400, 5,  SkFontStyle::kUpright_Slant)));
+
+    const char text[] = "Testy_jgq, ∀ x ∃ ";
+
     SkCanvas *canvas = myDrawingSurface->getCanvas();
     SkRect rect = SkRect::MakeXYWH(10, 10, 100, 160);
     canvas->drawRect(rect, paint);
+
+    canvas->drawText(text, strlen(text), 130, 120, paint1);
+    crosshairs(canvas, 131, 121);
+
+tiny();
+
+
+    sk_sp<SkFontMgr> mgr(SkFontMgr::RefDefault());
+    uint32_t utf32string[] = { 0x1F310 };
+    sk_sp<SkTypeface> tf(
+            mgr->matchFamilyStyleCharacter(
+                    nullptr, SkFontStyle(), nullptr, 0, utf32string[0]));
+    if (tf) {
+	SkPaint paint;
+	paint.setTextSize(64.0f);
+        paint.setAntiAlias(true);
+	paint.setColor(0xff4281A4);
+	paint.setStyle(SkPaint::kFill_Style);
+        paint.setTypeface(tf);
+        paint.setTextEncoding(SkPaint::kUTF32_TextEncoding);
+        canvas->drawText(utf32string, sizeof(utf32string), 200.0f, 264.0f, paint);
+    }
+
+
 #endif
 
 uploadEntireSurface();
@@ -57,7 +122,7 @@ cout<<"pixi "<<pixels<<endl;
 #endif
 }
 
-void TextTextureAtlas::createTextureAtlas() {
+void TextTextureAtlas::createTextureAtlas(GlContext &ctx) {
 
 	if (myTextureAtlas != 0) {
 //		glGenFramebuffers(1, &myFramebuffer);
@@ -93,6 +158,9 @@ void TextTextureAtlas::createTextureAtlas() {
 
 	}
 
+	glActiveTexture(GL_TEXTURE1);
+	GLint mySamplerUniform = glGetUniformLocation(ctx.shaderProgramHandle, "spriteSheets");
+	glUniform1i(mySamplerUniform, 1);
 
 	glGenTextures(1, &myTextureAtlas);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, myTextureAtlas);
@@ -131,6 +199,7 @@ check_gl_errors("creating atlas texture");
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 
+
 	// https://www.khronos.org/opengl/wiki/Array_Texture
 	// Upload pixel data.
 	// The first 0 refers to the mipmap level (level 0, since there's only 1)
@@ -145,7 +214,7 @@ check_gl_errors("creating atlas texture");
 // https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext/copyTexSubImage3D
 }
 
-void TextTextureAtlas::initOnFirstContext() {
+void TextTextureAtlas::initOnFirstContext(GlContext &ctx) {
 	myPixelMemory.resize(ATLAS_BYTES);
 #ifdef NATIVE
 cout<<"hum"<<endl;

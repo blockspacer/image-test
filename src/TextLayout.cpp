@@ -51,8 +51,8 @@ TextTextureAtlas TextLayout::myTextAtlas;
 
 void TextLayout::initOnFirstContext(GlContext &ctx) {
 	cout<<"hi"<<endl;
-	myTextAtlas.initOnFirstContext();
-	myTextAtlas.createTextureAtlas();
+	myTextAtlas.initOnFirstContext(ctx);
+	myTextAtlas.createTextureAtlas(ctx);
 check_gl_errors("pree test");
 	myTextAtlas.test();
 check_gl_errors("post atlas test");
