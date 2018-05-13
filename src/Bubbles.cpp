@@ -261,7 +261,7 @@ void Bubbles::setupOnFirstContext(GlContext &ctx) {
 
 	myPositionVarying = glGetAttribLocation(ctx.shaderProgramHandle, "position");
 	myBubbleIdVarying = glGetAttribLocation(ctx.shaderProgramHandle, "texCoord");
-
+cout<<"PROGRAM IS "<<ctx.shaderProgramHandle<<endl;
 	glGenBuffers(1,                      &myVertexIndices);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, myVertexIndices);
 

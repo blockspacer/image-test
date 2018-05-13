@@ -20,6 +20,7 @@ using std::complex;
 struct GlContext {
 	vector<Window> windows;
 	GLFWwindow* pCurrentContext;
+	WindowId    currentWindow;
 
 	GLuint shaderProgramHandle {0},
 

@@ -17,49 +17,13 @@ using std::endl;
 //#include "GlContext.h"
 #include "App.h"
 
-GLFWwindow *pWin {0};
-GLFWwindow *pWin2 {0};
-
 App gApp;
 
 
 static int framenum = 0;
 
 void draw_frame() {
-	glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
-
-	glClear( GL_COLOR_BUFFER_BIT );
-
-//glDrawArrays(GL_TRIANGLES, 0, 3);//-works! and no need to load a GL_ELEMENT_ARRAY_BUFFER if there's no complex geometry
-	// glBindVertexArray(gApp->context.triangleVertexArray);
-	// 	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
-	// glBindVertexArray(    0);
-
-	gApp.bubbles.draw(gApp.glContext, 0);
-
-	gApp.text.draw(gApp.glContext);
-
-// cout<<"Hum"<<endl;
-// 	glBindVertexArray(    data.starVertexArray);
-// //		glDrawArrays(GL_TRIANGLE_FAN, 0, 13);//3, GL_UNSIGNED_SHORT, 0);
-// 		glDrawElements(GL_TRIANGLE_FAN, 13, GL_UNSIGNED_SHORT, 0);
-// 	glBindVertexArray(    0);
-
-
-	glfwSwapBuffers(pWin);
-//	glClear();
-
-	#ifndef __EMSCRIPTEN__
-	 //    glfwMakeContextCurrent(pWin2);
-
-		// glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
-		// glClear( GL_COLOR_BUFFER_BIT );
-		// gApp.bubbles.draw(gApp.glContext, 1);
-		// glfwSwapBuffers(pWin2);
-
-		// glfwMakeContextCurrent(pWin);
-	#endif
-
+	gApp.draw();
 }
 
 
@@ -94,49 +58,7 @@ int main() {
 
 //	pWin = initialise_glfw_and_compile_shader(gApp.glContext);
 
-    GlContext &ctx = gApp.glContext;
-
-    gApp.glContext.createWindow(complex<float>(100.0f, 10.0f));
-
-ctx.check_gl_errors("main1");
-	gApp.bubbles.setupOnFirstContext(gApp.glContext);
-ctx.check_gl_errors("main2");
-    gApp.text.initOnFirstContext(gApp.glContext);
-	glBindVertexArray(ctx.windows[0].bubblesVAO);
-
-ctx.check_gl_errors("main3");
-
-	// BubbleId newb = gApp.bubbles.createBubble(5.0f,5.0f,5.0f,5.0f);
-	// gApp.bubbles.uploadBubbleVertexDataToContext(gApp.glContext, newb);
-	// BubbleId newb2 = gApp.bubbles.createBubble(5.0f,5.0f,5.0f,5.0f);
-	// gApp.bubbles.uploadBubbleVertexDataToContext(gApp.glContext, newb2);
-	// BubbleId newb3 = gApp.bubbles.createBubble(5.0f,5.0f,5.0f,5.0f);
-	// gApp.bubbles.uploadBubbleVertexDataToContext(gApp.glContext, newb3);
-	// BubbleId newb4 = gApp.bubbles.createBubble(5.0f,5.0f,5.0f,5.0f);
-	// gApp.bubbles.uploadBubbleVertexDataToContext(gApp.glContext, newb4);
-
-
-	gApp.bubbles.createBubble(ctx, -0.5f, -0.0f, 10.0f, 10.0f);
-	gApp.bubbles.createBubble(ctx, 0.0f, -0.3f, 10.0f, 10.0f);
-
-    pWin  = gApp.glContext.windows[0].glfwHandle;
-
-    #ifndef __EMSCRIPTEN__
-	 //    gApp.glContext.createWindow(complex<float>(100.0f, 10.0f));
-	 //    pWin2 = gApp.glContext.windows[1].glfwHandle;
-		// gApp.bubbles.setupOnSharedContext(gApp.glContext, 1);
-
-//	    glfwMakeContextCurrent(pWin);
-//		ctx.changeWindow(0);
-    #endif
-
-	gApp.bubbles.createBubble(ctx, 0.5f, 0.3f, 10.0f, 10.0f);
-	gApp.bubbles.createBubble(ctx, 0.5f, -0.7f, 10.0f, 10.0f);
-//ctx.changeWindow(1);
-	gApp.bubbles.createBubble(ctx, -0.8f, -0.7f, 10.0f, 10.0f);
-
-//	gApp.bubbles.uploadBubblePositionDataToContext();
-
+    gApp.init();
 
     #ifdef __EMSCRIPTEN__
 		read_in_user_settings_web_version();
@@ -157,7 +79,7 @@ ctx.check_gl_errors("main3");
 	#else
 //    	glfwSetWindowSizeCallback(pWin, native_window_size_callback);
 
-		while (!glfwWindowShouldClose(pWin) ){// && !glfwWindowShouldClose(pWin2)) {
+		while (!glfwWindowShouldClose(gApp.glContext.windows[0].glfwHandle) ){// && !glfwWindowShouldClose(pWin2)) {
 			draw_frame();
 			bool anim = false;
 			if (anim)

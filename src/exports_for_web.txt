@@ -1,1 +1,1 @@
-["_main", "_web_window_size_callback", "_receive_number", "_receive_color", "_receive_string", "_receive_boolean", "_free"]
+["_main", "_web_window_size_callback", "_receive_number", "_receive_color", "_receive_string", "_receive_boolean", "_receive_canvas", "_malloc", "_free"]

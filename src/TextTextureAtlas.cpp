@@ -2,8 +2,9 @@
 
 //#include "SkDocument.h"
 
-void TextTextureAtlas::crosshairs(SkCanvas* canvas, int x, int y, int len) {
+
 #ifdef NATIVE
+void TextTextureAtlas::crosshairs(SkCanvas* canvas, int x, int y, int len) {
 	SkPaint paint;
     paint.setStyle(SkPaint::kFill_Style);
     paint.setColor(SK_ColorWHITE);
@@ -11,10 +12,10 @@ void TextTextureAtlas::crosshairs(SkCanvas* canvas, int x, int y, int len) {
     canvas->drawRect(rect, paint);
 	rect = SkRect::MakeXYWH(x, y-len, 1, 2*len+1);
     canvas->drawRect(rect, paint);
-#endif
 }
-
 #include "SkFontMgr.h"
+
+#endif
 
 #include <iostream>
 #include <algorithm>
@@ -23,7 +24,7 @@ using namespace std;
 
 int tiny()
 {
-	cout<<"HIIIII"<<endl;🌍🌍
+	cout<<"HIIIII"<<endl;
     utf8_string str = u8"!🌍 olleH";
     for_each( str.rbegin() , str.rend() , []( char32_t codepoint ){
     	cout<<int(codepoint)<<" ";;
@@ -85,6 +86,12 @@ uploadEntireSurface();
 }
 
 void TextTextureAtlas::uploadEntireSurface() {
+#ifdef WEB
+	EM_ASM_({
+		transfer_entire_canvas($0);
+	}, ATLAS_SIZE);
+#endif
+	
 //glEnable(GL_TEXTURE_3D);
 int i;
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &i);
@@ -101,7 +108,7 @@ check_gl_errors("enum?");
 	const GLenum  format  = GL_RGBA,
 	              type    = GL_UNSIGNED_BYTE;
 
-	const GLvoid *pixels  = myPixelMemory.data();
+	const GLvoid *pixels  = gPixelMemory.data();
 	glTexSubImage3D(target,
 					level,
 					xoffset,
@@ -115,11 +122,8 @@ check_gl_errors("enum?");
 					pixels);
 
 cout<<"pixi "<<pixels<<endl;
-#if NATIVE
 //cout<<glGetString(GL_EXTENSIONS)<<endl;
 	check_gl_errors("oh noes!");
-#else
-#endif
 }
 
 void TextTextureAtlas::createTextureAtlas(GlContext &ctx) {
@@ -179,7 +183,7 @@ void TextTextureAtlas::createTextureAtlas(GlContext &ctx) {
 	const GLint   border 	= 0;
 	const GLenum  format 	= GL_RGBA;
 	const GLenum  type 	    = GL_UNSIGNED_BYTE;
-	const GLvoid* data 	    = &myPixelMemory[0];
+	const GLvoid* data 	    = &gPixelMemory[0];
 
 	glTexImage3D(target,
 				 level,
@@ -191,10 +195,11 @@ void TextTextureAtlas::createTextureAtlas(GlContext &ctx) {
 				 format,
 				 type,
 				 data);
+
 check_gl_errors("creating atlas texture");
 	// Always set reasonable myTextureAtlas parameters
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST); //GL_LINEAR
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR); //GL_LINEAR
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
@@ -215,9 +220,8 @@ check_gl_errors("creating atlas texture");
 }
 
 void TextTextureAtlas::initOnFirstContext(GlContext &ctx) {
-	myPixelMemory.resize(ATLAS_BYTES);
+	gPixelMemory.resize(ATLAS_BYTES);
 #ifdef NATIVE
-cout<<"hum"<<endl;
 	SkGraphics::Init();
 
 	// my linux machine refuses to create RGBA skia surfaces, but will allow BGRA ones
@@ -237,7 +241,7 @@ cout<<"hum"<<endl;
 	);
 
 	myDrawingSurface = 
-		SkSurface::MakeRasterDirect(drawingSurfaceInfo, &myPixelMemory[0], ATLAS_SIZE * 4);
+		SkSurface::MakeRasterDirect(drawingSurfaceInfo, &gPixelMemory[0], ATLAS_SIZE * 4);
 
 	if (myDrawingSurface != 0)
 		return;
@@ -250,13 +254,18 @@ cout<<"hum"<<endl;
 	);	
 
 	myDrawingSurface = 
-		SkSurface::MakeRasterDirect(drawingSurfaceInfo, &myPixelMemory[0], ATLAS_SIZE * 4);
+		SkSurface::MakeRasterDirect(drawingSurfaceInfo, &gPixelMemory[0], ATLAS_SIZE * 4);
 
 	if (myDrawingSurface != 0)
 		return;
 
 	cout << "Neither BGRA now RGBA drawing surfaces can be created >:O" << endl;
 #else // web version
+//	int n = ;
+
+	EM_ASM_({
+		create_canvas($0);
+	}, ATLAS_SIZE);
 #endif
 }
 
@@ -292,3 +301,15 @@ cout<<"hum"<<endl;
 //     }
 //     pdfDocument->close();
 // }
+
+
+
+extern "C" {
+	int receive_canvas(char * buffer, int width, int height) {
+		cout<<"got it! "<<width<<", "<<height<<endl;
+		memcpy(&gPixelMemory[0], buffer, width * height * 4);
+	//    g_game.SetImageLoaded( buffer, width, height );
+		cout<<"got it!"<<endl;
+	    return 0;
+	}
+}

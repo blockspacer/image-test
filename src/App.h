@@ -11,7 +11,8 @@ struct App {
 	GlContext glContext;
 	TextLayout text;
 	Bubbles   bubbles;
-	App();
+	void init();
+	void draw();
 };
 
 

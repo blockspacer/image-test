@@ -40,13 +40,13 @@ canvas {
     </head>
     <body id=bod>
     <span id=message>Please wait while the code loads, this should only happen once as your browser will cache it.<br />Loading it is slow because this program was written expecting it to be downloaded and run on your local machine (where it will work about ten or twenty times faster than running it in a browser), and making a browser-capable version was kinda an afterthought.</span>
-    <canvas class="topleft" id="canvas"></canvas>
+    <canvas class="topleft" id="canvs"></canvas>
 
     <script type="text/javascript">
-        var canvas = document.getElementById("canvas");
+        var canvs = document.getElementById("canvs");
         //make the canvas fullscreen
-        canvas.width = window.innerWidth 
-        canvas.height = window.innerHeight 
+        canvs.width = window.innerWidth 
+        canvs.height = window.innerHeight 
 
 // var ctx = canvas.getContext('2d');
 // ctx.fillStyle = 'rgb(200,0,0)'; // sets the color to fill in the rectangle with
@@ -54,7 +54,7 @@ canvas {
 
         //show Emscripten environment where the canvas is
         var Module = {};
-        Module.canvas = canvas;
+        Module.canvas = canvs;
 
         // these get called by the Lua configuration files
 		function pass_number_to_cpp() {
@@ -81,6 +81,38 @@ canvas {
 			_receive_string(ptr, ptr2);
 			_free(ptr2)
 			_free(ptr)
+		}
+		var textCtx = document.createElement("canvas").getContext("2d");
+		function create_canvas(size) {
+ 			textCtx.canvas.width  = size;
+			textCtx.canvas.height = size;
+			textCtx.font = "20px sans";
+			textCtx.textAlign = "center";
+			textCtx.textBaseline = "middle";
+			textCtx.fillStyle = "red";
+			textCtx.clearRect(0, 0, textCtx.canvas.width, textCtx.canvas.height);
+			textCtx.fillText("heyyy", size / 2, size / 2);
+
+			return textCtx.canvas;
+		}
+
+		function transfer_entire_canvas(size) {
+			var width = size
+			var height = size
+			var imgd = textCtx.getImageData(0, 0, width, height);
+
+            var numBytes = width * height * 4;
+            var ptr= Module._malloc(numBytes);
+            var heapBytes= new Uint8Array(Module.HEAPU8.buffer, ptr, numBytes);
+
+            // copy data into heapBytes
+            heapBytes.set(new Uint8Array(imgd.data));
+
+//            var send_canvas_data = Module.cwrap('_receive_canvas', 'number', ['number','number','number'])
+            var n = _receive_canvas(heapBytes.byteOffset, width, height );
+
+            Module._free(heapBytes.byteOffset);
+
 		}
 
     </script>

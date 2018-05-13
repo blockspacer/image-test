@@ -78,9 +78,10 @@ class TextTextureAtlas {
 	size_t myAvailablePages {1},
 		myHighestUsedPage{1};
 
-	vector<GLubyte> myPixelMemory;
 	#ifdef NATIVE
 		sk_sp<SkSurface> myDrawingSurface;
+	#else // web
+		GLubyte *myDrawingSurface;
 	#endif
 
 public:
@@ -89,10 +90,12 @@ public:
 	// copyTempWordToAtlas();
 	void initOnFirstContext(GlContext &ctx);
 	void createTextureAtlas(GlContext &ctx);
+#ifdef NATIVE
 	void crosshairs(SkCanvas* canvas, int x, int y, int len = 50);
+#endif
 void uploadEntireTexture();
 	void uploadEntireSurface();
 void fetchWordSprite(utf8_string word);
 };
 
-
+extern "C" int receive_canvas(char * buffer, int width, int height);
