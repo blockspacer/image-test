@@ -173,17 +173,17 @@ void TextTextureAtlas::createTextureAtlas(GlContext &ctx) {
 	// https://github.com/kripken/emscripten/issues/5747
 	// https://www.khronos.org/webgl/public-mailing-list/public_webgl/1410/msg00033.php
 //	glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, ATLAS_SIZE, ATLAS_SIZE, 1 + myAvailablePages);
-
-	const GLenum  target 	= GL_TEXTURE_2D_ARRAY;
-	const GLint   level 	= 0;
-	const GLint   internalFormat = GL_RGBA;
-	const GLsizei width 	= ATLAS_SIZE;
-	const GLsizei height 	= ATLAS_SIZE;
-	const GLsizei depth 	= 1;
-	const GLint   border 	= 0;
-	const GLenum  format 	= GL_RGBA;
-	const GLenum  type 	    = GL_UNSIGNED_BYTE;
-	const GLvoid* data 	    = &gPixelMemory[0];
+https://commanderrab.deviantart.com/art/On-Being-Motivated-327103148
+	const GLenum  target         = GL_TEXTURE_2D_ARRAY;
+	const GLint   level          = 0,
+	              internalFormat = GL_RGBA;
+	const GLsizei width          = ATLAS_SIZE,
+	              height         = ATLAS_SIZE,
+	              depth          = 1;
+	const GLint   border         = 0;
+	const GLenum  format         = GL_RGBA,
+	              type           = GL_UNSIGNED_BYTE;
+	const GLvoid* data           = &gPixelMemory[0];
 
 	glTexImage3D(target,
 				 level,
@@ -196,9 +196,9 @@ void TextTextureAtlas::createTextureAtlas(GlContext &ctx) {
 				 type,
 				 data);
 
-check_gl_errors("creating atlas texture");
+check_gl_errors("creating texture atlas");
 	// Always set reasonable myTextureAtlas parameters
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR); //GL_LINEAR
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);

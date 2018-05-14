@@ -89,8 +89,10 @@ canvas {
 			textCtx.font = "20px sans";
 			textCtx.textAlign = "center";
 			textCtx.textBaseline = "middle";
-			textCtx.fillStyle = "red";
-			textCtx.clearRect(0, 0, textCtx.canvas.width, textCtx.canvas.height);
+			textCtx.fillStyle = "black";
+			textCtx.fillRect(0, 0, textCtx.canvas.width, textCtx.canvas.height);
+			textCtx.fillStyle = "green";
+
 			textCtx.fillText("heyyy", size / 2, size / 2);
 
 			return textCtx.canvas;
