@@ -3,21 +3,46 @@
 //#include "SkDocument.h"
 
 
+void TextTextureAtlas::crosshairs(int x, int y, int len) {
 #ifdef NATIVE
-void TextTextureAtlas::crosshairs(SkCanvas* canvas, int x, int y, int len) {
 	SkPaint paint;
     paint.setStyle(SkPaint::kFill_Style);
     paint.setColor(SK_ColorWHITE);
     SkRect rect = SkRect::MakeXYWH(x-len, y, 2*len+1, 1);
-    canvas->drawRect(rect, paint);
+    
+	pMyCanvas->drawRect(rect, paint);
 	rect = SkRect::MakeXYWH(x, y-len, 1, 2*len+1);
-    canvas->drawRect(rect, paint);
-}
-#include "SkFontMgr.h"
+    pMyCanvas->drawRect(rect, paint);
+#else
+    EM_ASM_({
+		var x = $0;
+		var y = $1;
+		var l = $2;
+		textCtx.beginPath();
 
+		textCtx.strokeStyle = 'green';
+
+		textCtx.moveTo(x - l , y);
+		textCtx.lineTo(x + l, y);
+		textCtx.moveTo(x, y - l);
+		textCtx.lineTo(x, y + l);
+		textCtx.stroke();
+
+	}, x, y, len);
 #endif
+}
+
+#ifdef NATIVE
+	#include "SkFontMgr.h"
+#endif
+//#include ""
+
 
 #include <iostream>
+using std::cout;
+using std::endl;
+
+
 #include <algorithm>
 #include "tinyutf8.h"
 using namespace std;
@@ -33,8 +58,206 @@ int tiny()
     return 0;
 }
 
-void TextTextureAtlas::test() {
+void TextTextureAtlas::setTextStyle(int pixelSize, FontFaceTypes face) {
+	#ifdef NATIVE
+		if (myTextSize != pixelSize) {
+			myTextSize = pixelSize;
+			myTextPaint.setTextSize(float(pixelSize));
+		}
+		if (face != myCurrentFont) {
+			myCurrentFont = face;
+			// Roboto font? user font?
+			#ifdef __linux__
+				string font =  "Ubuntu"; // ::gStrings["Linux font"];
+			//	string font = "Free Sans";
+			#elif __APPLE__
+				string font = "Helvetica"; // ::gStrings["Apple font"];
+			#elif _WIN32
+				string font = "Arial"; // ::gStrings["Helvetica font"];
+			#else
+				string font = "Sans";
+			#endif
+
+			auto weight = 400;
+			auto slant  = SkFontStyle::kUpright_Slant;
+
+			switch(face) {
+				case 0:
+					break;
+				case 1:
+					weight = 700;
+					break;
+				case 2:
+					slant = SkFontStyle::kItalic_Slant;
+					break;
+				case 3:
+					weight = 700;
+					slant = SkFontStyle::kItalic_Slant;
+					break;
+				case 4:
+					font = "Mono";
+					break;
+				}
+
+			//todo: maybe try experimenting with condensed text?
+			myTextPaint.setTypeface(SkTypeface::MakeFromName(font.c_str(), SkFontStyle (weight, 5,  slant)));
+		}
+	#else
+		if (face != myCurrentFont || myTextSize != pixelSize) {
+			myCurrentFont = face; myTextSize = pixelSize;
+			EM_ASM_({
+				var pre = '';
+				var s = 'px sans';
+				switch($1) {
+					case 0:
+						break;
+					case 1:
+						pre = 'bold ';
+						s = 'px sans';
+						break;
+					case 2:
+						pre = 'italic ';
+						s = 'px italic sans';
+						break;
+					case 3:
+						pre = 'italic bold ';
+						s = 'px bold italic sans';
+						break;
+					case 4:
+						s = 'px monospace';
+						break;
+				}
+				textCtx.font = pre + $0 + s;
+				console.log(pre + $0 + s)
+			}, pixelSize, face);
+		}
+	#endif
+}
+
+void TextTextureAtlas::drawBox(const SpritePosition &pos) {
+#ifdef WEB
+	EM_ASM_({
+		textCtx.beginPath();
+		var x = $0;
+		var y = $1;
+		var w = $2;
+		var h = $3;
+
+		textCtx.strokeStyle = 'yellow';
+
+		textCtx.moveTo(x, y);
+		textCtx.lineTo(x+w, y);
+		textCtx.lineTo(x+w, y+h);
+		textCtx.lineTo(x, y+h);
+		textCtx.lineTo(x, y);
+		textCtx.stroke();
+
+	}, pos.left, pos.top, pos.width, pos.height);
+#endif
+}
+
+// returns width
+SpritePosition TextTextureAtlas::drawText(const utf8_string str) {
+	float acc = 0.0f;
 #ifdef NATIVE
+	// collect spans of ascii text to measure
+	utf8_string span;
+	uint32_t unicodeString[1] = {0x0};
+	auto i = str.begin();
+	while (i != str.end()) {
+		char32_t chr = *i;
+		if (int(chr) < 128) {
+			// ASCII char
+			span.append(chr);
+		}
+		else {
+			// Unicode char
+			if (span.size() > 0) {
+//				draw and measure
+				span = "";
+			}
+
+			sk_sp<SkFontMgr> mgr(SkFontMgr::RefDefault());
+	//		uint32_t utf32string[] = { 0x1F310 };
+			sk_sp<SkTypeface> tf(
+				mgr->matchFamilyStyleCharacter(
+					nullptr, SkFontStyle(), nullptr, 0, chr));
+			if (tf) {
+//				unicodeString.(chr);
+		        myTextPaint.setTypeface(tf);
+		        myTextPaint.setTextEncoding(SkPaint::kUTF32_TextEncoding);
+		        unicodeString[0] = chr;
+				pMyCanvas->drawText(unicodeString, 4, 200.0f, 264.0f, myTextPaint);
+				int w = myTextPaint.measureText(span.c_str(), span.size());
+				acc += w;
+		    }
+
+		}
+		i++;
+	}
+	if (span.size() != 0) {
+		int w = myTextPaint.measureText(span.c_str(), span.size());
+		pMyCanvas->drawText
+		acc += w;
+	}
+	return SpritePosition(0, 0, w, 0);
+#else // web
+	int w = EM_ASM_INT({
+		str = Pointer_stringify($0);
+		return textCtx.measureText(str).width;
+	}, str.c_str());
+
+	int x = myCurrentRowLeft,
+		h = myTextSize,
+		y = myCurrentRowTop + h;
+
+	if (ATLAS_SIZE - myCurrentRowLeft <= w) {
+		// fit it onto line
+	}
+	else {
+		// start a new line
+	}
+	EM_ASM_({
+		textCtx.fillStyle = "black";
+		textCtx.fillRect($0, $1, $2, $3);
+		textCtx.fillStyle = "white";
+		textCtx.fillText(str, $0, $1 + $3);		
+	}, x, y, w, h);
+	return SpritePosition(0,x,y,w,myTextSize);
+#endif
+}
+
+
+SpritePosition TextTextureAtlas::getTemporarySprite(utf8_string word, int pixelSize, FontFaceTypes face) {
+	// check if we've already got a suitable permanent sprite and if so return that
+	// if not, check if we've already got a temporary that fits
+	// draw it to our pixel surface and queue for transfer, return the position it will be at
+}
+
+SpritePosition TextTextureAtlas::getPermanentSprite(utf8_string word, int pixelSize, FontFaceTypes face) {
+	// check if we have it
+	// if not, check if this is currently a temporary; if so, copy to permanent and return the position
+	// draw it to pixel memory and queue for transfer to graphics card memory; return the position it will be at
+}
+
+
+
+void TextTextureAtlas::test() {
+#ifdef WEB
+
+	setTextStyle(24, bolditalic);
+	auto sp = drawText(utf8_string("ntsfi flieira"));
+	drawBox(sp);
+	crosshairs(myCurrentRowLeft,myCurrentRowTop+myTextSize);
+
+
+#else
+	setTextStyle(24, bolditalic);
+	auto sp = drawText(utf8_string("ntsfi flieira"));
+	drawBox(sp);
+	// crosshairs(myCurrentRowLeft,myCurrentRowTop+myTextSize);
+
+	setTextStyle(24, bolditalic);
     SkPaint paint;
     paint.setStyle(SkPaint::kFill_Style);
     paint.setAntiAlias(true);
@@ -48,16 +271,15 @@ void TextTextureAtlas::test() {
     paint1.setStyle(SkPaint::kFill_Style);
 
 	const string font = "Ubuntu";
-	paint.setTypeface(SkTypeface::MakeFromName(font.c_str(), SkFontStyle (400, 5,  SkFontStyle::kUpright_Slant)));
+//	paint.setTypeface(SkTypeface::MakeFromName(font.c_str(), SkFontStyle (400, 5,  SkFontStyle::kUpright_Slant)));
 
-    const char text[] = "Testy_jgq, ∀ x ∃ ";
+    const char text[] = "Testy fight _jgq, ∀ x ∃ ";
 
-    SkCanvas *canvas = myDrawingSurface->getCanvas();
     SkRect rect = SkRect::MakeXYWH(10, 10, 100, 160);
-    canvas->drawRect(rect, paint);
+    pMyCanvas->drawRect(rect, paint);
 
-    canvas->drawText(text, strlen(text), 130, 120, paint1);
-    crosshairs(canvas, 131, 121);
+    pMyCanvas->drawText(text, strlen(text), 130, 120, myTextPaint);
+    crosshairs(131, 121);
 
 tiny();
 
@@ -75,9 +297,8 @@ tiny();
 	paint.setStyle(SkPaint::kFill_Style);
         paint.setTypeface(tf);
         paint.setTextEncoding(SkPaint::kUTF32_TextEncoding);
-        canvas->drawText(utf32string, sizeof(utf32string), 200.0f, 264.0f, paint);
+        pMyCanvas->drawText(utf32string, sizeof(utf32string), 200.0f, 264.0f, paint);
     }
-
 
 #endif
 
@@ -224,6 +445,11 @@ void TextTextureAtlas::initOnFirstContext(GlContext &ctx) {
 #ifdef NATIVE
 	SkGraphics::Init();
 
+	myTextPaint.setTextSize(20.0f);
+	myTextPaint.setAntiAlias(true);
+	myTextPaint.setColor(0xffffffff);
+	myTextPaint.setStyle(SkPaint::kFill_Style);
+
 	// my linux machine refuses to create RGBA skia surfaces, but will allow BGRA ones
 	// my macbook is the opposite
 	// i have no idea if i'm compiling skia wrong or it's about endianness or what
@@ -240,11 +466,13 @@ void TextTextureAtlas::initOnFirstContext(GlContext &ctx) {
 	// kOpaque_SkAlphaType
 	);
 
-	myDrawingSurface = 
+	pMyDrawingSurface = 
 		SkSurface::MakeRasterDirect(drawingSurfaceInfo, &gPixelMemory[0], ATLAS_SIZE * 4);
 
-	if (myDrawingSurface != 0)
+	if (pMyDrawingSurface != 0) {
+		pMyCanvas = pMyDrawingSurface->getCanvas();
 		return;
+	}
 
 	cout << "Couldn't make an RGBA Skia drawing surface :("<<endl;
 
@@ -253,11 +481,14 @@ void TextTextureAtlas::initOnFirstContext(GlContext &ctx) {
 		kPremul_SkAlphaType
 	);	
 
-	myDrawingSurface = 
+	pMyDrawingSurface = 
 		SkSurface::MakeRasterDirect(drawingSurfaceInfo, &gPixelMemory[0], ATLAS_SIZE * 4);
 
-	if (myDrawingSurface != 0)
+	if (pMyDrawingSurface != 0) {
+		pMyCanvas = pMyDrawingSurface->getCanvas();
 		return;
+	}
+
 
 	cout << "Neither BGRA now RGBA drawing surfaces can be created >:O" << endl;
 #else // web version

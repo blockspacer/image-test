@@ -39,7 +39,7 @@ canvas {
 </style>
     </head>
     <body id=bod>
-    <span id=message>Please wait while the code loads, this should only happen once as your browser will cache it.<br />Loading it is slow because this program was written expecting it to be downloaded and run on your local machine (where it will work about ten or twenty times faster than running it in a browser), and making a browser-capable version was kinda an afterthought.</span>
+    <span id=message>Please wait while the code loads, this should only happen once as your browser will cache it.<br />Loading it is slow because this program was written expecting it to be downloaded and run on your local machine (where it will work about ten to twenty times faster than running it in a browser), and making a browser-capable version was kinda an afterthought.</span>
     <canvas class="topleft" id="canvs"></canvas>
 
     <script type="text/javascript">
@@ -83,18 +83,18 @@ canvas {
 			_free(ptr)
 		}
 		var textCtx = document.createElement("canvas").getContext("2d");
+		var str = "";
 		function create_canvas(size) {
  			textCtx.canvas.width  = size;
 			textCtx.canvas.height = size;
-			textCtx.font = "20px sans";
-			textCtx.textAlign = "center";
+			textCtx.font = "20px monospace";
+			textCtx.textAlign = "left";
 			textCtx.textBaseline = "middle";
 			textCtx.fillStyle = "black";
 			textCtx.fillRect(0, 0, textCtx.canvas.width, textCtx.canvas.height);
 			textCtx.fillStyle = "green";
-
-			textCtx.fillText("heyyy", size / 2, size / 2);
-
+			textCtx.fillText("!🌍 olleH Testy_jgq, ∀ x ∃ ", size / 2, size / 2);
+console.log ("Hum", textCtx.measureText("green").width)
 			return textCtx.canvas;
 		}
 
