@@ -22,6 +22,7 @@ extern int controlKeysDown;
 
 #ifdef __EMSCRIPTEN__
 	#define EM 1
+	#define WEB 1
 #else
 	#define NOTEM 1
 	#define NATIVE 1
@@ -30,6 +31,10 @@ extern int controlKeysDown;
 #include <GL/glew.h>
 
 #include <GLFW/glfw3.h>
+
+#include <vector>
+
+static std::vector<GLubyte> gPixelMemory;
 
 enum gNumberNames {version_number, second_thing, maximumNumber};
 static double gNums[maximumNumber];
@@ -93,11 +98,6 @@ std::string type_name() {
 		r += "&&";
 	return r;
 }
-
-#define BOLDSTR      "\033[1m" 
-#define ITALICSTR    "\033[3m" 
-#define UNDERLINESTR "\033[4m" 
-#define NORMALSTR    "\033[0m" 
 
 // make terminals more colorful using special ANSI escape character control codes
 #ifdef __EMSCRIPTEN__

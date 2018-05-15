@@ -42,11 +42,13 @@ using std::unordered_map;
 #define ATLAS_BYTES (ATLAS_SIZE * ATLAS_SIZE * 4)
 
 struct SpritePosition {
-	float top {-1}, left {-1}, layer {-1},
-		width {-1}, height {-1};
+	float layer {-1}, top {-1}, left {-1}, width {-1}, height {-1};
+	SpritePosition(int x, int y, int w, int h) : layer{0.0f}, left{float(x)}, top{float(y)}, width{float(w)}, height{float(h)} {};
+	SpritePosition(int layer, int x, int y, int w, int h) : layer{float(layer)}, left{float(x)}, top{float(y)}, width{float(w)}, height{float(h)} {};
+	SpritePosition(float layer, float x, float y, float w, float h) : layer{layer}, left{x}, top{y}, width{w}, height{h} {};
 };
 
-enum FontFacee {normal, bold, italic, bolditalic, monospaced, fontFaceCount};
+enum FontFaceTypes {normal = 0, bold, italic, bolditalic, monospaced, fontFaceCount};
 
 using FontFaceVariants = SpritePosition[5];
 
@@ -55,8 +57,7 @@ struct FontFace {SpritePosition
  bold ,
  italic ,
  bolditalic ,
- monospaced ,
- fontFaceCount ;
+ monospaced ;
 };
 
 struct WordSprites {
@@ -72,27 +73,51 @@ using Token = size_t;
 
 class TextTextureAtlas {
 	unordered_map< const char *, WordSprites > myStringsToSpritesDictionary;
+	vector< SpritePosition >                   myTempToPermTransfersToMake;
+
+	int myCurrentRowTop    {0},
+		myCurrentRowHeight {0},
+		myCurrentRowLeft   {0},
+
+		myTextSize         {20}
+		;
+	FontFaceTypes myCurrentFont {normal};
+
+
+
+
 
 	GLuint myTextureAtlas {0},
 			myFramebuffer {0};
 	size_t myAvailablePages {1},
-		myHighestUsedPage{1};
+			myHighestUsedPage{1};
 
-	vector<GLubyte> myPixelMemory;
 	#ifdef NATIVE
-		sk_sp<SkSurface> myDrawingSurface;
+		SkCanvas *pMyCanvas;
+		sk_sp<SkSurface> pMyDrawingSurface;
+		SkPaint myTextPaint;
+	#else // web
+		GLubyte *myDrawingSurface;
 	#endif
 
 public:
+	void           setTextStyle(int pixelSize, FontFaceTypes face);
+	SpritePosition drawText(const utf8_string str); // returns width in pixels
+	void           drawBox(const SpritePosition &sp);
+//	int  measureTextWidth(const utf8_string str);
 	void test();
 	// renderTempWord();
 	// copyTempWordToAtlas();
 	void initOnFirstContext(GlContext &ctx);
 	void createTextureAtlas(GlContext &ctx);
-	void crosshairs(SkCanvas* canvas, int x, int y, int len = 50);
+	void crosshairs(int x, int y, int len = 50);
+#ifdef NATIVE
+#endif
 void uploadEntireTexture();
 	void uploadEntireSurface();
-void fetchWordSprite(utf8_string word);
+	SpritePosition getTemporarySprite(utf8_string word, int pixelSize, FontFaceTypes face);
+	SpritePosition getPermanentSprite(utf8_string word, int pixelSize, FontFaceTypes face);
+
 };
 
-
+extern "C" int receive_canvas(char * buffer, int width, int height);
