@@ -197,7 +197,7 @@ SpritePosition TextTextureAtlas::drawText(const utf8_string str) {
 	}
 	if (span.size() != 0) {
 		int w = myTextPaint.measureText(span.c_str(), span.size());
-		pMyCanvas->drawText
+		pMyCanvas->drawText();
 		acc += w;
 	}
 	return SpritePosition(0, 0, w, 0);
