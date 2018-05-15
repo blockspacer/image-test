@@ -23,7 +23,7 @@ using namespace std;
 
 int tiny()
 {
-	cout<<"HIIIII"<<endl;🌍🌍
+	cout<<"HIIIII"<<endl;
     utf8_string str = u8"!🌍 olleH";
     for_each( str.rbegin() , str.rend() , []( char32_t codepoint ){
     	cout<<int(codepoint)<<" ";;
