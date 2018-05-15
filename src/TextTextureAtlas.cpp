@@ -3,16 +3,16 @@
 //#include "SkDocument.h"
 
 
-void TextTextureAtlas::crosshairs(int x, int y, int len) {
+void TextTextureAtlas::drawCrosshairs(int x, int y, int len) {
 #ifdef NATIVE
 	SkPaint paint;
     paint.setStyle(SkPaint::kFill_Style);
-    paint.setColor(SK_ColorWHITE);
+    paint.setColor(SK_ColorGREEN);
     SkRect rect = SkRect::MakeXYWH(x-len, y, 2*len+1, 1);
     
-	pMyCanvas->drawRect(rect, paint);
+	pMySkiaCanvas->drawRect(rect, paint);
 	rect = SkRect::MakeXYWH(x, y-len, 1, 2*len+1);
-    pMyCanvas->drawRect(rect, paint);
+    pMySkiaCanvas->drawRect(rect, paint);
 #else
     EM_ASM_({
 		var x = $0;
@@ -187,7 +187,7 @@ SpritePosition TextTextureAtlas::drawText(const utf8_string str) {
 		        myTextPaint.setTypeface(tf);
 		        myTextPaint.setTextEncoding(SkPaint::kUTF32_TextEncoding);
 		        unicodeString[0] = chr;
-				pMyCanvas->drawText(unicodeString, 4, 200.0f, 264.0f, myTextPaint);
+				pMySkiaCanvas->drawText(unicodeString, 4, 200.0f, 264.0f, myTextPaint);
 				int w = myTextPaint.measureText(span.c_str(), span.size());
 				acc += w;
 		    }
@@ -197,9 +197,9 @@ SpritePosition TextTextureAtlas::drawText(const utf8_string str) {
 	}
 	if (span.size() != 0) {
 		int w = myTextPaint.measureText(span.c_str(), span.size());
-		pMyCanvas->drawText
+//		pMySkiaCanvas->drawText
 		acc += w;
-	}
+	}//52.634292, -1.6907115
 	return SpritePosition(0, 0, w, 0);
 #else // web
 	int w = EM_ASM_INT({
@@ -248,14 +248,14 @@ void TextTextureAtlas::test() {
 	setTextStyle(24, bolditalic);
 	auto sp = drawText(utf8_string("ntsfi flieira"));
 	drawBox(sp);
-	crosshairs(myCurrentRowLeft,myCurrentRowTop+myTextSize);
+	drawCrosshairs(myCurrentRowLeft,myCurrentRowTop+myTextSize);
 
 
 #else
 	setTextStyle(24, bolditalic);
 	auto sp = drawText(utf8_string("ntsfi flieira"));
 	drawBox(sp);
-	// crosshairs(myCurrentRowLeft,myCurrentRowTop+myTextSize);
+	// drawCrosshairs(myCurrentRowLeft,myCurrentRowTop+myTextSize);
 
 	setTextStyle(24, bolditalic);
     SkPaint paint;
@@ -276,10 +276,10 @@ void TextTextureAtlas::test() {
     const char text[] = "Testy fight _jgq, ∀ x ∃ ";
 
     SkRect rect = SkRect::MakeXYWH(10, 10, 100, 160);
-    pMyCanvas->drawRect(rect, paint);
+    pMySkiaCanvas->drawRect(rect, paint);
 
-    pMyCanvas->drawText(text, strlen(text), 130, 120, myTextPaint);
-    crosshairs(131, 121);
+    pMySkiaCanvas->drawText(text, strlen(text), 130, 120, myTextPaint);
+    drawCrosshairs(131, 121);
 
 tiny();
 
@@ -297,7 +297,7 @@ tiny();
 	paint.setStyle(SkPaint::kFill_Style);
         paint.setTypeface(tf);
         paint.setTextEncoding(SkPaint::kUTF32_TextEncoding);
-        pMyCanvas->drawText(utf32string, sizeof(utf32string), 200.0f, 264.0f, paint);
+        pMySkiaCanvas->drawText(utf32string, sizeof(utf32string), 200.0f, 264.0f, paint);
     }
 
 #endif
@@ -470,7 +470,7 @@ void TextTextureAtlas::initOnFirstContext(GlContext &ctx) {
 		SkSurface::MakeRasterDirect(drawingSurfaceInfo, &gPixelMemory[0], ATLAS_SIZE * 4);
 
 	if (pMyDrawingSurface != 0) {
-		pMyCanvas = pMyDrawingSurface->getCanvas();
+		pMySkiaCanvas = pMyDrawingSurface->getCanvas();
 		return;
 	}
 
@@ -485,7 +485,7 @@ void TextTextureAtlas::initOnFirstContext(GlContext &ctx) {
 		SkSurface::MakeRasterDirect(drawingSurfaceInfo, &gPixelMemory[0], ATLAS_SIZE * 4);
 
 	if (pMyDrawingSurface != 0) {
-		pMyCanvas = pMyDrawingSurface->getCanvas();
+		pMySkiaCanvas = pMyDrawingSurface->getCanvas();
 		return;
 	}
 

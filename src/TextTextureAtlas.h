@@ -93,7 +93,7 @@ class TextTextureAtlas {
 			myHighestUsedPage{1};
 
 	#ifdef NATIVE
-		SkCanvas *pMyCanvas;
+		SkCanvas *pMySkiaCanvas;
 		sk_sp<SkSurface> pMyDrawingSurface;
 		SkPaint myTextPaint;
 	#else // web
@@ -110,7 +110,7 @@ public:
 	// copyTempWordToAtlas();
 	void initOnFirstContext(GlContext &ctx);
 	void createTextureAtlas(GlContext &ctx);
-	void crosshairs(int x, int y, int len = 50);
+	void drawCrosshairs(int x, int y, int len = 50);
 #ifdef NATIVE
 #endif
 void uploadEntireTexture();
