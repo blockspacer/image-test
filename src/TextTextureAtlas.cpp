@@ -59,79 +59,81 @@ int tiny()
 }
 
 void TextTextureAtlas::setTextStyle(int pixelSize, FontFaceTypes face) {
-	#ifdef NATIVE
-		if (myTextSize != pixelSize) {
-			myTextSize = pixelSize;
-			myTextPaint.setTextSize(float(pixelSize));
-		}
-		if (face != myCurrentFont) {
-			myCurrentFont = face;
-			// Roboto font? user font?
-			#ifdef __linux__
-				string font =  "Ubuntu"; // ::gStrings["Linux font"];
-			//	string font = "Free Sans";
-			#elif __APPLE__
-				string font = "Helvetica"; // ::gStrings["Apple font"];
-			#elif _WIN32
-				string font = "Arial"; // ::gStrings["Helvetica font"];
-			#else
-				string font = "Sans";
-			#endif
+#ifdef NATIVE
+	if (myTextSize != pixelSize) {
+		myTextSize = pixelSize;
+		myTextPaint.setTextSize(float(pixelSize));
+	}
+	if (face != myCurrentFont) {
+		myCurrentFont = face;
+		// Roboto font? user font?
+		#ifdef __linux__
+			string font =  "Sans"; // ::gStrings["Linux font"];
+		//	string font = "Free Sans";
+		#elif __APPLE__
+			string font = "Helvetica"; // ::gStrings["Apple font"];
+		#elif _WIN32
+			string font = "Arial"; // ::gStrings["Helvetica font"];
+		#else
+			string font = "Sans";
+		#endif
 
-			auto weight = 400;
-			auto slant  = SkFontStyle::kUpright_Slant;
+		auto weight = 400;
+		auto slant  = SkFontStyle::kUpright_Slant;
 
-			switch(face) {
+		switch(face) {
+			case 0:
+				break;
+			case 1:
+				weight = 700;
+				break;
+			case 2:
+				slant = SkFontStyle::kItalic_Slant;
+				break;
+			case 3:
+				weight = 700;
+				slant = SkFontStyle::kItalic_Slant;
+				break;
+			case 4:
+				font = "Mono";
+				break;
+			}
+
+		//todo: maybe try experimenting with condensed text?
+		myTextPaint.setTypeface(SkTypeface::MakeFromName(font.c_str(), SkFontStyle (weight, 5,  slant)));
+	}
+#else
+	if (face != myCurrentFont || myTextSize != pixelSize) {
+		myCurrentFont = face; myTextSize = pixelSize;
+		EM_ASM_({
+			var pre = '';
+			var s = 'px sans';
+			switch($1) {
 				case 0:
 					break;
 				case 1:
-					weight = 700;
+					pre = 'bold ';
+					s = 'px sans';
 					break;
 				case 2:
-					slant = SkFontStyle::kItalic_Slant;
+					pre = 'italic ';
+					s = 'px italic sans';
 					break;
 				case 3:
-					weight = 700;
-					slant = SkFontStyle::kItalic_Slant;
+					pre = 'italic bold ';
+					s = 'px bold italic sans';
 					break;
 				case 4:
-					font = "Mono";
+					s = 'px monospace';
 					break;
-				}
-
-			//todo: maybe try experimenting with condensed text?
-			myTextPaint.setTypeface(SkTypeface::MakeFromName(font.c_str(), SkFontStyle (weight, 5,  slant)));
-		}
-	#else
-		if (face != myCurrentFont || myTextSize != pixelSize) {
-			myCurrentFont = face; myTextSize = pixelSize;
-			EM_ASM_({
-				var pre = '';
-				var s = 'px sans';
-				switch($1) {
-					case 0:
-						break;
-					case 1:
-						pre = 'bold ';
-						s = 'px sans';
-						break;
-					case 2:
-						pre = 'italic ';
-						s = 'px italic sans';
-						break;
-					case 3:
-						pre = 'italic bold ';
-						s = 'px bold italic sans';
-						break;
-					case 4:
-						s = 'px monospace';
-						break;
-				}
-				textCtx.font = pre + $0 + s;
-				console.log(pre + $0 + s)
-			}, pixelSize, face);
-		}
-	#endif
+			}
+			textCtx.font = pre + $0 + s;
+			console.log(pre + $0 + s)
+		}, pixelSize, face);
+	}
+#endif
+	myTextSize    = pixelSize;
+	myCurrentFont = face;
 }
 
 void TextTextureAtlas::drawBox(const SpritePosition &pos) {
@@ -153,13 +155,68 @@ void TextTextureAtlas::drawBox(const SpritePosition &pos) {
 		textCtx.stroke();
 
 	}, pos.left, pos.top, pos.width, pos.height);
+#else
+//    myTextPaint.setStyle(SkPaint::kFill_Style);
+
+	SkRect rect = SkRect::MakeXYWH(pos.left, pos.top, pos.width, 1);
+	pMySkiaCanvas->drawRect(rect, myTextPaint);
+
+	rect = SkRect::MakeXYWH(pos.left, pos.top + pos.height, pos.width, 1);
+	pMySkiaCanvas->drawRect(rect, myTextPaint);
+
+	rect = SkRect::MakeXYWH(pos.left, pos.top, 1, pos.height);
+	pMySkiaCanvas->drawRect(rect, myTextPaint);
+
+	rect = SkRect::MakeXYWH(pos.left + pos.width, pos.top, 1, pos.height);
+	pMySkiaCanvas->drawRect(rect, myTextPaint);
+
 #endif
 }
 
-// returns width
-SpritePosition TextTextureAtlas::drawText(const utf8_string str) {
-	float acc = 0.0f;
 #ifdef NATIVE
+// this is annoying because skia doesn't do automatic fallback for non-ASCII characters, it just draws an empty box
+// i'm not sure if you're supposed to use something else for positioning your glyphs, like the situation with the Gnome project libraries Cairo and Pango, where Cairo ~can~ draw text but only in a very basic manner, and certainly not fun foreign scripts like Arabic and Devanagari
+// anyway, i'm mostly concerned with mathematical symbols and greek letters, so am just going to be lazy and collect spans of < 127 ascii character code symbols to do all at once and (as i assume kerning and ligatures would mean going character-by-character wouldn't work) and doing other characters one by one
+// if the optional argument measure_char_count is given this doesn't draw anything but instead measures the width of the specified number of characters into the string, a behaviour used for cursor positioning
+
+
+// this tries to draw text but and return the width, but returns -1 if it wouldn't fit on that row of the texture sheet
+float TextTextureAtlas::attemptToDraw(utf8_string str, uint32_t *unicodeChar, float widthSoFar, bool abort_allowed) {
+
+	float newWidth;
+	if (unicodeChar == 0)
+		newWidth = myTextPaint.measureText(str.c_str(), str.size());
+	else
+		newWidth = myTextPaint.measureText(unicodeChar, 4);
+
+	if (abort_allowed && myCurrentRowLeft + widthSoFar + newWidth > ATLAS_SIZE) {
+		// start over
+		myCurrentRowLeft = 0;
+		myCurrentRowTop += myCurrentRowHeight;
+		myCurrentRowHeight = myTextSize;
+		return -1.0f;
+	}
+
+	myTextPaint.setColor(SK_ColorBLACK);
+	SkRect rect = SkRect::MakeXYWH(myCurrentRowLeft + widthSoFar, myCurrentRowTop, newWidth, myTextSize);
+	pMySkiaCanvas->drawRect(rect, myTextPaint);
+
+	myTextPaint.setColor(SK_ColorWHITE);
+	if (unicodeChar == 0)
+		pMySkiaCanvas->drawText(str.c_str(), str.size(), myCurrentRowLeft + widthSoFar, myCurrentRowTop + myTextSize * 0.8f, myTextPaint);
+	else
+		pMySkiaCanvas->drawText(unicodeChar, 4, myCurrentRowLeft + widthSoFar, myCurrentRowTop + myTextSize * 0.8f, myTextPaint);
+
+	return newWidth;
+}
+
+SpritePosition TextTextureAtlas::drawSkiaString(const utf8_string str, bool abort_allowed, int measure_char_count) {
+	float widthSoFar = 0.0f;
+
+	float x   = myCurrentRowLeft,
+			y = myCurrentRowTop,
+			h = myTextSize;
+
 	// collect spans of ascii text to measure
 	utf8_string span;
 	uint32_t unicodeString[1] = {0x0};
@@ -172,8 +229,15 @@ SpritePosition TextTextureAtlas::drawText(const utf8_string str) {
 		}
 		else {
 			// Unicode char
-			if (span.size() > 0) {
+			if (span.size() > 0 && abort_allowed) {
 //				draw and measure
+				float w = attemptToDraw(span, 0, widthSoFar, abort_allowed);
+				if (w == -1.0f) {
+cout<<"overlap, forced to wrap"<<endl;
+					return drawSkiaString(str, false);
+				}
+
+				widthSoFar += w;
 				span = "";
 			}
 
@@ -184,23 +248,49 @@ SpritePosition TextTextureAtlas::drawText(const utf8_string str) {
 					nullptr, SkFontStyle(), nullptr, 0, chr));
 			if (tf) {
 //				unicodeString.(chr);
-		        myTextPaint.setTypeface(tf);
+				myTextPaint.setTypeface(tf);
+
 		        myTextPaint.setTextEncoding(SkPaint::kUTF32_TextEncoding);
 		        unicodeString[0] = chr;
-				pMySkiaCanvas->drawText(unicodeString, 4, 200.0f, 264.0f, myTextPaint);
-				int w = myTextPaint.measureText(span.c_str(), span.size());
-				acc += w;
-		    }
 
+				float w = attemptToDraw(span, unicodeString, widthSoFar, abort_allowed);
+				if (w == -1.0f) {
+cout<<"FORCED 2"<<endl;
+					return drawSkiaString(str, false);
+
+				}
+
+				widthSoFar += w;
+
+				FontFaceTypes font = myCurrentFont;
+				myCurrentFont = fontFaceTypesCount;
+		        myTextPaint.setTextEncoding(SkPaint::kUTF8_TextEncoding);
+				setTextStyle(myTextSize, font);
+		    }
 		}
 		i++;
 	}
 	if (span.size() != 0) {
-		int w = myTextPaint.measureText(span.c_str(), span.size());
-//		pMySkiaCanvas->drawText
-		acc += w;
-	}//52.634292, -1.6907115
-	return SpritePosition(0, 0, w, 0);
+//		draw and measure
+		float w = attemptToDraw(span, 0, widthSoFar, abort_allowed);
+		if (w == -1.0f) {
+cout<<"FORCEDDD 3"<<endl;
+			return drawSkiaString(str, false);
+		}
+		widthSoFar += w;
+	}
+	myCurrentRowLeft += widthSoFar;
+	return SpritePosition(x, y, widthSoFar, h);
+}
+#endif
+
+// returns position of drawn thing
+SpritePosition TextTextureAtlas::drawText(const utf8_string str) {
+	if (myTextSize > myCurrentRowHeight)
+		myCurrentRowHeight = myTextSize;
+
+#ifdef NATIVE
+	return drawSkiaString(str, true);
 #else // web
 	int w = EM_ASM_INT({
 		str = Pointer_stringify($0);
@@ -209,19 +299,24 @@ SpritePosition TextTextureAtlas::drawText(const utf8_string str) {
 
 	int x = myCurrentRowLeft,
 		h = myTextSize,
-		y = myCurrentRowTop + h;
+		y = myCurrentRowTop;
 
-	if (ATLAS_SIZE - myCurrentRowLeft <= w) {
+	if (myCurrentRowLeft + w <= ATLAS_SIZE) {
 		// fit it onto line
+		myCurrentRowLeft += w + 1;
 	}
 	else {
 		// start a new line
+		x = 0;
+		y += myCurrentRowHeight + 1;
+		myCurrentRowLeft = w + 1;
 	}
 	EM_ASM_({
 		textCtx.fillStyle = "black";
 		textCtx.fillRect($0, $1, $2, $3);
 		textCtx.fillStyle = "white";
-		textCtx.fillText(str, $0, $1 + $3);		
+
+		textCtx.fillText(str, $0, $1 + $3 * 0.51);
 	}, x, y, w, h);
 	return SpritePosition(0,x,y,w,myTextSize);
 #endif
@@ -245,15 +340,35 @@ SpritePosition TextTextureAtlas::getPermanentSprite(utf8_string word, int pixelS
 void TextTextureAtlas::test() {
 #ifdef WEB
 
-	setTextStyle(24, bolditalic);
-	auto sp = drawText(utf8_string("ntsfi flieira"));
+	myCurrentRowLeft = 10;
+	myCurrentRowTop  = 20;
+
+	setTextStyle(24, normal);
+
+	auto sp = drawText(utf8_string("M∀xx ∃!🌍 _olleH "));
 	drawBox(sp);
-	drawCrosshairs(myCurrentRowLeft,myCurrentRowTop+myTextSize);
+
+	drawText(utf8_string("boop "));
+	drawText(utf8_string("boop "));
+	drawText(utf8_string("boop "));
+	drawText(utf8_string("boop "));
+// drawText(utf8_string("boop "));
+	// drawText(utf8_string("boop "));
+	sp = drawText(utf8_string("boop "));
+	drawBox(sp);
+
+	cout<<myTextSize<<" text size"<<endl;
+//	sp = drawText(utf8_string("TehWfiflay^'@\"'fgj_jgq, ∀ x ∃ "));
+	drawBox(sp);
+	drawCrosshairs(sp.left, sp.top);
+//	drawText(utf8_string("TehWfiflay^'@\"'fgj_jgq, ∀ x ∃ "));
 
 
 #else
-	setTextStyle(24, bolditalic);
-	auto sp = drawText(utf8_string("ntsfi flieira"));
+	setTextStyle(32, bolditalic);
+	auto sp = drawText(utf8_string("M∀xx ∃!🌍 olleH"));
+myTextPaint.setColor(SK_ColorRED);
+
 	drawBox(sp);
 	// drawCrosshairs(myCurrentRowLeft,myCurrentRowTop+myTextSize);
 
@@ -275,8 +390,8 @@ void TextTextureAtlas::test() {
 
     const char text[] = "Testy fight _jgq, ∀ x ∃ ";
 
-    SkRect rect = SkRect::MakeXYWH(10, 10, 100, 160);
-    pMySkiaCanvas->drawRect(rect, paint);
+    // SkRect rect = SkRect::MakeXYWH(10, 10, 100, 160);
+    // pMySkiaCanvas->drawRect(rect, paint);
 
     pMySkiaCanvas->drawText(text, strlen(text), 130, 120, myTextPaint);
     drawCrosshairs(131, 121);
@@ -316,7 +431,7 @@ void TextTextureAtlas::uploadEntireSurface() {
 //glEnable(GL_TEXTURE_3D);
 int i;
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &i);
-cout<<"fax: "<<i<<endl;
+
 check_gl_errors("enum?");
 	const GLenum  target  = GL_TEXTURE_2D_ARRAY;
 	const GLint   level   = 0,
@@ -342,7 +457,6 @@ check_gl_errors("enum?");
 					type,
 					pixels);
 
-cout<<"pixi "<<pixels<<endl;
 //cout<<glGetString(GL_EXTENSIONS)<<endl;
 	check_gl_errors("oh noes!");
 }

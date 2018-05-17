@@ -48,7 +48,7 @@ struct SpritePosition {
 	SpritePosition(float layer, float x, float y, float w, float h) : layer{layer}, left{x}, top{y}, width{w}, height{h} {};
 };
 
-enum FontFaceTypes {normal = 0, bold, italic, bolditalic, monospaced, fontFaceCount};
+enum FontFaceTypes {normal = 0, bold, italic, bolditalic, monospaced, fontFaceTypesCount};
 
 using FontFaceVariants = SpritePosition[5];
 
@@ -112,6 +112,8 @@ public:
 	void createTextureAtlas(GlContext &ctx);
 	void drawCrosshairs(int x, int y, int len = 50);
 #ifdef NATIVE
+	float attemptToDraw(const utf8_string str, uint32_t *unicodeChar, float widthSoFar, bool abort_allowed);
+	SpritePosition drawSkiaString(const utf8_string str, bool abort_allowed, int measure_char_count = -2);
 #endif
 void uploadEntireTexture();
 	void uploadEntireSurface();
