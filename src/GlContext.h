@@ -16,14 +16,26 @@ using std::vector;
 #include <complex>
 using std::complex;
 
+struct Monitor {
+	GLFWmonitor* glfwHandle;
+	complex<float> physicalSize,
+					pixelSize,
+					position;
+	float	pixelsPerCM;
+	string 	name;
+	Monitor(GLFWmonitor*& h, std::complex<float> phys, std::complex<float> pixs, std::complex<float> posn, double ppcm, string nom)
+		 : glfwHandle {h}, physicalSize {phys}, pixelSize {pixs}, position {posn}, pixelsPerCM {ppcm}, name {nom}
+		 {};
+};
 
 struct GlContext {
-	vector<Window> windows;
 	GLFWwindow* pCurrentContext;
 	WindowId    currentWindow;
 
-	GLuint shaderProgramHandle {0},
+	vector<Window>  windows;
+	vector<Monitor> monitors;
 
+	GLuint shaderProgramHandle {0},
 		spareHandle {0};
 
 
@@ -32,11 +44,13 @@ struct GlContext {
 
 	WindowId 	createWindow(complex<float> center);
 	GLFWwindow*	setupFirstContext();
-    GLFWwindow* setupSharedContext();
+	GLFWwindow* setupSharedContext();
 
-    WindowId lookupWindow(GLFWwindow* pWin);
+	void getMonitorsInfo();
+
+	WindowId lookupWindow(GLFWwindow* pWin);
     
-    void enlargeBuffer(GLenum target, size_t oldSize, size_t newSize);
+//	void enlargeBuffer(GLenum target, size_t oldSize, size_t newSize);
 
 	bool checkglerror(int err, int errnum, string errname, string label);
 	void check_gl_errors(string label);
@@ -48,3 +62,4 @@ struct GlContext {
 	bool checkglerror(int err, int errnum, string errname, string label);
 	void check_gl_errors(string label);
 	void check_gl_errors();
+

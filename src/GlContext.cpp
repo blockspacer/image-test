@@ -163,8 +163,7 @@ void glfw_error_callback(int error, const char* description) {
 }
 
 
-void
-MessageCallback( GLenum source,
+void MessageCallback( GLenum source,
                  GLenum type,
                  GLuint id,
                  GLenum severity,
@@ -172,24 +171,57 @@ MessageCallback( GLenum source,
                  const GLchar* message,
                  const void* userParam )
 {
-	cout<<"err!"<<endl;
 	if (type != GL_DEBUG_TYPE_ERROR)
 		return;
   fprintf( stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
            ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ),
             type, severity, message );
-//cout<<"GL CALLBACK: "<<( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" )
-//<<" type = 0x"<<type<<", severity = 0x"<<severity<<", message = "<<message<<endl;
-
-
-
-
 }
 
 // During init, enable debug output
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+void GlContext::getMonitorsInfo() {
+	cout<<"Getting monitor specs\n";
+	int count;
+	GLFWmonitor** ms = glfwGetMonitors(&count);
+	monitors.clear();
+	for (int i=0; i<count; ++i) {
+		const GLFWvidmode* mode = glfwGetVideoMode(ms[i]);
+		int w = mode->width;
+		int h = mode->height;
+		int r = mode->refreshRate;
+		int posX, posY;
+		string name;
+		name = glfwGetMonitorName(ms[i]);
+		glfwGetMonitorPos(ms[i], &posX, &posY);
+		int widthMM, heightMM;
+		glfwGetMonitorPhysicalSize(ms[i], &widthMM, &heightMM);
+		
+		cout<<w<<" x "<<h<<" pixel(/screen unit?), "<<(widthMM/10.0)<<" cm x "<<(heightMM/10.0)<<" cm monitor found, with "<<r<<" Hz refresh rate, named \""<<name<<"\", positioned at "<<posX<<", "<<posY<<"\n";
+		
+		monitors.emplace_back(ms[i], complex<float>(widthMM,heightMM),
+			complex<float>(w, h),
+			complex<float>(posX, posY),
+			(10.0 * w) / widthMM,
+			name);
+		cout<< monitors[monitors.size()-1].pixelsPerCM <<endl;
+	}
+}
 
 
 
@@ -336,7 +368,7 @@ glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
    	
    	glfwSetWindowUserPointer(pCurrentContext, (void *) 0);
 
-
+   	getMonitorsInfo();
 
 	glewExperimental = true; // Needed for core profile or something
 	if (glewInit() != GLEW_OK) {
