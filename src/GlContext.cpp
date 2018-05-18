@@ -193,13 +193,14 @@ void MessageCallback( GLenum source,
 
 
 
+vector<Monitor> GlContext::sMonitors;
 
 
 void GlContext::getMonitorsInfo() {
 	cout<<"Getting monitor specs\n";
 	int count;
 	GLFWmonitor** ms = glfwGetMonitors(&count);
-	monitors.clear();
+	sMonitors.clear();
 	for (int i=0; i<count; ++i) {
 		const GLFWvidmode* mode = glfwGetVideoMode(ms[i]);
 		int w = mode->width;
@@ -212,18 +213,18 @@ void GlContext::getMonitorsInfo() {
 		int widthMM, heightMM;
 		glfwGetMonitorPhysicalSize(ms[i], &widthMM, &heightMM);
 		
-		cout<<w<<" x "<<h<<" pixel(/screen unit?), "<<(widthMM/10.0)<<" cm x "<<(heightMM/10.0)<<" cm monitor found, with "<<r<<" Hz refresh rate, named \""<<name<<"\", positioned at "<<posX<<", "<<posY<<"\n";
+		cout<<w<<" x "<<h<<" screen unit, "<<(widthMM/10.0)<<" cm x "<<(heightMM/10.0)<<" cm monitor found, with "<<r<<" Hz refresh rate, named \""<<name<<"\", positioned at "<<posX<<", "<<posY<<"\n";
 		
-		monitors.emplace_back(ms[i], complex<float>(widthMM,heightMM),
+		sMonitors.emplace_back(ms[i], complex<float>(widthMM,heightMM),
 			complex<float>(w, h),
 			complex<float>(posX, posY),
-			(10.0 * w) / widthMM,
+			(10.0f * w) / widthMM,
 			name);
-		cout<< monitors[monitors.size()-1].pixelsPerCM <<endl;
+		cout<< sMonitors[sMonitors.size()-1].screenUnitsPerCM <<endl;
 	}
 }
 
-
+void GlContext::monitor_callback(GLFWmonitor* monitor, int event) {getMonitorsInfo();}
 
 
 
@@ -249,6 +250,14 @@ void GlContext::changeCurrentContext(GLFWwindow *pWin) {
 
 void GlContext::changeWindow(WindowId id) {
 	changeCurrentContext(windows[id].glfwHandle);
+}
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+
+	cout<<"New framebuffer size "<<width<<" x "<<height<<" pixels\n";
+
+//    glViewport(0, 0, width, height);
 }
 
 WindowId GlContext::createWindow(complex<float> center) {
@@ -278,6 +287,8 @@ WindowId GlContext::createWindow(complex<float> center) {
 	glUseProgram(shaderProgramHandle);
 
 	glfwSwapInterval(1);
+
+glfwSetFramebufferSizeCallback(windows[newWin].glfwHandle, framebuffer_size_callback);
 
 glViewport(0,0, 1000, 1000);
 
@@ -369,6 +380,9 @@ glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
    	glfwSetWindowUserPointer(pCurrentContext, (void *) 0);
 
    	getMonitorsInfo();
+
+	glfwSetMonitorCallback(monitor_callback);
+
 
 	glewExperimental = true; // Needed for core profile or something
 	if (glewInit() != GLEW_OK) {

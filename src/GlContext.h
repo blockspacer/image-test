@@ -19,12 +19,12 @@ using std::complex;
 struct Monitor {
 	GLFWmonitor* glfwHandle;
 	complex<float> physicalSize,
-					pixelSize,
+					screenUnitsSize,
 					position;
-	float	pixelsPerCM;
+	float	screenUnitsPerCM;
 	string 	name;
-	Monitor(GLFWmonitor*& h, std::complex<float> phys, std::complex<float> pixs, std::complex<float> posn, double ppcm, string nom)
-		 : glfwHandle {h}, physicalSize {phys}, pixelSize {pixs}, position {posn}, pixelsPerCM {ppcm}, name {nom}
+	Monitor(GLFWmonitor*& h, std::complex<float> phys, std::complex<float> pixs, std::complex<float> posn, float ppcm, string nom)
+		 : glfwHandle {h}, physicalSize {phys}, screenUnitsSize {pixs}, position {posn}, screenUnitsPerCM {ppcm}, name {nom}
 		 {};
 };
 
@@ -33,7 +33,7 @@ struct GlContext {
 	WindowId    currentWindow;
 
 	vector<Window>  windows;
-	vector<Monitor> monitors;
+	static vector<Monitor> sMonitors;
 
 	GLuint shaderProgramHandle {0},
 		spareHandle {0};
@@ -46,7 +46,8 @@ struct GlContext {
 	GLFWwindow*	setupFirstContext();
 	GLFWwindow* setupSharedContext();
 
-	void getMonitorsInfo();
+	static void getMonitorsInfo();
+	static void monitor_callback(GLFWmonitor* monitor, int event);
 
 	WindowId lookupWindow(GLFWwindow* pWin);
     
