@@ -84,7 +84,7 @@ else
 MOVETORELEASEDIR := mv web_release.js ../web_version/
 endif
 
-OPENINFIREFOX = firefox ../web_version/index.html
+OPENINFIREFOX = google-chrome-stable ../web_version/index.html
 
 .PHONY: move
 move:

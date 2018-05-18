@@ -174,18 +174,28 @@ void TextTextureAtlas::drawBox(const SpritePosition &pos) {
 }
 
 #ifdef NATIVE
-// this is annoying because skia doesn't do automatic fallback for non-ASCII characters, it just draws an empty box
+// this is annoying because Skia doesn't do automatic font fallback for characters missing from the current font, it just draws an empty box
 // i'm not sure if you're supposed to use something else for positioning your glyphs, like the situation with the Gnome project libraries Cairo and Pango, where Cairo ~can~ draw text but only in a very basic manner, and certainly not fun foreign scripts like Arabic and Devanagari
 // anyway, i'm mostly concerned with mathematical symbols and greek letters, so am just going to be lazy and collect spans of < 127 ascii character code symbols to do all at once and (as i assume kerning and ligatures would mean going character-by-character wouldn't work) and doing other characters one by one
 // if the optional argument measure_char_count is given this doesn't draw anything but instead measures the width of the specified number of characters into the string, a behaviour used for cursor positioning
 
+// https://groups.google.com/forum/#!topic/skia-discuss/VpuAHejfQ2Y
+// https://github.com/google/skia/blob/master/site/user/tips.md#font-hinting
+
+// https://github.com/aam/skiaex
 
 // this tries to draw text but and return the width, but returns -1 if it wouldn't fit on that row of the texture sheet
 float TextTextureAtlas::attemptToDraw(utf8_string str, uint32_t *unicodeChar, float widthSoFar, bool abort_allowed) {
 
 	float newWidth;
-	if (unicodeChar == 0)
+	if (unicodeChar == 0) {
 		newWidth = myTextPaint.measureText(str.c_str(), str.size());
+		if (widthSoFar==0.0f)
+			cout<<"world width "<<newWidth<<endl;
+		if (newWidth == 0) {
+			cout<<"UNICHAHAH \n";
+		}
+	}
 	else
 		newWidth = myTextPaint.measureText(unicodeChar, 4);
 
@@ -202,8 +212,9 @@ float TextTextureAtlas::attemptToDraw(utf8_string str, uint32_t *unicodeChar, fl
 	pMySkiaCanvas->drawRect(rect, myTextPaint);
 
 	myTextPaint.setColor(SK_ColorWHITE);
-	if (unicodeChar == 0)
+	if (unicodeChar == 0) {
 		pMySkiaCanvas->drawText(str.c_str(), str.size(), myCurrentRowLeft + widthSoFar, myCurrentRowTop + myTextSize * 0.8f, myTextPaint);
+	}
 	else
 		pMySkiaCanvas->drawText(unicodeChar, 4, myCurrentRowLeft + widthSoFar, myCurrentRowTop + myTextSize * 0.8f, myTextPaint);
 
@@ -310,6 +321,9 @@ SpritePosition TextTextureAtlas::drawText(const utf8_string str) {
 		x = 0;
 		y += myCurrentRowHeight + 1;
 		myCurrentRowLeft = w + 1;
+		myCurrentRowTop += myCurrentRowHeight + 1;
+		myCurrentRowHeight = myTextSize;
+
 	}
 	EM_ASM_({
 		textCtx.fillStyle = "black";
@@ -345,16 +359,16 @@ void TextTextureAtlas::test() {
 
 	setTextStyle(24, normal);
 
-	auto sp = drawText(utf8_string("M∀xx ∃!🌍 _olleH "));
+	auto sp = drawText(utf8_string("M∀xx ∃!🌍 _ol🌐leH "));
 	drawBox(sp);
 
-	drawText(utf8_string("boop "));
-	drawText(utf8_string("boop "));
-	drawText(utf8_string("boop "));
-	drawText(utf8_string("boop "));
-// drawText(utf8_string("boop "));
-	// drawText(utf8_string("boop "));
-	sp = drawText(utf8_string("boop "));
+	drawText(utf8_string("boop"));
+	drawText(utf8_string("boop"));
+	drawText(utf8_string("boop"));
+	drawText(utf8_string("boop"));
+    drawText(utf8_string("boop"));
+	// drawText(utf8_string("boop"));
+	sp = drawText(utf8_string("bo🌐o🌐p"));
 	drawBox(sp);
 
 	cout<<myTextSize<<" text size"<<endl;
@@ -366,9 +380,17 @@ void TextTextureAtlas::test() {
 
 #else
 	setTextStyle(32, bolditalic);
-	auto sp = drawText(utf8_string("M∀xx ∃!🌍 olleH"));
+	auto sp = drawText(utf8_string("🌍 M∀xx ∃!🌍 ol🌐leH"));
 myTextPaint.setColor(SK_ColorRED);
 
+	drawBox(sp);
+	drawText(utf8_string("boop"));
+	drawText(utf8_string("boop"));
+	drawText(utf8_string("boop"));
+	drawText(utf8_string("boop"));
+ drawText(utf8_string("boop"));
+	// drawText(utf8_string("boop"));
+	sp = drawText(utf8_string("bo🌐op"));
 	drawBox(sp);
 	// drawCrosshairs(myCurrentRowLeft,myCurrentRowTop+myTextSize);
 

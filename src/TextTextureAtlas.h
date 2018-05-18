@@ -84,7 +84,8 @@ class TextTextureAtlas {
 	FontFaceTypes myCurrentFont {normal};
 
 
-
+// https://www.raywenderlich.com/149239/htc-vive-tutorial-unity
+// https://www.raywenderlich.com/159552/advanced-vr-mechanics-unity-htc-vive-part-1
 
 
 	GLuint myTextureAtlas {0},
@@ -123,3 +124,5 @@ void uploadEntireTexture();
 };
 
 extern "C" int receive_canvas(char * buffer, int width, int height);
+
+// http://twocubes.tumblr.com/post/173999647528/how-2-count

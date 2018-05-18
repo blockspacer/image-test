@@ -50,4 +50,7 @@ Variable name prefixes:
 
 Switch out `glTexImage3D` for the more efficient `glTexStorage3D` [once that is supported by Emscripten](https://github.com/kripken/emscripten/issues/5747) (it's funny Emscripten only supports the older version, because i also found [a thread about how the WebGL working group had been controversially planning to drop support for it and only keep the newer one in the WebGL spec](https://www.khronos.org/webgl/public-mailing-list/public_webgl/1410/msg00033.php)).
 
+The Linux version can't display emoji, unlike the Mac and Web ones. May need to load a special font? https://groups.google.com/forum/#!topic/skia-discuss/1uJoMAvUXXo https://forums.xamarin.com/discussion/82233/how-to-use-mutiple-ttf-file-of-typeface-in-skiasharp or glyph layout library https://stackoverflow.com/questions/30757193/find-out-if-character-in-string-is-emoji?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+
+
 

@@ -19,7 +19,8 @@ void main()
 		return;
 	}
 	else {
-		col = texture(spriteSheets,  outTexCoord);vec4(0.0, 0.9, 0.1, 1.0);
+//yyyyyy;oi		col = vec4(1.0,0.0,0.0,1.0);
+		col = texture(spriteSheets,  outTexCoord);
 		return;
 	}
 //	    case  -2: outColor = overlay(texture(tex1,  Texcoord), Color); break;
