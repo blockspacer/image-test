@@ -304,6 +304,8 @@ WindowId GlContext::createWindow(complex<float> center) {
 		windows[newWin].glfwHandle = setupSharedContext();
 	}
 
+	myCurrentWindow = newWin;
+
 	glUseProgram(shaderProgramHandle);
 
 	glfwSwapInterval(1);

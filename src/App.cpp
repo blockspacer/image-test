@@ -24,9 +24,9 @@ void App::createWindow(WindowId parent) {
 	WindowId newId = glContext.createWindow(parent);
 	Window&  win = glContext.window(newId);
 
-	bubbles.setupOnSharedContext(glContext, newId);
     text.setupOnSharedContext    (glContext);
-	glBindVertexArray(win.bubblesVAO);
+	bubbles.setupOnSharedContext(glContext, newId);
+//	glBindVertexArray(win.bubblesVAO);
 
 }
 
@@ -36,9 +36,9 @@ void App::init() {
     ctx.createWindow(complex<float>(100.0f, 10.0f));
     setCallbacks(ctx.window(0).glfwHandle);
 
-	bubbles.setupOnFirstContext(glContext);
     text.initOnFirstContext(glContext);
-	glBindVertexArray(ctx.window(0).bubblesVAO);
+	bubbles.setupOnFirstContext(glContext);
+//	glBindVertexArray(ctx.window(0).bubblesVAO);
 
 
 	// BubbleId newb = bubbles.createBubble(5.0f,5.0f,5.0f,5.0f);
