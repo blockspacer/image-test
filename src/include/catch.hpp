@@ -98,7 +98,7 @@ namespace Catch {
 // The following features are defined:
 //
 // CATCH_CONFIG_COUNTER : is the __COUNTER__ macro supported?
-// CATCH_CONFIG_WINDOWS_SEH : is Windows SEH supported?
+// CATCH_CONFIG_WINDOWS_SEH : is Window SEH supported?
 // CATCH_CONFIG_POSIX_SIGNALS : are POSIX signals supported?
 // ****************
 // Note to maintainers: if new toggles are added please document them
@@ -164,7 +164,7 @@ namespace Catch {
 // Visual C++
 #ifdef _MSC_VER
 
-// Universal Windows platform does not support SEH
+// Universal Window platform does not support SEH
 // Or console colours (or console at all...)
 #  if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
 #    define CATCH_CONFIG_COLOUR_NONE
@@ -4682,7 +4682,7 @@ namespace Catch {
 
 #  endif // CATCH_CONFIG_WINDOWS_SEH
 
-#else // Not Windows - assumed to be POSIX compatible //////////////////////////
+#else // Not Window - assumed to be POSIX compatible //////////////////////////
 
 #  if !defined(CATCH_CONFIG_POSIX_SIGNALS)
 
@@ -4716,7 +4716,7 @@ namespace Catch {
 
 #  endif // CATCH_CONFIG_POSIX_SIGNALS
 
-#endif // not Windows
+#endif // not Window
 
 // end catch_fatal_condition.h
 #include <string>
@@ -6789,7 +6789,7 @@ namespace {
 } // end anon namespace
 } // end namespace Catch
 
-#else  // not Windows or ANSI ///////////////////////////////////////////////
+#else  // not Window or ANSI ///////////////////////////////////////////////
 
 namespace Catch {
 
@@ -6797,7 +6797,7 @@ namespace Catch {
 
 } // end namespace Catch
 
-#endif // Windows/ ANSI/ None
+#endif // Window/ ANSI/ None
 
 namespace Catch {
 
@@ -7142,7 +7142,7 @@ namespace Catch {
     struct SignalDefs { DWORD id; const char* name; };
 
     // There is no 1-1 mapping between signals and windows exceptions.
-    // Windows can easily distinguish between SO and SigSegV,
+    // Window can easily distinguish between SO and SigSegV,
     // but SigInt, SigTerm, etc are handled differently.
     static SignalDefs signalDefs[] = {
         { EXCEPTION_ILLEGAL_INSTRUCTION,  "SIGILL - Illegal instruction signal" },
@@ -7196,7 +7196,7 @@ PVOID FatalConditionHandler::exceptionHandlerHandle = nullptr;
 
 #  endif // CATCH_CONFIG_WINDOWS_SEH
 
-#else // Not Windows - assumed to be POSIX compatible //////////////////////////
+#else // Not Window - assumed to be POSIX compatible //////////////////////////
 
 #  if !defined(CATCH_CONFIG_POSIX_SIGNALS)
 
@@ -7277,7 +7277,7 @@ namespace Catch {
 
 #  endif // CATCH_CONFIG_POSIX_SIGNALS
 
-#endif // not Windows
+#endif // not Window
 
 #if defined(__GNUC__)
 #    pragma GCC diagnostic pop

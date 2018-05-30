@@ -9,13 +9,11 @@ using std::endl;
 
 Bubbles::Bubbles() {
 
-
-	#ifdef DEBUG
-cout<<"debug defined\n";
-	#else
-cout<<"debug undefined\n";
-	#endif
-
+#ifdef DEBUG
+	cout<<"DEBUG defined\n";
+#else
+	cout<<"DEBUG undefined\n";
+#endif
 
 }
 
@@ -206,18 +204,19 @@ void Bubbles::setupBuffers(GlContext &ctx) {
 	glVertexAttribPointer(myBubbleIdVarying, 1,  GL_FLOAT, GL_FALSE, sizeof(BubbleVertex), (const void*) (2*sizeof(GLfloat)));
 
 	glUniform1f(myDataTextureWidthUniform, float(mySpaceAvailable * BubblePositionInfoMemberCount));
-ctx.check_gl_errors("Setup same context's buffers end");
 }
 
 void Bubbles::setupBuffersInOtherContexts(GlContext &ctx) {
+	WindowId orig = ctx.currentWindowId();
 	
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, myVertexIndices);
 	setupBuffers(ctx);
 
-	if (ctx.windows.size() > 1) {
-		for (WindowId i = 0; i < ctx.windows.size(); i++) {
-			if (ctx.windows[i].glfwHandle != ctx.pCurrentContext && ! ctx.windows[i].unused) {
-				glfwMakeContextCurrent(ctx.windows[i].glfwHandle);
+	if (ctx.windowCount() > 1) {
+		for (WindowId i = 0; i < ctx.windowCount(); i++) {
+			Window &win = ctx.window(i);
+			if (! ctx.isCurrentWindow(i) && ! win.unused) {
+				ctx.changeWindow(i);
 
 				setupBuffers(ctx);
 
@@ -225,7 +224,7 @@ void Bubbles::setupBuffersInOtherContexts(GlContext &ctx) {
 			}
 		}
 
-		glfwMakeContextCurrent(ctx.pCurrentContext);
+		ctx.changeWindow(orig);
 	}
 }
 
@@ -241,7 +240,7 @@ void Bubbles::commonContextSetup() {
 }
 
 void Bubbles::setupOnSharedContext(GlContext &ctx, WindowId win) {
-	glBindVertexArray(ctx.windows[win].bubblesVAO);
+	glBindVertexArray(ctx.window(win).bubblesVAO);
 
 	setupBuffers(ctx);
 
@@ -255,7 +254,7 @@ void Bubbles::setupOnFirstContext(GlContext &ctx) {
 	//create a dummy bubble positioned off screen, marked unused
 	myBubbles.emplace_back(0.0f,0.0f,0.0f,0.0f,0.0f);
 
-	glBindVertexArray(ctx.windows[0].bubblesVAO);
+	glBindVertexArray(ctx.window(0).bubblesVAO);
 
 	glGenBuffers(1, &myVertexBuffer);
 
@@ -298,12 +297,11 @@ cout<<"PROGRAM IS "<<ctx.shaderProgramHandle<<endl;
 void Bubbles::draw(GlContext &ctx, WindowId win) {
 //	glBindVertexArray(ctx.bubblesVAO);
 //glDrawArrays(GL_TRIANGLES, 0, 3);
-	
-	glBindVertexArray(ctx.windows[win].bubblesVAO);
+	glBindVertexArray(ctx.window(win).bubblesVAO);
 //cout<<"Drawing window "<<win<<endl;
 //cout<<"Drawing bubbles with VAO "<<ctx.windows[win].bubblesVAO<<endl;
 	glDrawElements(GL_TRIANGLE_FAN, myBubbles.size() * (VERTICES_PER_BUBBLE + 2), GL_UNSIGNED_SHORT, 0);
 //	glBindVertexArray(0);
 
-ctx.check_gl_errors("draw");
+check_gl_errors("draw");
 }

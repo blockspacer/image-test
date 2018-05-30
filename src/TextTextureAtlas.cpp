@@ -44,7 +44,6 @@ using std::endl;
 
 
 #include <algorithm>
-#include "tinyutf8.h"
 using namespace std;
 
 int tiny()

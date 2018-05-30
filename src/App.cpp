@@ -1,17 +1,45 @@
 #include "App.h"
 
+#include "globals.h"
+
+
+MouseEvents    App::mouseHandler;
+RedrawRequests App::redrawQueue;
+GlContext 	   App::glContext;
+
+void App::cursorPositionCallback(GLFWwindow* window, double xpos, double ypos) {
+	mouseHandler.moved(window, xpos, ypos, glContext, redrawQueue);
+}
+
+void App::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
+	mouseHandler.buttonInput(window, button, action, mods, glContext, redrawQueue);
+}
+
+void App::setCallbacks(GLFWwindow* pWin) {
+	glfwSetCursorPosCallback(pWin, cursorPositionCallback);
+	glfwSetMouseButtonCallback(pWin, mouseButtonCallback);
+}
+
+void App::createWindow(WindowId parent) {
+	WindowId newId = glContext.createWindow(parent);
+	Window&  win = glContext.window(newId);
+
+	bubbles.setupOnSharedContext(glContext, newId);
+    text.setupOnSharedContext    (glContext);
+	glBindVertexArray(win.bubblesVAO);
+
+}
+
 void App::init() {
 	GlContext &ctx = glContext;
 
-    glContext.createWindow(complex<float>(100.0f, 10.0f));
+    ctx.createWindow(complex<float>(100.0f, 10.0f));
+    setCallbacks(ctx.window(0).glfwHandle);
 
-ctx.check_gl_errors("main1");
 	bubbles.setupOnFirstContext(glContext);
-ctx.check_gl_errors("main2");
     text.initOnFirstContext(glContext);
-	glBindVertexArray(ctx.windows[0].bubblesVAO);
+	glBindVertexArray(ctx.window(0).bubblesVAO);
 
-ctx.check_gl_errors("main3");
 
 	// BubbleId newb = bubbles.createBubble(5.0f,5.0f,5.0f,5.0f);
 	// bubbles.uploadBubbleVertexDataToContext(glContext, newb);
@@ -46,21 +74,32 @@ ctx.check_gl_errors("main3");
 
 }
 
+
 void App::draw() {
 	GlContext &ctx = glContext;
+cout<<"drawl "<<redrawQueue.doRedrawEverything()<<endl;
+	for (int i = 0; i < glContext.windowCount(); ++i) {
+		Window& win = glContext.window(i);
+		if (redrawQueue.doRedrawEverything() || ! win.unused && win.needsRefresh) {
+cout<<"drawing window "<<i<<endl;
+			ctx.changeWindow(i);
+			glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
+			glClear( GL_COLOR_BUFFER_BIT );
+			bubbles.draw(glContext, i);
+			text.draw(glContext);
 
-	glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
+			ctx.swapBuffers();
+			win.needsRefresh = false;
+		}
+	}
+	redrawQueue.haveRedrawnEverything();
 
-	glClear( GL_COLOR_BUFFER_BIT );
 
 //glDrawArrays(GL_TRIANGLES, 0, 3);//-works! and no need to load a GL_ELEMENT_ARRAY_BUFFER if there's no complex geometry
 	// glBindVertexArray(gApp->context.triangleVertexArray);
 	// 	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
 	// glBindVertexArray(    0);
 
-	bubbles.draw(glContext, 0);
-
-	text.draw(glContext);
 
 // cout<<"Hum"<<endl;
 // 	glBindVertexArray(    data.starVertexArray);
@@ -69,9 +108,7 @@ void App::draw() {
 // 	glBindVertexArray(    0);
 
 
-	glfwSwapBuffers(ctx.pCurrentContext);
 //	glClear();
-
 	#ifndef __EMSCRIPTEN__
 	 //    glfwMakeContextCurrent(pWin2);
 

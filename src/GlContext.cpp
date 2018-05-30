@@ -1,7 +1,5 @@
 #include "GlContext.h"
 
-#include "globals.h"
-
 using std::endl;
 
 GLuint GlContext::compileShaderFromSourceString(GLenum type, std::string source) {
@@ -192,9 +190,8 @@ void MessageCallback( GLenum source,
 
 
 
-
+vector<Window>  GlContext::windows;
 vector<Monitor> GlContext::sMonitors;
-
 
 void GlContext::getMonitorsInfo() {
 	cout<<"Getting monitor specs\n";
@@ -212,28 +209,47 @@ void GlContext::getMonitorsInfo() {
 		glfwGetMonitorPos(ms[i], &posX, &posY);
 		int widthMM, heightMM;
 		glfwGetMonitorPhysicalSize(ms[i], &widthMM, &heightMM);
-		
-		cout<<w<<" x "<<h<<" screen unit, "<<(widthMM/10.0)<<" cm x "<<(heightMM/10.0)<<" cm monitor found, with "<<r<<" Hz refresh rate, named \""<<name<<"\", positioned at "<<posX<<", "<<posY<<"\n";
-		
+				
 		sMonitors.emplace_back(ms[i], complex<float>(widthMM,heightMM),
-			complex<float>(w, h),
+			complex<float>(w/10.0f, h/10.0f),
 			complex<float>(posX, posY),
 			(10.0f * w) / widthMM,
 			name);
 		cout<< sMonitors[sMonitors.size()-1].screenUnitsPerCM <<endl;
 	}
+
+	sort(sMonitors.begin(), sMonitors.end(), [](Monitor a, Monitor b) {
+		return ::x(a.position) < ::x(b.position);
+	});
+
+	for (int i=0; i<count; ++i) {
+		sMonitors[i].print();
+	}
+
 }
 
 void GlContext::monitor_callback(GLFWmonitor* monitor, int event) {getMonitorsInfo();}
 
 
+Window &GlContext::lookupWindow(GLFWwindow* pWin) {
+	return (windows[size_t(glfwGetWindowUserPointer(pWin))]);
+}
 
 
 
 
 
 
-
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+cout<<".\n";
+	if (key==GLFW_KEY_F ) {
+#ifdef WEB
+		emscripten_resume_main_loop();
+#endif
+		cout<<"F\n";
+	}
+}
 
 
 
@@ -244,11 +260,14 @@ void GlContext::monitor_callback(GLFWmonitor* monitor, int event) {getMonitorsIn
 
 
 void GlContext::changeCurrentContext(GLFWwindow *pWin) {
-	pCurrentContext = pWin;
-	glfwMakeContextCurrent(pCurrentContext);
+	if (pWin != pCurrentContext) {
+		pCurrentContext = pWin;
+		glfwMakeContextCurrent(pCurrentContext);
+	}
 }
 
 void GlContext::changeWindow(WindowId id) {
+	myCurrentWindow = id;
 	changeCurrentContext(windows[id].glfwHandle);
 }
 
@@ -278,6 +297,7 @@ WindowId GlContext::createWindow(complex<float> center) {
 			}
 		}
 	}
+
 	// add a window to the list
 	if (newWin == windows.size()) {
 		windows.emplace_back(newWin);
@@ -289,13 +309,12 @@ WindowId GlContext::createWindow(complex<float> center) {
 	glfwSwapInterval(1);
 
 glfwSetFramebufferSizeCallback(windows[newWin].glfwHandle, framebuffer_size_callback);
-
+glfwSetKeyCallback(windows[newWin].glfwHandle, key_callback);
 glViewport(0,0, 1000, 1000);
 
 
 	windows[newWin].setupVAOs();
 	glfwSetWindowUserPointer(windows[newWin].glfwHandle, (void *) newWin);
-cout<<"window "<<newWin<<"\thandle"<<windows[newWin].glfwHandle<<endl;
 
 	#ifdef __APPLE__
 		glEnable(GL_PRIMITIVE_RESTART);
@@ -307,6 +326,11 @@ cout<<"window "<<newWin<<"\thandle"<<windows[newWin].glfwHandle<<endl;
 	#endif
 
 	return newWin;
+}
+
+WindowId GlContext::createWindow(WindowId parent) {
+	WindowId newId = createWindow(windows[parent].center());
+	return newId;
 }
 
 GLFWwindow* GlContext::setupSharedContext() {

@@ -19,18 +19,20 @@ using std::endl;
 
 App gApp;
 
-
 static int framenum = 0;
 
 void draw_frame() {
 	gApp.draw();
+#ifdef WEB
+	emscripten_pause_main_loop();
+#endif
 }
 
 
 #ifdef __EMSCRIPTEN__
 	extern "C" {
 	 	void web_window_size_callback() {
-			cout<<"size changed " << EM_ASM_INT(return document.innerHeight, 0) << '\n';
+//			cout<<"size changed " << EM_ASM_INT(return document.innerHeight, 0) << '\n';
 		}
 	}
 #else
@@ -73,20 +75,24 @@ int main() {
 
 
     #ifdef __EMSCRIPTEN__
-		EM_ASM(document.getElementById("bod").onresize = Module._web_window_size_callback, 0);
+//		EM_ASM({window.onResize = alert("SIZ");}//Module._web_window_size_callback
+//			, 0);
 
 		emscripten_set_main_loop(draw_frame, 0, 1);
 	#else
 //    	glfwSetWindowSizeCallback(pWin, native_window_size_callback);
 
-		while (!glfwWindowShouldClose(gApp.glContext.windows[0].glfwHandle) ){// && !glfwWindowShouldClose(pWin2)) {
+		while (!glfwWindowShouldClose(gApp.glContext.window(0).glfwHandle) ){// && !glfwWindowShouldClose(pWin2)) {
+			if (gApp.redrawQueue.newWindowRequested()) {
+				gApp.createWindow( gApp.redrawQueue.newWindowParentId() );
+				gApp.redrawQueue.newWindowCreated();
+			}
 			draw_frame();
 			bool anim = false;
 			if (anim)
 				glfwPollEvents();
 			else
 				glfwWaitEvents();
-
 		}
 	#endif
 

@@ -11,14 +11,14 @@ using std::vector;
 
 #include <GLFW/glfw3.h>
 
-#include "Windows.h"
+#include "Window.h"
 
-#include <complex>
-using std::complex;
+#include <algorithm>
+
 
 struct Monitor {
 	GLFWmonitor* glfwHandle;
-	complex<float> physicalSize,
+	Point physicalSize,
 					screenUnitsSize,
 					position;
 	float	screenUnitsPerCM;
@@ -26,30 +26,28 @@ struct Monitor {
 	Monitor(GLFWmonitor*& h, std::complex<float> phys, std::complex<float> pixs, std::complex<float> posn, float ppcm, string nom)
 		 : glfwHandle {h}, physicalSize {phys}, screenUnitsSize {pixs}, position {posn}, screenUnitsPerCM {ppcm}, name {nom}
 		 {};
+	void print() {
+		cout << ::x(screenUnitsSize) <<" x "<< ::y(screenUnitsSize) << " screen unit, " <<
+			::x(physicalSize) << " cm x "<<::y(physicalSize)<<" cm monitor found, named \""<<name<<"\", positioned at "<<::x(position)<<", "<<::y(position)<<"\n";
+	}
 };
 
-struct GlContext {
+class GlContext {
 	GLFWwindow* pCurrentContext;
-	WindowId    currentWindow;
+	WindowId    myCurrentWindow;
 
-	vector<Window>  windows;
+	static vector<Window>  windows;
 	static vector<Monitor> sMonitors;
 
-	GLuint shaderProgramHandle {0},
-		spareHandle {0};
 
 
 	GLuint linkShadersIntoProgram(GLuint vertex, GLuint fragment);
 	GLuint compileShaderFromSourceString(GLenum type, std::string source);
 
-	WindowId 	createWindow(complex<float> center);
-	GLFWwindow*	setupFirstContext();
-	GLFWwindow* setupSharedContext();
 
 	static void getMonitorsInfo();
 	static void monitor_callback(GLFWmonitor* monitor, int event);
 
-	WindowId lookupWindow(GLFWwindow* pWin);
     
 //	void enlargeBuffer(GLenum target, size_t oldSize, size_t newSize);
 
@@ -57,7 +55,27 @@ struct GlContext {
 	void check_gl_errors(string label);
 	void check_gl_errors();
 	void changeCurrentContext(GLFWwindow *pWin);
-	void changeWindow(WindowId win);
+
+public:
+	GLuint shaderProgramHandle {0};
+	GLuint spareHandle {0};
+
+	GLFWwindow*	setupFirstContext();
+	GLFWwindow* setupSharedContext();
+
+	WindowId createWindow(complex<float> center);
+	WindowId createWindow(WindowId parent);
+	void     changeWindow(WindowId win);
+	bool     isCurrentWindow(WindowId id) {return windows[id].glfwHandle != pCurrentContext;};
+	WindowId currentWindowId() {return myCurrentWindow;};
+	Window   &currentWindow () {return windows[myCurrentWindow];};
+	Window   &lookupWindow(GLFWwindow* pWin);
+
+	int    windowCount() {return windows.size();};
+	Window &window(WindowId win) {return windows[win];};
+	
+	void swapBuffers() {glfwSwapBuffers(pCurrentContext);};
+
 };
 
 	bool checkglerror(int err, int errnum, string errname, string label);

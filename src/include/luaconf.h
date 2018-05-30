@@ -39,22 +39,22 @@
 /*
 @@ LUA_USE_C89 controls the use of non-ISO-C89 features.
 ** Define it if you want Lua to avoid the use of a few C99 features
-** or Windows-specific features on Windows.
+** or Window-specific features on Window.
 */
 /* #define LUA_USE_C89 */
 
 
 /*
-** By default, Lua on Windows use (some) specific Windows features
+** By default, Lua on Window use (some) specific Window features
 */
 #if !defined(LUA_USE_C89) && defined(_WIN32) && !defined(_WIN32_WCE)
-#define LUA_USE_WINDOWS  /* enable goodies for regular Windows */
+#define LUA_USE_WINDOWS  /* enable goodies for regular Window */
 #endif
 
 
 #if defined(LUA_USE_WINDOWS)
 #define LUA_DL_DLL	/* enable support for DLL */
-#define LUA_USE_C89	/* broadly, Windows is C89 */
+#define LUA_USE_C89	/* broadly, Window is C89 */
 #endif
 
 
@@ -74,7 +74,7 @@
 
 /*
 @@ LUA_C89_NUMBERS ensures that Lua uses the largest types available for
-** C89 ('long' and 'double'); Windows always has '__int64', so it does
+** C89 ('long' and 'double'); Window always has '__int64', so it does
 ** not need to use this case.
 */
 #if defined(LUA_USE_C89) && !defined(LUA_USE_WINDOWS)
@@ -170,7 +170,7 @@
 #define LUA_VDIR	LUA_VERSION_MAJOR "." LUA_VERSION_MINOR
 #if defined(_WIN32)	/* { */
 /*
-** In Windows, any exclamation mark ('!') in the path is replaced by the
+** In Window, any exclamation mark ('!') in the path is replaced by the
 ** path of the directory of the executable file of the current process.
 */
 #define LUA_LDIR	"!\\lua\\"
@@ -205,7 +205,7 @@
 /*
 @@ LUA_DIRSEP is the directory separator (for submodules).
 ** CHANGE it if your machine does not use "/" as the directory separator
-** and is not Windows. (On Windows Lua automatically uses "\".)
+** and is not Window. (On Window Lua automatically uses "\".)
 */
 #if defined(_WIN32)
 #define LUA_DIRSEP	"\\"
@@ -227,7 +227,7 @@
 @@ LUALIB_API is a mark for all auxiliary library functions.
 @@ LUAMOD_API is a mark for all standard library opening functions.
 ** CHANGE them if you need to define those functions in some special way.
-** For instance, if you want to create one Windows DLL with the core and
+** For instance, if you want to create one Window DLL with the core and
 ** the libraries, you may want to use the following definition (define
 ** LUA_BUILD_AS_DLL to get it).
 */
@@ -555,7 +555,7 @@
 #define LUA_MININTEGER		LLONG_MIN
 
 #elif defined(LUA_USE_WINDOWS) /* }{ */
-/* in Windows, can use specific Windows types */
+/* in Window, can use specific Window types */
 
 #define LUA_INTEGER		__int64
 #define LUA_INTEGER_FRMLEN	"I64"

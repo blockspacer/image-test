@@ -33,6 +33,15 @@ extern int controlKeysDown;
 #include <GLFW/glfw3.h>
 
 #include <vector>
+using std::vector;
+
+#include <iostream>
+using std::cout;
+using std::endl;
+
+using BubbleGroupId = size_t;
+using BubbleId = GLuint;
+using WindowId = size_t;
 
 static std::vector<GLubyte> gPixelMemory;
 
@@ -48,9 +57,13 @@ static Color gColors[maximumColor];
 enum gBoolNames {bob, maximumBoolean};
 static bool gBools[maximumBoolean];
 
-
 #include <utility>
 
+#include <complex>
+using std::complex;
+using Point = complex<float>;
+float x(Point);
+float y(Point);
 //const double PI  = 3.141592653589793238463;
 
 #define PI 3.14159265

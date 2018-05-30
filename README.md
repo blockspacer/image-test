@@ -35,7 +35,7 @@ Currently it's set to dynamically link to GLFW and GLEW, so install those via yo
 
 All spellings are North American, but measurements are in centimetres.
 
-There are four global arrays indexed by enums, used to hold user-configurable settings: `::gNums` (for floats), `::gStrings`, `::gColors`, and `::gBools`. `The global.h` file also contains some debugging macros. A global is also used for the program's single App object as i couldn't figure out how to pass arguments to Emscripten's main loop function. Another global contains the pixel memory that text is drawn onto before being sent to the graphics card.
+There are four global arrays indexed by enums, used to hold user-configurable settings: `::gNums` (for floats), `::gStrings`, `::gColors`, and `::gBools`. `The global.h` file also contains some debugging macros, and common convenience functions. A global is also used for the program's single App object as i couldn't figure out how to pass arguments to Emscripten's main loop function. Another global contains the pixel memory that text is drawn onto before being sent to the graphics card.
 
 There's a neat trick for embedding GLSL code files inside your compiled binaries near the bottom of `GlContext.cpp`.
 

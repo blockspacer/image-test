@@ -5,16 +5,13 @@
 
 #include "GlContext.h"
 
-#include "Windows.h"
+#include "Window.h"
 
 #define VERTICES_PER_BUBBLE_SIDE   8
 #define VERTICES_PER_BUBBLE_CORNER 6
 
 #define VERTICES_PER_BUBBLE (4 * (VERTICES_PER_BUBBLE_SIDE + VERTICES_PER_BUBBLE_CORNER) + 1)
 
-
-using BubbleGroupId = size_t;
-using BubbleId = GLuint;
 
 struct Bubble {
 	BubbleId id;
