@@ -120,6 +120,7 @@ void uploadEntireTexture();
 	void uploadEntireSurface();
 	SpritePosition getTemporarySprite(utf8_string word, int pixelSize, FontFaceTypes face);
 	SpritePosition getPermanentSprite(utf8_string word, int pixelSize, FontFaceTypes face);
+	void setupOnContext(GlContext &cxt);
 
 };
 

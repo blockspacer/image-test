@@ -31,6 +31,7 @@ class TextLayout {
 	vector<TextSpriteVertex> myVertices;
 
 public:
+	void sharedSetup(GlContext &ctx);
 	void setupOnSharedContext(GlContext &ctx);
 	void initOnFirstContext(GlContext &ctx);
 	void addTextureQuad(GlContext &ctx, float x, float y, float w, float h, float texU, float texV, float texLayer, float texWidth, float texHeight);

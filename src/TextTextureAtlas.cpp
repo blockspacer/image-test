@@ -442,6 +442,19 @@ uploadEntireSurface();
 //cout<<hi[3]<<endl;
 }
 
+void TextTextureAtlas::setupOnContext(GlContext &ctx) {
+	glActiveTexture(GL_TEXTURE1);
+	GLint mySamplerUniform = glGetUniformLocation(ctx.shaderProgramHandle, "spriteSheets");
+	glUniform1i(mySamplerUniform, 1);
+
+	glBindTexture(GL_TEXTURE_2D_ARRAY, myTextureAtlas);
+
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR); //GL_LINEAR
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+}
+
 void TextTextureAtlas::uploadEntireSurface() {
 #ifdef WEB
 	EM_ASM_({
@@ -518,18 +531,15 @@ void TextTextureAtlas::createTextureAtlas(GlContext &ctx) {
 
 	}
 
-	glActiveTexture(GL_TEXTURE1);
-	GLint mySamplerUniform = glGetUniformLocation(ctx.shaderProgramHandle, "spriteSheets");
-	glUniform1i(mySamplerUniform, 1);
-
 	glGenTextures(1, &myTextureAtlas);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, myTextureAtlas);
+
+	setupOnContext(ctx);
 
 	// Allocate the storage.
 	// https://github.com/kripken/emscripten/issues/5747
 	// https://www.khronos.org/webgl/public-mailing-list/public_webgl/1410/msg00033.php
 //	glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, ATLAS_SIZE, ATLAS_SIZE, 1 + myAvailablePages);
-https://commanderrab.deviantart.com/art/On-Being-Motivated-327103148
+
 	const GLenum  target         = GL_TEXTURE_2D_ARRAY;
 	const GLint   level          = 0,
 	              internalFormat = GL_RGBA;
@@ -553,11 +563,6 @@ https://commanderrab.deviantart.com/art/On-Being-Motivated-327103148
 				 data);
 
 check_gl_errors("creating texture atlas");
-	// Always set reasonable myTextureAtlas parameters
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR); //GL_LINEAR
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 
 
@@ -577,7 +582,14 @@ check_gl_errors("creating texture atlas");
 
 void TextTextureAtlas::initOnFirstContext(GlContext &ctx) {
 	gPixelMemory.resize(ATLAS_BYTES);
-#ifdef NATIVE
+	createTextureAtlas(ctx);
+
+#ifdef WEB
+	EM_ASM_({
+		create_canvas($0);
+	}, ATLAS_SIZE);
+#else 
+
 	SkGraphics::Init();
 
 	myTextPaint.setTextSize(20.0f);
@@ -604,34 +616,23 @@ void TextTextureAtlas::initOnFirstContext(GlContext &ctx) {
 	pMyDrawingSurface = 
 		SkSurface::MakeRasterDirect(drawingSurfaceInfo, &gPixelMemory[0], ATLAS_SIZE * 4);
 
-	if (pMyDrawingSurface != 0) {
-		pMySkiaCanvas = pMyDrawingSurface->getCanvas();
-		return;
+	if (pMyDrawingSurface == 0) {
+
+		cout << "Couldn't make an RGBA Skia drawing surface :("<<endl;
+
+		drawingSurfaceInfo = SkImageInfo::Make(ATLAS_SIZE, ATLAS_SIZE, 
+			kBGRA_8888_SkColorType,    //safe linux, mac crash
+			kPremul_SkAlphaType
+		);
+
+		pMyDrawingSurface = 
+			SkSurface::MakeRasterDirect(drawingSurfaceInfo, &gPixelMemory[0], ATLAS_SIZE * 4);
 	}
 
-	cout << "Couldn't make an RGBA Skia drawing surface :("<<endl;
-
-	drawingSurfaceInfo = SkImageInfo::Make(ATLAS_SIZE, ATLAS_SIZE, 
-		kBGRA_8888_SkColorType,    //safe linux, mac crash
-		kPremul_SkAlphaType
-	);	
-
-	pMyDrawingSurface = 
-		SkSurface::MakeRasterDirect(drawingSurfaceInfo, &gPixelMemory[0], ATLAS_SIZE * 4);
-
-	if (pMyDrawingSurface != 0) {
+	if (pMyDrawingSurface == 0)
+		cout << "Neither BGRA now RGBA drawing surfaces can be created >:O" << endl;
+	else
 		pMySkiaCanvas = pMyDrawingSurface->getCanvas();
-		return;
-	}
-
-
-	cout << "Neither BGRA now RGBA drawing surfaces can be created >:O" << endl;
-#else // web version
-//	int n = ;
-
-	EM_ASM_({
-		create_canvas($0);
-	}, ATLAS_SIZE);
 #endif
 }
 

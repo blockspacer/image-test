@@ -48,6 +48,7 @@ void TextLayout::setupOnSharedContext(GlContext &ctx) {
 	glBindBuffer(GL_ARRAY_BUFFER, myVertexBuffer);
 	glBufferData(GL_ARRAY_BUFFER, myVertexBufferSize * sizeof(TextSpriteVertex), nullptr, GL_DYNAMIC_DRAW);
 
+	myTextAtlas.setupOnContext(ctx);
 	sharedSetup(ctx);
 check_gl_errors("post texture drawing");
 }
@@ -56,7 +57,7 @@ TextTextureAtlas TextLayout::myTextAtlas;
 
 void TextLayout::initOnFirstContext(GlContext &ctx) {
 	myTextAtlas.initOnFirstContext(ctx);
-	myTextAtlas.createTextureAtlas(ctx);
+
 	myTextAtlas.test();
 	
 	glBindVertexArray(ctx.window(0).textVAO);
@@ -66,7 +67,7 @@ void TextLayout::initOnFirstContext(GlContext &ctx) {
 	glBufferData(GL_ARRAY_BUFFER, myVertexBufferSize * sizeof(TextSpriteVertex), nullptr, GL_DYNAMIC_DRAW);
 
 	test(ctx);
-	sharedSetup();
+	sharedSetup(ctx);
 check_gl_errors("post texture test");
 
 }
