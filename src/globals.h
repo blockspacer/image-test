@@ -4,10 +4,49 @@
 #include <string>
 #include <iostream>
 #include <algorithm>
-#include "tinyutf8.h"
 #include <unordered_map>
 
 using std::cout;
+
+// from https://stackoverflow.com/questions/3378560/how-to-disable-gcc-warnings-for-a-few-lines-of-code
+#define DIAG_STR(s) #s
+#define DIAG_JOINSTR(x,y) DIAG_STR(x ## y)
+
+#ifdef _MSC_VER
+	#define DIAG_DO_PRAGMA(x) __pragma (#x)
+	#define DIAG_PRAGMA(compiler,x) DIAG_DO_PRAGMA(warning(x))
+#else
+	#define DIAG_DO_PRAGMA(x) _Pragma (#x)
+	#define DIAG_PRAGMA(compiler,x) DIAG_DO_PRAGMA(compiler diagnostic x)
+#endif
+
+#if defined(__clang__)
+	# define DISABLE_WARNING(gcc_unused,clang_option,msvc_unused) DIAG_PRAGMA(clang,push) DIAG_PRAGMA(clang,ignored DIAG_JOINSTR(-W,clang_option))
+	# define ENABLE_WARNING(gcc_unused,clang_option,msvc_unused) DIAG_PRAGMA(clang,pop)
+#elif defined(_MSC_VER)
+	# define DISABLE_WARNING(gcc_unused,clang_unused,msvc_errorcode) DIAG_PRAGMA(msvc,push) DIAG_DO_PRAGMA(warning(disable:##msvc_errorcode))
+	# define ENABLE_WARNING(gcc_unused,clang_unused,msvc_errorcode) DIAG_PRAGMA(msvc,pop)
+#elif defined(__GNUC__)
+	#if ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406
+		# define DISABLE_WARNING(gcc_option,clang_unused,msvc_unused) DIAG_PRAGMA(GCC,push) DIAG_PRAGMA(GCC,ignored DIAG_JOINSTR(-W,gcc_option))
+		# define ENABLE_WARNING(gcc_option,clang_unused,msvc_unused) DIAG_PRAGMA(GCC,pop)
+	#else
+		# define DISABLE_WARNING(gcc_option,clang_unused,msvc_unused) DIAG_PRAGMA(GCC,ignored DIAG_JOINSTR(-W,gcc_option))
+		# define ENABLE_WARNING(gcc_option,clang_option,msvc_unused) DIAG_PRAGMA(GCC,warning DIAG_JOINSTR(-W,gcc_option))
+	#endif
+#endif
+
+DISABLE_WARNING(class-memaccess,class-memaccess,class-memaccess)
+#include "tinyutf8.h"
+ENABLE_WARNING(class-memaccess,class-memaccess,class-memaccess)
+
+DISABLE_WARNING(pragmas, pragmas, pragmas)
+	// far too tedious to wrap every use of EM_ASM_ et al in these
+	// i know turning off a warning globally is a v bad idea, but this one seems so obscure it can't hurt
+	DISABLE_WARNING(dollar-in-identifier-extension, dollar-in-identifier-extension, dollar-in-identifier-extension)
+	DISABLE_WARNING(unused-variable,unused-variable,unused-variable)
+	DISABLE_WARNING(unused-parameter,unused-parameter,unused-parameter)
+ENABLE_WARNING(pragmas, pragmas, pragmas)
 
 //#include "include/selene.h"
 //#include "SkColor.h"
@@ -62,8 +101,11 @@ static bool gBools[maximumBoolean];
 #include <complex>
 using std::complex;
 using Point = complex<float>;
-float x(Point);
-float y(Point);
+// float x(Point);
+// float y(Point);
+static float x(Point p) {return real(p);};
+static float y(Point p) {return imag(p);};
+
 //const double PI  = 3.141592653589793238463;
 
 #define PI 3.14159265
@@ -141,40 +183,6 @@ std::string type_name() {
 	#define SHOW_TYPE(...) std::cout << ITALIC "Variable " << NORMAL BOLD UNDERLINE #__VA_ARGS__ << NORMAL ITALIC " is of type " << NORMAL BOLD UNDERLINE type_name<decltype( __VA_ARGS__ )>() << NORMAL std::endl;
 #pragma GCC diagnostic pop
 
-
-// from https://stackoverflow.com/questions/3378560/how-to-disable-gcc-warnings-for-a-few-lines-of-code
-#define DIAG_STR(s) #s
-#define DIAG_JOINSTR(x,y) DIAG_STR(x ## y)
-
-#ifdef _MSC_VER
-	#define DIAG_DO_PRAGMA(x) __pragma (#x)
-	#define DIAG_PRAGMA(compiler,x) DIAG_DO_PRAGMA(warning(x))
-#else
-	#define DIAG_DO_PRAGMA(x) _Pragma (#x)
-	#define DIAG_PRAGMA(compiler,x) DIAG_DO_PRAGMA(compiler diagnostic x)
-#endif
-
-#if defined(__clang__)
-	# define DISABLE_WARNING(gcc_unused,clang_option,msvc_unused) DIAG_PRAGMA(clang,push) DIAG_PRAGMA(clang,ignored DIAG_JOINSTR(-W,clang_option))
-	# define ENABLE_WARNING(gcc_unused,clang_option,msvc_unused) DIAG_PRAGMA(clang,pop)
-#elif defined(_MSC_VER)
-	# define DISABLE_WARNING(gcc_unused,clang_unused,msvc_errorcode) DIAG_PRAGMA(msvc,push) DIAG_DO_PRAGMA(warning(disable:##msvc_errorcode))
-	# define ENABLE_WARNING(gcc_unused,clang_unused,msvc_errorcode) DIAG_PRAGMA(msvc,pop)
-#elif defined(__GNUC__)
-	#if ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406
-		# define DISABLE_WARNING(gcc_option,clang_unused,msvc_unused) DIAG_PRAGMA(GCC,push) DIAG_PRAGMA(GCC,ignored DIAG_JOINSTR(-W,gcc_option))
-		# define ENABLE_WARNING(gcc_option,clang_unused,msvc_unused) DIAG_PRAGMA(GCC,pop)
-	#else
-		# define DISABLE_WARNING(gcc_option,clang_unused,msvc_unused) DIAG_PRAGMA(GCC,ignored DIAG_JOINSTR(-W,gcc_option))
-		# define ENABLE_WARNING(gcc_option,clang_option,msvc_unused) DIAG_PRAGMA(GCC,warning DIAG_JOINSTR(-W,gcc_option))
-	#endif
-#endif
-
-DISABLE_WARNING(pragmas, pragmas, pragmas)
-	// far too tedious to wrap every use of EM_ASM_ et al in these
-	// i know turning off a warning globally is a v bad idea, but this one seems so obscure it can't hurt
-	DISABLE_WARNING(dollar-in-identifier-extension, dollar-in-identifier-extension, dollar-in-identifier-extension)
-ENABLE_WARNING(pragmas, pragmas, pragmas)
 
 #ifdef __EMSCRIPTEN__
 	DISABLE_WARNING(dollar-in-identifier-extension, dollar-in-identifier-extension, dollar-in-identifier-extension)

@@ -16,6 +16,7 @@ layout(location = 3) in vec4 bgColor;
 uniform float widthOfBubbleData;
 uniform sampler2D allBubbleData;
 uniform sampler2DArray spriteSheets;
+uniform mat4 transformation;
 
 //uniform float bubbleHaloDepth;
 //uniform float bubbleHilightedHaloDepth;
@@ -29,6 +30,7 @@ const float bubbleY = 1.5;
 const float bubbleW = 2.5;
 const float bubbleH = 3.5;
 const float bubbleMouseOver = 4.5;
+
 const float bubbleGradientLeft       = 5.5;
 const float bubbleGradientRight      = 6.5;
 const float bubbleGradientYIntercept = 7.5;
@@ -39,6 +41,7 @@ const float bubbleGradientLeftBlue  = 11.5;
 const float bubbleGradientRightRed   = 12.5;
 const float bubbleGradientRightGreen = 13.5;
 const float bubbleGradientRightBlue  = 14.5;
+
 const float bubbleInfoMembers = 15.0;
 
 void main() {
@@ -52,7 +55,8 @@ void main() {
 		float xOffset = texture(allBubbleData, xDataPositionInTexture).r;
 		float yOffset = texture(allBubbleData, yDataPositionInTexture).r;
 
-		gl_Position = position + vec4(xOffset, yOffset, 0.0f, 0.0f);
+//output degenerate triangle if bubble is entirely offscreen
+		gl_Position = transformation * (position + vec4(xOffset, yOffset, 0.0f, 0.0f));
 
 		outColor = vec4(0.5,0.0,0.5,1.0);
 		outTexCoord = vec3(-1.0, 0.0, 0.0);
@@ -60,7 +64,7 @@ void main() {
 	}
 	else {
 		outColor = vec4(0.67,0.0,0.0, 1.0);
-		gl_Position = position;
+		gl_Position = transformation * position;
 		outTexCoord = texCoord;
 	}
 

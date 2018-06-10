@@ -32,6 +32,33 @@ struct Monitor {
 	}
 };
 
+/*
+drawing order should be front to back except for text:
+
+panning bar bubbles
+panning bar background
+
+[menu, menu text]
+help line
+
+bubbles contents background
+background
+overlays
+text
+*/
+
+enum struct Layer {
+menu, 
+helpLine, 
+bubbleContentsOverlay, 
+bubbleContentsBackground, 
+bubbleHalo, 
+panningBarWindowOutline, 
+panningBarBubble, 
+panningBar, 
+background
+};
+
 class GlContext {
 	GLFWwindow* pCurrentContext;
 	WindowId    myCurrentWindow;

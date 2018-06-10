@@ -1,5 +1,7 @@
 #include "Window.h"
 
+#include "Workspace.h"
+
 Window::Window(WindowId _id) {
 	id = _id;
 }

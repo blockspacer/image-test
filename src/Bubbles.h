@@ -7,10 +7,29 @@
 
 #include "Window.h"
 
+
+//#include "glm/mat3x3.hpp"
+#include "glm/glm.hpp"
+#include "glm/gtx/transform.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
+
+using glm::scale;
+using glm::translate;
+using glm::mat4;
+using glm::vec3;
+// using glm::;
+// using glm::;
+// using glm::;
+// using glm::;
+
 #define VERTICES_PER_BUBBLE_SIDE   8
 #define VERTICES_PER_BUBBLE_CORNER 6
 
 #define VERTICES_PER_BUBBLE (4 * (VERTICES_PER_BUBBLE_SIDE + VERTICES_PER_BUBBLE_CORNER) + 1)
+
+// drugs and wires playlist https://open.spotify.com/user/cryoclaire/playlist/7pSKHOUu7vRxFTPmrlghbB
+
 
 
 struct Bubble {
@@ -50,6 +69,8 @@ struct BubbleInfo {
 	GLfloat x, y,
 		w, h,
 		mouseOver,
+
+		// group info
 		gradientLeft, gradientRight,
 		gradientYIntercept, gradientGradient,
 		gradientLeftRed, gradientLeftGreen, gradientLeftBlue,
@@ -155,11 +176,13 @@ class Bubbles {
 			myDataTexture
 			;
 
-    int myPositionVarying {-1},
-    	myBubbleIdVarying {-1},
-    	mySamplerUniform {-1},
-    	myDataTextureWidthUniform {-1}
-    ;
+	int myPositionVarying {-1},
+		myBubbleIdVarying {-1},
+		mySamplerUniform {-1},
+		myDataTextureWidthUniform {-1},
+		myTransformationUniform {-1}
+	;
+	mat4 myTransformationMatrix;
 
 	void generateBubbleVertexIndices(size_t first, size_t last);
 	void setupBuffers(GlContext &ctx);

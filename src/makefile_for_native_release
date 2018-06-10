@@ -7,7 +7,6 @@ BIN := juxt_edit
 
 # source files
 SRCS := \
-	globals.cpp \
     configuration.cpp \
     tinyutf8.cpp \
     Bubbles.cpp \

@@ -7,6 +7,7 @@
 using std::cout;
 using std::endl;
 
+
 Bubbles::Bubbles() {
 
 #ifdef DEBUG
@@ -260,7 +261,7 @@ void Bubbles::setupOnFirstContext(GlContext &ctx) {
 
 	myPositionVarying = glGetAttribLocation(ctx.shaderProgramHandle, "position");
 	myBubbleIdVarying = glGetAttribLocation(ctx.shaderProgramHandle, "texCoord");
-cout<<"PROGRAM IS "<<ctx.shaderProgramHandle<<endl;
+
 	glGenBuffers(1,                      &myVertexIndices);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, myVertexIndices);
 
@@ -291,7 +292,8 @@ cout<<"PROGRAM IS "<<ctx.shaderProgramHandle<<endl;
 
 	mySamplerUniform = glGetUniformLocation(ctx.shaderProgramHandle, "allBubbleData");
 	myDataTextureWidthUniform = glGetUniformLocation(ctx.shaderProgramHandle, "widthOfBubbleData");
-	
+
+	myTransformationUniform = glGetUniformLocation(ctx.shaderProgramHandle, "transformation");	
 }
 
 void Bubbles::draw(GlContext &ctx, WindowId win) {
@@ -300,6 +302,14 @@ void Bubbles::draw(GlContext &ctx, WindowId win) {
 	glBindVertexArray(ctx.window(win).bubblesVAO);
 //cout<<"Drawing window "<<win<<endl;
 //cout<<"Drawing bubbles with VAO "<<ctx.windows[win].bubblesVAO<<endl;
+
+
+
+	myTransformationMatrix = scale(mat4(1.0f), vec3(0.5, -1, 1));
+	myTransformationMatrix = translate(myTransformationMatrix, vec3(0.3, 0.3, 0.0));
+
+	glUniformMatrix4fv(myTransformationUniform, 1, GL_FALSE, glm::value_ptr(myTransformationMatrix));
+
 	glDrawElements(GL_TRIANGLE_FAN, myBubbles.size() * (VERTICES_PER_BUBBLE + 2), GL_UNSIGNED_SHORT, 0);
 //	glBindVertexArray(0);
 

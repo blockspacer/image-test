@@ -15,24 +15,29 @@
 #include "TextLayout.h"
 #include "MouseEvents.h"
 #include "RedrawRequests.h"
+#include "PanningBar.h"
 
-struct App {
-	static GlContext  glContext;
+
+class App {
+	static GlContext  myGlContext;
 	TextLayout text;
-	Bubbles    bubbles;
+	Bubbles    myBubbles;
 
 //	KeyEvents  
-	static MouseEvents    mouseHandler;
-	static RedrawRequests redrawQueue;
+	static MouseEvents    myMouseHandler;
+	static RedrawRequests myRedrawQueue;
+	static PanningBar     myPanningBar;
 
-	void init();
-	void draw();
 	void setCallbacks(GLFWwindow* pWin);
-	void createWindow(WindowId parent);
 
 	static void cursorPositionCallback(GLFWwindow* window, double xpos, double ypos);
 	static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
-
+public:
+	GlContext      &glContext()   {return myGlContext;};
+	RedrawRequests &redrawQueue() {return myRedrawQueue;};
+	void init();
+	void draw();
+	void createWindow(WindowId parent);
 
 };
 

@@ -350,7 +350,7 @@ GLFWwindow* GlContext::setupSharedContext() {
 	pCurrentContext = glfwCreateWindow(width, height, "image test", NULL, pWin);
 
 	if (! pCurrentContext) {
-		complain("Unable to create shared context");
+		complain("Unable to create a new window with shared graphics context");
 		exit(-1);
 	}
 

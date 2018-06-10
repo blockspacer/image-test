@@ -1,6 +1,6 @@
 #include "MouseEvents.h"
 
-void MouseEvents::moved(GLFWwindow* window, double xpos, double ypos, GlContext &ctx, RedrawRequests &redrawQueue) {
+void MouseEvents::moved(GLFWwindow* window, double xpos, double ypos, GlContext &ctx, PanningBar &panBar, RedrawRequests &redrawQueue) {
 
 	Window &win = ctx.lookupWindow(window);
 

@@ -5,7 +5,6 @@ BIN := web_release.js
 
 # source files
 SRCS := \
-	globals.cpp \
     main_for_release.cpp \
     configuration.cpp \
     tinyutf8.cpp \
