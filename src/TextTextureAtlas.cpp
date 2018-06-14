@@ -443,9 +443,9 @@ uploadEntireSurface();
 }
 
 void TextTextureAtlas::setupOnContext(GlContext &ctx) {
-	glActiveTexture(GL_TEXTURE1);
-	GLint mySamplerUniform = glGetUniformLocation(ctx.shaderProgramHandle, "spriteSheets");
-	glUniform1i(mySamplerUniform, 1);
+	glActiveTexture(GL_TEXTURE2);
+	GLint mySamplerUniform = glGetUniformLocation(ctx.shaderHandle(), "spriteSheets");
+	glUniform1i(mySamplerUniform, 2);
 
 	glBindTexture(GL_TEXTURE_2D_ARRAY, myTextureAtlas);
 

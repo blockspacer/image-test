@@ -36,6 +36,8 @@ using std::cout;
 	#endif
 #endif
 
+DISABLE_WARNING(unused-function, unused-function, unused-function) 
+
 DISABLE_WARNING(class-memaccess,class-memaccess,class-memaccess)
 #include "tinyutf8.h"
 ENABLE_WARNING(class-memaccess,class-memaccess,class-memaccess)
@@ -47,6 +49,7 @@ DISABLE_WARNING(pragmas, pragmas, pragmas)
 	DISABLE_WARNING(unused-variable,unused-variable,unused-variable)
 	DISABLE_WARNING(unused-parameter,unused-parameter,unused-parameter)
 ENABLE_WARNING(pragmas, pragmas, pragmas)
+	DISABLE_WARNING(reorder, reorder, reorder) 
 
 //#include "include/selene.h"
 //#include "SkColor.h"
@@ -103,8 +106,8 @@ using std::complex;
 using Point = complex<float>;
 // float x(Point);
 // float y(Point);
-static float x(Point p) {return real(p);};
-static float y(Point p) {return imag(p);};
+static float x(Point p) {return real(p);}
+static float y(Point p) {return imag(p);}
 
 //const double PI  = 3.141592653589793238463;
 

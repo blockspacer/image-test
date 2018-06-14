@@ -188,12 +188,10 @@ void MessageCallback( GLenum source,
 
 
 
-
-
 vector<Window>  GlContext::windows;
 vector<Monitor> GlContext::sMonitors;
 
-void GlContext::getMonitorsInfo() {
+Point GlContext::getMonitorsInfo() {
 	cout<<"Getting monitor specs\n";
 	int count;
 	GLFWmonitor** ms = glfwGetMonitors(&count);
@@ -222,13 +220,19 @@ void GlContext::getMonitorsInfo() {
 		return ::x(a.position) < ::x(b.position);
 	});
 
+	Point largestExtent {0,0};
 	for (int i=0; i<count; ++i) {
-		sMonitors[i].print();
+//		sMonitors[i].print();
+		if (::x(sMonitors[i].physicalSize) > ::x(largestExtent))
+			largestExtent.real(::x(sMonitors[i].physicalSize));
+		if (::y(sMonitors[i].physicalSize) > ::y(largestExtent))
+			largestExtent.imag(::y(sMonitors[i].physicalSize));
 	}
 
-}
 
-void GlContext::monitor_callback(GLFWmonitor* monitor, int event) {getMonitorsInfo();}
+	return largestExtent;
+//	setWorkspaceSize
+}
 
 
 Window &GlContext::lookupWindow(GLFWwindow* pWin) {
@@ -285,7 +289,7 @@ WindowId GlContext::createWindow(complex<float> center) {
 	// first window ever
 	if (windows.size() == 0) {
 		windows.emplace_back(newWin);
-		windows[0].glfwHandle = setupFirstContext();
+		windows[0].glfwHandle = initializeFirstContext();
 	}
 	// re-use an old slot
 	else {
@@ -306,7 +310,7 @@ WindowId GlContext::createWindow(complex<float> center) {
 
 	myCurrentWindow = newWin;
 
-	glUseProgram(shaderProgramHandle);
+	glUseProgram(myShaderProgramHandle);
 
 	glfwSwapInterval(1);
 
@@ -360,7 +364,7 @@ GLFWwindow* GlContext::setupSharedContext() {
 }
 
 
-GLFWwindow* GlContext::setupFirstContext() {
+GLFWwindow* GlContext::initializeFirstContext() {
 	if (!glfwInit()) {
 		complain("GLFW init failed :(");
 		exit(-1);
@@ -406,8 +410,6 @@ glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
    	glfwSetWindowUserPointer(pCurrentContext, (void *) 0);
 
    	getMonitorsInfo();
-
-	glfwSetMonitorCallback(monitor_callback);
 
 
 	glewExperimental = true; // Needed for core profile or something
@@ -459,9 +461,11 @@ glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
 	GLuint fragshader = compileShaderFromSourceString(GL_FRAGMENT_SHADER, frag);
 	GLuint vertshader = compileShaderFromSourceString(GL_VERTEX_SHADER,   vert);
 
-	shaderProgramHandle = linkShadersIntoProgram(vertshader, fragshader);
+	myShaderProgramHandle = linkShadersIntoProgram(vertshader, fragshader);
 
-//	glValidateProgram(shaderProgramHandle);
+	myTransformationUniform = glGetUniformLocation(myShaderProgramHandle, "transformation");	
+
+//	glValidateProgram(myShaderProgramHandle);
 
 
 
@@ -478,3 +482,14 @@ glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
 }
 
 
+
+
+
+
+
+
+
+
+void GlContext::setMatrix(mat4& m) {
+	glUniformMatrix4fv(myTransformationUniform, 1, GL_FALSE, glm::value_ptr(m));
+}

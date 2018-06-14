@@ -34,16 +34,16 @@ cout<<"tvu "<<myVertexBufferSize<<", "<<myVertices.size()<<endl;
 }
 
 void TextLayout::sharedSetup(GlContext &ctx) {
-		GLint myPositionVarying = glGetAttribLocation(ctx.shaderProgramHandle, "position");
+		GLint myPositionVarying = glGetAttribLocation(ctx.shaderHandle(), "position");
 	glEnableVertexAttribArray(myPositionVarying);
 	glVertexAttribPointer(myPositionVarying, 2, GL_FLOAT, GL_FALSE, sizeof(TextSpriteVertex), (const void*) 0);
 
-	GLint myTexCoordVarying = glGetAttribLocation(ctx.shaderProgramHandle, "texCoord");
+	GLint myTexCoordVarying = glGetAttribLocation(ctx.shaderHandle(), "texCoord");
 	glEnableVertexAttribArray(myTexCoordVarying);
 	glVertexAttribPointer(myTexCoordVarying, 2, GL_FLOAT, GL_FALSE, sizeof(TextSpriteVertex), (const void*) (8 * sizeof(GLfloat)));
 }
 
-void TextLayout::setupOnSharedContext(GlContext &ctx) {
+void TextLayout::setupSharedContext(GlContext &ctx) {
 	glBindVertexArray(ctx.currentWindow().textVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, myVertexBuffer);
 	glBufferData(GL_ARRAY_BUFFER, myVertexBufferSize * sizeof(TextSpriteVertex), nullptr, GL_DYNAMIC_DRAW);
@@ -55,7 +55,7 @@ check_gl_errors("post texture drawing");
 
 TextTextureAtlas TextLayout::myTextAtlas;
 
-void TextLayout::initOnFirstContext(GlContext &ctx) {
+void TextLayout::initializeFirstContext(GlContext &ctx) {
 	myTextAtlas.initOnFirstContext(ctx);
 
 	myTextAtlas.test();

@@ -6,13 +6,14 @@
 #include "GlContext.h"
 
 #include "Window.h"
-
+#include "DataTextures.h"
 
 //#include "glm/mat3x3.hpp"
-#include "glm/glm.hpp"
-#include "glm/gtx/transform.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtc/type_ptr.hpp"
+#include "include/glm/glm.hpp"
+using glm::mat4;
+#include "include/glm/gtx/transform.hpp"
+#include "include/glm/gtc/matrix_transform.hpp"
+#include "include/glm/gtc/type_ptr.hpp"
 
 using glm::scale;
 using glm::translate;
@@ -58,23 +59,30 @@ struct BubbleVertex {
 enum BubbleInfoMembers {bubbleX, bubbleY,
 		bubbleW, bubbleH,
 		bubbleMouseOver,
+		BubblePositionInfoMemberCount
+	};
+
+enum BubbleGroupInfoMembers {
 		bubbleGradientLeft, bubbleGradientRight,
 		bubbleGradientYIntercept, bubbleGradientGradient,
 		bubbleGradientLeftRed, bubbleGradientLeftGreen, bubbleGradientLeftBlue,
 		bubbleGradientRightRed, bubbleGradientRightGreen, bubbleGradientRightBlue,
-		BubblePositionInfoMemberCount
+		BubbleGroupInfoMembersCount
 	};
+
+struct BubbleGroupInfo {
+	GLfloat gradientLeft {0.0f}, gradientRight {1.0f},
+		gradientYIntercept {0.0f}, gradientGradient {0.0f},
+		gradientLeftRed {0.0f}, gradientLeftGreen {0.0f}, gradientLeftBlue {0.0f},
+		gradientRightRed {0.0f}, gradientRightGreen {0.0f}, gradientRightBlue {0.0f};
+
+};
 
 struct BubbleInfo {
 	GLfloat x, y,
 		w, h,
 		mouseOver,
-
-		// group info
-		gradientLeft, gradientRight,
-		gradientYIntercept, gradientGradient,
-		gradientLeftRed, gradientLeftGreen, gradientLeftBlue,
-		gradientRightRed, gradientRightGreen, gradientRightBlue;
+		groupId;
 
 	BubbleInfo(
 		GLfloat x,
@@ -83,37 +91,26 @@ struct BubbleInfo {
 		GLfloat h,
 
 		GLfloat mouseOver,
-		GLfloat gradientLeft, 
-		GLfloat gradientRight,
-
-		GLfloat gradientYIntercept,
-		GLfloat gradientGradient,
-
-		GLfloat gradientLeftRed,
-		GLfloat gradientLeftGreen, 
-		GLfloat gradientLeftBlue,
-
-		GLfloat gradientRightRed,
-		GLfloat gradientRightGreen, 
-		GLfloat gradientRightBlue
+		GLfloat groupId
 		) :
 			x{x},
 			y{y},
 			w{w},
 			h{h},
 			mouseOver{mouseOver},
-			gradientLeft{gradientLeft}, 
-			gradientRight{gradientRight},
+			groupId{groupId}
+			// gradientLeft{gradientLeft}, 
+			// gradientRight{gradientRight},
 			
-			gradientYIntercept{gradientYIntercept},
-			gradientGradient{gradientGradient},
+			// gradientYIntercept{gradientYIntercept},
+			// gradientGradient{gradientGradient},
 
-			gradientLeftRed{gradientLeftRed},
-			gradientLeftGreen{gradientLeftGreen}, 
-			gradientLeftBlue{gradientLeftBlue},
-			gradientRightRed{gradientRightRed},
-			gradientRightGreen{gradientRightGreen}, 
-			gradientRightBlue{gradientRightBlue}
+			// gradientLeftRed{gradientLeftRed},
+			// gradientLeftGreen{gradientLeftGreen}, 
+			// gradientLeftBlue{gradientLeftBlue},
+			// gradientRightRed{gradientRightRed},
+			// gradientRightGreen{gradientRightGreen}, 
+			// gradientRightBlue{gradientRightBlue}
 		{};
 
 		BubbleInfo(
@@ -124,19 +121,7 @@ struct BubbleInfo {
 			w{10.0f},
 			h{10.0f},
 			mouseOver{0.0f},
-			gradientLeft{-1.0f}, 
-			gradientRight{1.0f},
-			
-			gradientYIntercept{1.0f},
-			gradientGradient{-1.0f},
-
-			gradientLeftRed{0.5f},
-			gradientLeftGreen{0.0f}, 
-			gradientLeftBlue{0.5f},
-
-			gradientRightRed{0.0f},
-			gradientRightGreen{0.5f}, 
-			gradientRightBlue{0.0f}
+			groupId{0.0f}
 		{};
 
 		BubbleInfo()
@@ -145,19 +130,20 @@ struct BubbleInfo {
 			w{10.0f},
 			h{10.0f},
 			mouseOver{0.0f},
-			gradientLeft{-1.0f}, 
-			gradientRight{1.0f},
+			groupId{0.0f}
+			// gradientLeft{-1.0f}, 
+			// gradientRight{1.0f},
 			
-			gradientYIntercept{1.0f},
-			gradientGradient{-1.0f},
+			// gradientYIntercept{1.0f},
+			// gradientGradient{-1.0f},
 
-			gradientLeftRed{0.5f},
-			gradientLeftGreen{0.0f}, 
-			gradientLeftBlue{0.5f},
+			// gradientLeftRed{0.5f},
+			// gradientLeftGreen{0.0f}, 
+			// gradientLeftBlue{0.5f},
 
-			gradientRightRed{0.0f},
-			gradientRightGreen{0.5f}, 
-			gradientRightBlue{0.0f}
+			// gradientRightRed{0.0f},
+			// gradientRightGreen{0.5f}, 
+			// gradientRightBlue{0.0f}
 		{};
 };
 
@@ -178,24 +164,24 @@ class Bubbles {
 
 	int myPositionVarying {-1},
 		myBubbleIdVarying {-1},
-		mySamplerUniform {-1},
-		myDataTextureWidthUniform {-1},
-		myTransformationUniform {-1}
-	;
+		myBubbleInfoSamplerUniform {-1},
+		myDataTextureWidthUniform {-1}
+		;
 	mat4 myTransformationMatrix;
 
 	void generateBubbleVertexIndices(size_t first, size_t last);
 	void setupBuffers(GlContext &ctx);
 	void setupBuffersInOtherContexts(GlContext &ctx);
-	void enlargeBuffers(GlContext &ctx);
+	void enlargeBubbleBuffers(GlContext &ctx);
 public:
 	Bubbles();
-	void setupOnFirstContext(GlContext &ctx);
-	void setupOnSharedContext(GlContext &ctx, WindowId win);
-	void commonContextSetup();
+	void initializeFirstContext(GlContext &ctx);
+	void setupSharedContext(GlContext &ctx, WindowId win);
+	void commonSetup();
 
 	BubbleId createBubble(GlContext &ctx, float x, float y, float w, float h);
 	void uploadVertexData(GlContext &ctx, BubbleId id);
 	void uploadBubblePositions();
 	void draw(GlContext &ctx, WindowId id);
+	size_t count() {return myBubbles.size();};
 };

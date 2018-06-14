@@ -1,12 +1,10 @@
 #include "App.h"
 
-#include "globals.h"
-
-
 MouseEvents    App::myMouseHandler;
 RedrawRequests App::myRedrawQueue;
 GlContext 	   App::myGlContext;
 PanningBar     App::myPanningBar;
+Workspace      App::myWorkspace;
 
 void App::cursorPositionCallback(GLFWwindow* window, double xpos, double ypos) {
 	myMouseHandler.moved(window, xpos, ypos, myGlContext, myPanningBar, myRedrawQueue);
@@ -16,9 +14,15 @@ void App::mouseButtonCallback(GLFWwindow* window, int button, int action, int mo
 	myMouseHandler.buttonInput(window, button, action, mods, myGlContext, myRedrawQueue);
 }
 
+void App::monitorCallback(GLFWmonitor* monitor, int event) {
+	Point largestMonitorExtent = myGlContext.getMonitorsInfo();
+	myWorkspace.setSize(largestMonitorExtent);
+}
+
 void App::setCallbacks(GLFWwindow* pWin) {
 	glfwSetCursorPosCallback(pWin, cursorPositionCallback);
 	glfwSetMouseButtonCallback(pWin, mouseButtonCallback);
+	glfwSetMonitorCallback(monitorCallback);
 }
 
 // the first window is created in the `init` method, all other ones are made here, with the window they were requested from as their parent
@@ -26,8 +30,8 @@ void App::createWindow(WindowId parent) {
 	WindowId newId = myGlContext.createWindow(parent);
 	Window&  win = myGlContext.window(newId);
 
-    text.setupOnSharedContext    (myGlContext);
-	myBubbles.setupOnSharedContext(myGlContext, newId);
+    text     .setupSharedContext(myGlContext);
+	myBubbles.setupSharedContext(myGlContext, newId);
 //	glBindVertexArray(win.bubblesVAO);
 
 }
@@ -38,8 +42,8 @@ void App::init() {
     ctx.createWindow(complex<float>(100.0f, 10.0f));
     setCallbacks(ctx.window(0).glfwHandle);
 
-    text.initOnFirstContext(ctx);
-	myBubbles.setupOnFirstContext(ctx);
+    text     .initializeFirstContext(ctx);
+	myBubbles.initializeFirstContext(ctx);
 //	glBindVertexArray(ctx.window(0).bubblesVAO);
 
 
@@ -72,8 +76,13 @@ void App::init() {
 //ctx.changeWindow(1);
 	myBubbles.createBubble(ctx, -0.8f, -0.7f, 10.0f, 10.0f);
 
+	monitorCallback(nullptr,0);
 //	myBubbles.uploadBubblePositionDataToContext();
 
+	myBubbles.createBubble(ctx, 15.0f, 13.0f, 20.0f, 20.0f);
+	myBubbles.createBubble(ctx, 35.0f, 33.0f, 20.0f, 20.0f);
+	myBubbles.createBubble(ctx, 55.0f, 53.0f, 20.0f, 20.0f);
+	myBubbles.createBubble(ctx, 0.5f, 0.3f, 10.0f, 10.0f);
 }
 
 
@@ -88,6 +97,8 @@ void App::draw() {
 			glClear( GL_COLOR_BUFFER_BIT );
 			myBubbles.draw(ctx, i);
 			text.draw(ctx);
+
+			myPanningBar.draw(ctx, i, myWorkspace, myBubbles);
 
 			ctx.swapBuffers();
 			win.needsRefresh = false;

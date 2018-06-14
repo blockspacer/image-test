@@ -1,7 +1,8 @@
 #include <cmath>
 
-#include "Bubbles.h"
 #include "globals.h"
+#include "Bubbles.h"
+#include "Workspace.h"
 
 #include <iostream>
 using std::cout;
@@ -41,7 +42,7 @@ BubbleId Bubbles::createBubble(GlContext &ctx, float x, float y, float w, float 
 
 	if (bubbleId == myBubbles.size()) {
 		if (bubbleId >= mySpaceAvailable)
-			enlargeBuffers(ctx);
+			enlargeBubbleBuffers(ctx);
 
 		myBubbles.emplace_back(x,y,w,h,bubbleId);
 		myBubbles[bubbleId].unused = false;
@@ -62,6 +63,8 @@ cout<<"\tBUBBLE ID "<<-1.0f - float(bubbleId)<<endl;
 	myBubblePositions[bubbleId].y = y;
 	uploadBubblePositions();
 
+
+
 	return bubbleId;
 }
 
@@ -69,13 +72,14 @@ cout<<"\tBUBBLE ID "<<-1.0f - float(bubbleId)<<endl;
 void Bubbles::uploadVertexData(GlContext &ctx, BubbleId id) {
 	
 	glBindBuffer(GL_ARRAY_BUFFER, myVertexBuffer);
-
+auto bop = myBubbleVertices.data();
+SHOW_TYPE(bop);
 	glBufferSubData(GL_ARRAY_BUFFER, id * VERTICES_PER_BUBBLE * sizeof(BubbleVertex), VERTICES_PER_BUBBLE * sizeof(BubbleVertex), myBubbleVertices.data());
 }
 
 void Bubbles::uploadBubblePositions() {
 	glActiveTexture(GL_TEXTURE0);
-
+SHOW_TYPE(GL_TEXTURE0)
 	glTexSubImage2D(GL_TEXTURE_2D, //target
 		0, // mipmap level
 		0, // x offset
@@ -119,7 +123,7 @@ void Bubbles::generateBubbleVertexIndices(size_t first, size_t last) {
 	}
 }
 
-void Bubbles::enlargeBuffers(GlContext &ctx) {
+void Bubbles::enlargeBubbleBuffers(GlContext &ctx) {
 	size_t oldSpaceAvailable = mySpaceAvailable;
 	mySpaceAvailable *= 2;
 
@@ -191,7 +195,7 @@ void Bubbles::enlargeBuffers(GlContext &ctx) {
 
 // }
 
-// void Bubbles::enlargeBuffers() {
+// void Bubbles::enlargeBubbleBuffers() {
 	
 // }
 
@@ -229,18 +233,21 @@ void Bubbles::setupBuffersInOtherContexts(GlContext &ctx) {
 	}
 }
 
-void Bubbles::commonContextSetup() {
-	glUniform1i(mySamplerUniform, 0);
+void Bubbles::commonSetup() {
+	glUniform1i(myBubbleInfoSamplerUniform, 0);
 	glUniform1f(myDataTextureWidthUniform, float(mySpaceAvailable * BubblePositionInfoMemberCount));
 
+	// bubble data
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, myDataTexture);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
+	// bubble group data
+
 	glBufferData(GL_ARRAY_BUFFER, mySpaceAvailable * VERTICES_PER_BUBBLE * sizeof(BubbleVertex), nullptr, GL_STATIC_DRAW);
 }
 
-void Bubbles::setupOnSharedContext(GlContext &ctx, WindowId win) {
+void Bubbles::setupSharedContext(GlContext &ctx, WindowId win) {
 	glBindVertexArray(ctx.window(win).bubblesVAO);
 
 	setupBuffers(ctx);
@@ -248,19 +255,22 @@ void Bubbles::setupOnSharedContext(GlContext &ctx, WindowId win) {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, myVertexIndices);
 	glBindTexture(GL_TEXTURE_2D, myDataTexture);
 
-	commonContextSetup();
+	commonSetup();
 }
 
-void Bubbles::setupOnFirstContext(GlContext &ctx) {
+void Bubbles::initializeFirstContext(GlContext &ctx) {
+	GLuint shader = ctx.shaderHandle();
+
 	//create a dummy bubble positioned off screen, marked unused
+	// so the create new bubbles function doesn't have to treat there being none as a special case
 	myBubbles.emplace_back(0.0f,0.0f,0.0f,0.0f,0.0f);
 
 	glBindVertexArray(ctx.window(0).bubblesVAO);
 
 	glGenBuffers(1, &myVertexBuffer);
 
-	myPositionVarying = glGetAttribLocation(ctx.shaderProgramHandle, "position");
-	myBubbleIdVarying = glGetAttribLocation(ctx.shaderProgramHandle, "texCoord");
+	myPositionVarying = glGetAttribLocation(shader, "position");
+	myBubbleIdVarying = glGetAttribLocation(shader, "texCoord");
 
 	glGenBuffers(1,                      &myVertexIndices);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, myVertexIndices);
@@ -286,14 +296,13 @@ void Bubbles::setupOnFirstContext(GlContext &ctx) {
 		0);
 
 	setupBuffers(ctx);
-	commonContextSetup();
+	commonSetup();
 
 
 
-	mySamplerUniform = glGetUniformLocation(ctx.shaderProgramHandle, "allBubbleData");
-	myDataTextureWidthUniform = glGetUniformLocation(ctx.shaderProgramHandle, "widthOfBubbleData");
+	myBubbleInfoSamplerUniform = glGetUniformLocation(shader, "bubbleData");
+	myDataTextureWidthUniform = glGetUniformLocation(shader, "widthOfBubbleData");
 
-	myTransformationUniform = glGetUniformLocation(ctx.shaderProgramHandle, "transformation");	
 }
 
 void Bubbles::draw(GlContext &ctx, WindowId win) {
@@ -308,10 +317,12 @@ void Bubbles::draw(GlContext &ctx, WindowId win) {
 	myTransformationMatrix = scale(mat4(1.0f), vec3(0.5, -1, 1));
 	myTransformationMatrix = translate(myTransformationMatrix, vec3(0.3, 0.3, 0.0));
 
-	glUniformMatrix4fv(myTransformationUniform, 1, GL_FALSE, glm::value_ptr(myTransformationMatrix));
+	ctx.setMatrix(myTransformationMatrix);
+	//glUniformMatrix4fv(myTransformationUniform, 1, GL_FALSE, glm::value_ptr(myTransformationMatrix));
 
 	glDrawElements(GL_TRIANGLE_FAN, myBubbles.size() * (VERTICES_PER_BUBBLE + 2), GL_UNSIGNED_SHORT, 0);
 //	glBindVertexArray(0);
+
 
 check_gl_errors("draw");
 }

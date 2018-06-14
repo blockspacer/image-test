@@ -2,7 +2,7 @@
 -- you also need to have installed GraphViz and optionally ImageMagick
 
 local source_directory = "~/github/image-test/src/"
-local ignored_prefixes = {"Sk", "tinyutf8"}
+local ignored_prefixes = {"Sk", "tinyutf8", "glm", "include/glm"}
 local ignored_suffixes = {".vert", ".frag"}
 local merge_headers    = true -- whether to show .h and .cpp files separately or not
 local ignore_system_libraries = true

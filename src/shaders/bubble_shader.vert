@@ -14,7 +14,8 @@ layout(location = 3) in vec4 bgColor;
 // for bubble shader
 //layout(location = 4) in float bubbleId;
 uniform float widthOfBubbleData;
-uniform sampler2D allBubbleData;
+uniform sampler2D bubbleData;
+uniform sampler2D bubbleGroupData;
 uniform sampler2DArray spriteSheets;
 uniform mat4 transformation;
 
@@ -30,19 +31,20 @@ const float bubbleY = 1.5;
 const float bubbleW = 2.5;
 const float bubbleH = 3.5;
 const float bubbleMouseOver = 4.5;
+const float bubbleInfoMembers = 6.0;
 
-const float bubbleGradientLeft       = 5.5;
-const float bubbleGradientRight      = 6.5;
-const float bubbleGradientYIntercept = 7.5;
-const float bubbleGradientGradient   = 8.5;
-const float bubbleGradientLeftRed   = 9.5;
-const float bubbleGradientLeftGreen = 10.5;
-const float bubbleGradientLeftBlue  = 11.5;
-const float bubbleGradientRightRed   = 12.5;
-const float bubbleGradientRightGreen = 13.5;
-const float bubbleGradientRightBlue  = 14.5;
+const float bubbleGroupGradientLeft       = 0.5;
+const float bubbleGroupGradientRight      = 1.5;
+const float bubbleGroupGradientYIntercept = 2.5;
+const float bubbleGroupGradientGradient   = 3.5;
+const float bubbleGroupGradientLeftRed    = 4.5;
+const float bubbleGroupGradientLeftGreen  = 5.5;
+const float bubbleGroupGradientLeftBlue   = 6.5;
+const float bubbleGroupGradientRightRed   = 7.5;
+const float bubbleGroupGradientRightGreen = 8.5;
+const float bubbleGroupGradientRightBlue  = 9.5;
+const float bubbleGroupInfoMembers        = 10.0;
 
-const float bubbleInfoMembers = 15.0;
 
 void main() {
 	if (texCoord.x < -0.1) {
@@ -52,10 +54,10 @@ void main() {
 		vec2 yDataPositionInTexture =
 			vec2(((bubbleId * bubbleInfoMembers) + bubbleY)/widthOfBubbleData, 0.5);
 
-		float xOffset = texture(allBubbleData, xDataPositionInTexture).r;
-		float yOffset = texture(allBubbleData, yDataPositionInTexture).r;
+		float xOffset = texture(bubbleData, xDataPositionInTexture).r;
+		float yOffset = texture(bubbleData, yDataPositionInTexture).r;
 
-//output degenerate triangle if bubble is entirely offscreen
+//output degenerate triangle if bubble is entirely offscreen?
 		gl_Position = transformation * (position + vec4(xOffset, yOffset, 0.0f, 0.0f));
 
 		outColor = vec4(0.5,0.0,0.5,1.0);

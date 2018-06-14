@@ -11,6 +11,10 @@ using std::vector;
 
 #include <GLFW/glfw3.h>
 
+#include "include/glm/glm.hpp"
+using glm::mat4;
+#include "include/glm/gtc/type_ptr.hpp"
+
 #include "Window.h"
 
 #include <algorithm>
@@ -19,8 +23,8 @@ using std::vector;
 struct Monitor {
 	GLFWmonitor* glfwHandle;
 	Point physicalSize,
-					screenUnitsSize,
-					position;
+			screenUnitsSize,
+			position;
 	float	screenUnitsPerCM;
 	string 	name;
 	Monitor(GLFWmonitor*& h, std::complex<float> phys, std::complex<float> pixs, std::complex<float> posn, float ppcm, string nom)
@@ -71,9 +75,9 @@ class GlContext {
 	GLuint linkShadersIntoProgram(GLuint vertex, GLuint fragment);
 	GLuint compileShaderFromSourceString(GLenum type, std::string source);
 
+	int 	myTransformationUniform {-1};
+	GLuint	myShaderProgramHandle {0};
 
-	static void getMonitorsInfo();
-	static void monitor_callback(GLFWmonitor* monitor, int event);
 
     
 //	void enlargeBuffer(GLenum target, size_t oldSize, size_t newSize);
@@ -84,10 +88,10 @@ class GlContext {
 	void changeCurrentContext(GLFWwindow *pWin);
 
 public:
-	GLuint shaderProgramHandle {0};
+	GLuint shaderHandle() {return myShaderProgramHandle;};
 	GLuint spareHandle {0};
 
-	GLFWwindow*	setupFirstContext();
+	GLFWwindow*	initializeFirstContext();
 	GLFWwindow* setupSharedContext();
 
 	WindowId createWindow(complex<float> center);
@@ -101,8 +105,10 @@ public:
 	int    windowCount() {return windows.size();};
 	Window &window(WindowId win) {return windows[win];};
 	
+	static Point getMonitorsInfo();
 	void swapBuffers() {glfwSwapBuffers(pCurrentContext);};
 
+	void setMatrix(mat4& m);
 };
 
 	bool checkglerror(int err, int errnum, string errname, string label);
