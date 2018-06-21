@@ -264,10 +264,13 @@ cout<<".\n";
 
 
 void GlContext::changeCurrentContext(GLFWwindow *pWin) {
-	if (pWin != pCurrentContext) {
-		pCurrentContext = pWin;
-		glfwMakeContextCurrent(pCurrentContext);
-	}
+	if (pCurrentContext == pWin)
+		return;
+	pCurrentContext = pWin;
+	glfwMakeContextCurrent(pCurrentContext);
+	myCurrentWindow = (WindowId) glfwGetWindowUserPointer(pWin);
+
+//	cout << "new context context: "<<pWin<<", window: "<<myCurrentWindow<<endl;
 }
 
 void GlContext::changeWindow(WindowId id) {

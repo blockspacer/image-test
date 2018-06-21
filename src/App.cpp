@@ -20,9 +20,10 @@ void App::monitorCallback(GLFWmonitor* monitor, int event) {
 }
 
 void App::framebufferSizeCallback(GLFWwindow* window, int width, int height) {
-cout<<"FRMABRY "<<height<<endl;
+//	cout<<".";
+	myGlContext.changeCurrentContext(window);
     glViewport(0, 0, width, height);
-
+    myRedrawQueue.redrawAllWindows();
 }
 
 void App::webCanvasResize(int w, int h) {

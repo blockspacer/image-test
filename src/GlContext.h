@@ -85,7 +85,6 @@ class GlContext {
 	bool checkglerror(int err, int errnum, string errname, string label);
 	void check_gl_errors(string label);
 	void check_gl_errors();
-	void changeCurrentContext(GLFWwindow *pWin);
 
 public:
 	GLuint shaderHandle() {return myShaderProgramHandle;};
@@ -97,6 +96,7 @@ public:
 	WindowId createWindow(complex<float> center);
 	WindowId createWindow(WindowId parent);
 	GLFWwindow* currentContext() {return pCurrentContext;};
+	void     changeCurrentContext(GLFWwindow *pWin);
 	void     changeWindow(WindowId win);
 	bool     isCurrentWindow(WindowId id) {return windows[id].glfwHandle != pCurrentContext;};
 	WindowId currentWindowId() {return myCurrentWindow;};
