@@ -6,7 +6,7 @@
 #include "GlContext.h"
 
 #include "Window.h"
-#include "DataTextures.h"
+#include "DataTextureTemplate.h"
 
 //#include "glm/mat3x3.hpp"
 #include "include/glm/glm.hpp"

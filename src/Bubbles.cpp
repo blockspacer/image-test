@@ -72,14 +72,13 @@ cout<<"\tBUBBLE ID "<<-1.0f - float(bubbleId)<<endl;
 void Bubbles::uploadVertexData(GlContext &ctx, BubbleId id) {
 	
 	glBindBuffer(GL_ARRAY_BUFFER, myVertexBuffer);
-auto bop = myBubbleVertices.data();
-SHOW_TYPE(bop);
+
 	glBufferSubData(GL_ARRAY_BUFFER, id * VERTICES_PER_BUBBLE * sizeof(BubbleVertex), VERTICES_PER_BUBBLE * sizeof(BubbleVertex), myBubbleVertices.data());
 }
 
 void Bubbles::uploadBubblePositions() {
 	glActiveTexture(GL_TEXTURE0);
-SHOW_TYPE(GL_TEXTURE0)
+
 	glTexSubImage2D(GL_TEXTURE_2D, //target
 		0, // mipmap level
 		0, // x offset
@@ -314,8 +313,8 @@ void Bubbles::draw(GlContext &ctx, WindowId win) {
 
 
 
-	myTransformationMatrix = scale(mat4(1.0f), vec3(0.5, -1, 1));
-	myTransformationMatrix = translate(myTransformationMatrix, vec3(0.3, 0.3, 0.0));
+	myTransformationMatrix = scale(mat4(1.0f), vec3(1, 1, 1));
+	myTransformationMatrix = translate(myTransformationMatrix, vec3(0.0, 0.0, 0.0));
 
 	ctx.setMatrix(myTransformationMatrix);
 	//glUniformMatrix4fv(myTransformationUniform, 1, GL_FALSE, glm::value_ptr(myTransformationMatrix));

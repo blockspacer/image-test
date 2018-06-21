@@ -40,14 +40,14 @@ class App {
 	static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 
 	static void monitorCallback(GLFWmonitor* monitor, int event);
-
+	static void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 public:
 	GlContext      &glContext()   {return myGlContext;};
 	RedrawRequests &redrawQueue() {return myRedrawQueue;};
 	void init();
 	void draw();
 	void createWindow(WindowId parent);
-
+	void webCanvasResize(int w, int h);
 };
 
 

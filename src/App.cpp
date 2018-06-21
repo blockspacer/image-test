@@ -19,10 +19,22 @@ void App::monitorCallback(GLFWmonitor* monitor, int event) {
 	myWorkspace.setSize(largestMonitorExtent);
 }
 
+void App::framebufferSizeCallback(GLFWwindow* window, int width, int height) {
+cout<<"FRMABRY "<<height<<endl;
+    glViewport(0, 0, width, height);
+
+}
+
+void App::webCanvasResize(int w, int h) {
+	framebufferSizeCallback(myGlContext.currentContext(), w, h);
+}
+
 void App::setCallbacks(GLFWwindow* pWin) {
 	glfwSetCursorPosCallback(pWin, cursorPositionCallback);
 	glfwSetMouseButtonCallback(pWin, mouseButtonCallback);
 	glfwSetMonitorCallback(monitorCallback);
+	glfwSetFramebufferSizeCallback(pWin, framebufferSizeCallback);
+
 }
 
 // the first window is created in the `init` method, all other ones are made here, with the window they were requested from as their parent
@@ -59,6 +71,13 @@ void App::init() {
 
 	myBubbles.createBubble(ctx, -0.5f, -0.0f, 10.0f, 10.0f);
 	myBubbles.createBubble(ctx, 0.0f, -0.3f, 10.0f, 10.0f);
+	// myBubbles.createBubble(ctx, 0.5f, 0.3f, 10.0f, 10.0f);
+	// myBubbles.createBubble(ctx, 0.5f, -0.7f, 10.0f, 10.0f);
+	// myBubbles.createBubble(ctx, -0.8f, -0.7f, 10.0f, 10.0f);
+	myBubbles.createBubble(ctx, 15.0f, 13.0f, 20.0f, 20.0f);
+	myBubbles.createBubble(ctx, 35.0f, 33.0f, 20.0f, 20.0f);
+	myBubbles.createBubble(ctx, 55.0f, 53.0f, 20.0f, 20.0f);	
+// myBubbles.createBubble(ctx, 0.5f, 0.3f, 10.0f, 10.0f);
 
 //   pWin  = myGlContext.windows[0].glfwHandle;
 
@@ -71,18 +90,11 @@ void App::init() {
 //		ctx.changeWindow(0);
     #endif
 
-	myBubbles.createBubble(ctx, 0.5f, 0.3f, 10.0f, 10.0f);
-	myBubbles.createBubble(ctx, 0.5f, -0.7f, 10.0f, 10.0f);
 //ctx.changeWindow(1);
-	myBubbles.createBubble(ctx, -0.8f, -0.7f, 10.0f, 10.0f);
 
 	monitorCallback(nullptr,0);
 //	myBubbles.uploadBubblePositionDataToContext();
 
-	myBubbles.createBubble(ctx, 15.0f, 13.0f, 20.0f, 20.0f);
-	myBubbles.createBubble(ctx, 35.0f, 33.0f, 20.0f, 20.0f);
-	myBubbles.createBubble(ctx, 55.0f, 53.0f, 20.0f, 20.0f);
-	myBubbles.createBubble(ctx, 0.5f, 0.3f, 10.0f, 10.0f);
 }
 
 
@@ -96,9 +108,9 @@ void App::draw() {
 			glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
 			glClear( GL_COLOR_BUFFER_BIT );
 			myBubbles.draw(ctx, i);
-			text.draw(ctx);
+//			text.draw(ctx);
 
-			myPanningBar.draw(ctx, i, myWorkspace, myBubbles);
+//			myPanningBar.draw(ctx, i, myWorkspace, myBubbles);
 
 			ctx.swapBuffers();
 			win.needsRefresh = false;

@@ -19,6 +19,14 @@ using std::endl;
 
 App gApp;
 
+#ifdef WEB
+	extern "C" {
+		void resize_web_canvas(int wh, int hh) {
+			gApp.webCanvasResize(wh, hh);
+		}
+	}
+#endif
+
 static int framenum = 0;
 
 void draw_frame() {
@@ -28,18 +36,6 @@ void draw_frame() {
 #endif
 }
 
-
-#ifdef __EMSCRIPTEN__
-	extern "C" {
-	 	void web_window_size_callback() {
-//			cout<<"size changed " << EM_ASM_INT(return document.innerHeight, 0) << '\n';
-		}
-	}
-#else
-	void native_window_size_callback(GLFWwindow* window, int width, int height) {
-		cout<<"size changed " << width <<'\n';
-	}
-#endif
 
 // EM_ASM({
 // 	function back(text){

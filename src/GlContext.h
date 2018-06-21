@@ -96,6 +96,7 @@ public:
 
 	WindowId createWindow(complex<float> center);
 	WindowId createWindow(WindowId parent);
+	GLFWwindow* currentContext() {return pCurrentContext;};
 	void     changeWindow(WindowId win);
 	bool     isCurrentWindow(WindowId id) {return windows[id].glfwHandle != pCurrentContext;};
 	WindowId currentWindowId() {return myCurrentWindow;};

@@ -275,14 +275,6 @@ void GlContext::changeWindow(WindowId id) {
 	changeCurrentContext(windows[id].glfwHandle);
 }
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-
-	cout<<"New framebuffer size "<<width<<" x "<<height<<" pixels\n";
-
-//    glViewport(0, 0, width, height);
-}
-
 WindowId GlContext::createWindow(complex<float> center) {
 	WindowId newWin {0};
 
@@ -314,10 +306,7 @@ WindowId GlContext::createWindow(complex<float> center) {
 
 	glfwSwapInterval(1);
 
-glfwSetFramebufferSizeCallback(windows[newWin].glfwHandle, framebuffer_size_callback);
 glfwSetKeyCallback(windows[newWin].glfwHandle, key_callback);
-glViewport(0,0, 1000, 1000);
-
 
 	windows[newWin].setupVAOs();
 	glfwSetWindowUserPointer(windows[newWin].glfwHandle, (void *) newWin);
