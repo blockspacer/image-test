@@ -25,8 +25,8 @@ DISABLE_WARNING(reorder, reorder, reorder)
 
 class App {
 	static GlContext  myGlContext;
-	TextLayout text;
-	Bubbles    myBubbles;
+	static TextLayout myText;
+	static Bubbles    myBubbles;
 
 //	KeyEvents  
 	static MouseEvents    myMouseHandler;
@@ -34,19 +34,20 @@ class App {
 	static PanningBar     myPanningBar;
 	static Workspace      myWorkspace;
 
-	void setCallbacks(GLFWwindow* pWin);
+static	void setCallbacks(GLFWwindow* pWin);
 
 	static void cursorPositionCallback(GLFWwindow* window, double xpos, double ypos);
 	static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 
 	static void monitorCallback(GLFWmonitor* monitor, int event);
 	static void framebufferSizeCallback(GLFWwindow* window, int width, int height);
+	static void redrawCallback(GLFWwindow*);
 public:
 	GlContext      &glContext()   {return myGlContext;};
 	RedrawRequests &redrawQueue() {return myRedrawQueue;};
-	void init();
-	void draw();
-	void createWindow(WindowId parent);
+static	void init();
+static	void draw();
+static	void createWindow(WindowId parent);
 	void webCanvasResize(int w, int h);
 };
 

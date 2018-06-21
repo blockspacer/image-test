@@ -2,9 +2,12 @@
 
 MouseEvents    App::myMouseHandler;
 RedrawRequests App::myRedrawQueue;
-GlContext 	   App::myGlContext;
 PanningBar     App::myPanningBar;
 Workspace      App::myWorkspace;
+GlContext      App::myGlContext;
+TextLayout     App::myText;
+Bubbles        App::myBubbles;
+
 
 void App::cursorPositionCallback(GLFWwindow* window, double xpos, double ypos) {
 	myMouseHandler.moved(window, xpos, ypos, myGlContext, myPanningBar, myRedrawQueue);
@@ -20,7 +23,7 @@ void App::monitorCallback(GLFWmonitor* monitor, int event) {
 }
 
 void App::framebufferSizeCallback(GLFWwindow* window, int width, int height) {
-//	cout<<".";
+	cout<<".";
 	myGlContext.changeCurrentContext(window);
     glViewport(0, 0, width, height);
     myRedrawQueue.redrawAllWindows();
@@ -30,12 +33,16 @@ void App::webCanvasResize(int w, int h) {
 	framebufferSizeCallback(myGlContext.currentContext(), w, h);
 }
 
+void App::redrawCallback(GLFWwindow* pWin) {draw();};
+
 void App::setCallbacks(GLFWwindow* pWin) {
+	cout<<"CALLMVBAN"<<endl;
 	glfwSetCursorPosCallback(pWin, cursorPositionCallback);
 	glfwSetMouseButtonCallback(pWin, mouseButtonCallback);
 	glfwSetMonitorCallback(monitorCallback);
 	glfwSetFramebufferSizeCallback(pWin, framebufferSizeCallback);
-
+	glfwSetWindowRefreshCallback(pWin, redrawCallback);
+//	glfwSetWindowRefreshCallback
 }
 
 // the first window is created in the `init` method, all other ones are made here, with the window they were requested from as their parent
@@ -43,9 +50,10 @@ void App::createWindow(WindowId parent) {
 	WindowId newId = myGlContext.createWindow(parent);
 	Window&  win = myGlContext.window(newId);
 
-    text     .setupSharedContext(myGlContext);
+    myText   .setupSharedContext(myGlContext);
 	myBubbles.setupSharedContext(myGlContext, newId);
 //	glBindVertexArray(win.bubblesVAO);
+	setCallbacks(win.glfwHandle());
 
 }
 
@@ -55,7 +63,7 @@ void App::init() {
     ctx.createWindow(complex<float>(100.0f, 10.0f));
     setCallbacks(ctx.window(0).glfwHandle);
 
-    text     .initializeFirstContext(ctx);
+    myText   .initializeFirstContext(ctx);
 	myBubbles.initializeFirstContext(ctx);
 //	glBindVertexArray(ctx.window(0).bubblesVAO);
 
