@@ -18,7 +18,7 @@ void MouseEvents::buttonInput(GLFWwindow* window, int button, int action, int mo
 	bool handled = false;
 
 	if (action == GLFW_PRESS) {
-		WindowId parent = win.id;
+		WindowId parent = win.id();
 		SHOW_TYPE(parent)
 		redrawQueue.newWindow(parent);
 	}

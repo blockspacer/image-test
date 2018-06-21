@@ -78,7 +78,7 @@ int main() {
 	#else
 //    	glfwSetWindowSizeCallback(pWin, native_window_size_callback);
 
-		while (!glfwWindowShouldClose(gApp.glContext().window(0).glfwHandle) ){// && !glfwWindowShouldClose(pWin2)) {
+		while (!glfwWindowShouldClose(gApp.glContext().window(0).glfwHandle()) ){// && !glfwWindowShouldClose(pWin2)) {
 			RedrawRequests &rdq = gApp.redrawQueue();
 			if (rdq.newWindowRequested()) {
 				gApp.createWindow( rdq.newWindowParentId() );

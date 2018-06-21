@@ -67,8 +67,8 @@ class GlContext {
 	GLFWwindow* pCurrentContext;
 	WindowId    myCurrentWindow;
 
-	static vector<Window>  windows;
-	static vector<Monitor> sMonitors;
+	vector<Window>  windows;
+	vector<Monitor> sMonitors;
 
 
 
@@ -98,7 +98,7 @@ public:
 	GLFWwindow* currentContext() {return pCurrentContext;};
 	void     changeCurrentContext(GLFWwindow *pWin);
 	void     changeWindow(WindowId win);
-	bool     isCurrentWindow(WindowId id) {return windows[id].glfwHandle != pCurrentContext;};
+	bool     isCurrentWindow(WindowId id) {return windows[id].glfwHandle() != pCurrentContext;};
 	WindowId currentWindowId() {return myCurrentWindow;};
 	Window   &currentWindow () {return windows[myCurrentWindow];};
 	Window   &lookupWindow(GLFWwindow* pWin);
@@ -106,7 +106,7 @@ public:
 	int    windowCount() {return windows.size();};
 	Window &window(WindowId win) {return windows[win];};
 	
-	static Point getMonitorsInfo();
+	Point getMonitorsInfo();
 	void swapBuffers() {glfwSwapBuffers(pCurrentContext);};
 
 	void setMatrix(mat4& m);

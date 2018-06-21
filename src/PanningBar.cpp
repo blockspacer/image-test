@@ -1,5 +1,14 @@
 #include "PanningBar.h"
 
+
+
+void PanningBar::initializeFirstContext(GlContext &ctx) {
+	GLuint shader = ctx.shaderHandle();
+
+
+}
+
+
 void PanningBar::draw(GlContext &ctx, WindowId win, Workspace& wksp, Bubbles& bubbles) {
 //	glBindVertexArray(ctx.bubblesVAO);
 //glDrawArrays(GL_TRIANGLES, 0, 3);

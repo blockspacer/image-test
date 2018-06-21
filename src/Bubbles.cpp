@@ -207,7 +207,7 @@ void Bubbles::setupBuffers(GlContext &ctx) {
 	glEnableVertexAttribArray(myBubbleIdVarying);
 	glVertexAttribPointer(myBubbleIdVarying, 1,  GL_FLOAT, GL_FALSE, sizeof(BubbleVertex), (const void*) (2*sizeof(GLfloat)));
 
-	glUniform1f(myDataTextureWidthUniform, float(mySpaceAvailable * BubblePositionInfoMemberCount));
+	glUniform1f(myBubbleInfoTextureWidthUniform, float(mySpaceAvailable * BubblePositionInfoMemberCount));
 }
 
 void Bubbles::setupBuffersInOtherContexts(GlContext &ctx) {
@@ -219,7 +219,7 @@ void Bubbles::setupBuffersInOtherContexts(GlContext &ctx) {
 	if (ctx.windowCount() > 1) {
 		for (WindowId i = 0; i < ctx.windowCount(); i++) {
 			Window &win = ctx.window(i);
-			if (! ctx.isCurrentWindow(i) && ! win.unused) {
+			if (! ctx.isCurrentWindow(i) && win.inUse()) {
 				ctx.changeWindow(i);
 
 				setupBuffers(ctx);
@@ -233,8 +233,8 @@ void Bubbles::setupBuffersInOtherContexts(GlContext &ctx) {
 }
 
 void Bubbles::commonSetup() {
-	glUniform1i(myBubbleInfoSamplerUniform, 0);
-	glUniform1f(myDataTextureWidthUniform, float(mySpaceAvailable * BubblePositionInfoMemberCount));
+	glUniform1i(myBubbleInfoTextureUniform, 0);
+	glUniform1f(myBubbleInfoTextureWidthUniform, float(mySpaceAvailable * BubblePositionInfoMemberCount));
 
 	// bubble data
 	glActiveTexture(GL_TEXTURE0);
@@ -299,8 +299,8 @@ void Bubbles::initializeFirstContext(GlContext &ctx) {
 
 
 
-	myBubbleInfoSamplerUniform = glGetUniformLocation(shader, "bubbleData");
-	myDataTextureWidthUniform = glGetUniformLocation(shader, "widthOfBubbleData");
+	myBubbleInfoTextureUniform = glGetUniformLocation(shader, "bubbleData");
+	myBubbleInfoTextureWidthUniform = glGetUniformLocation(shader, "widthOfBubbleData");
 
 }
 

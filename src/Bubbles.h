@@ -163,8 +163,8 @@ class Bubbles {
 
 	int myPositionVarying {-1},
 		myBubbleIdVarying {-1},
-		myBubbleInfoSamplerUniform {-1},
-		myDataTextureWidthUniform {-1}
+		myBubbleInfoTextureUniform {-1},
+		myBubbleInfoTextureWidthUniform {-1}
 		;
 	mat4 myTransformationMatrix;
 

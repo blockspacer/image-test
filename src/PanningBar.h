@@ -22,9 +22,15 @@ using glm::vec3;
 #include "Bubbles.h"
 
 class PanningBar {
-	mat4 myTransformationMatrix;
+	mat4   myTransformationMatrix;
+	GLuint myUBO {0},
+			myVertexBuffer {0}
+	;
+
 public:
 	void draw(GlContext &ctx, WindowId win, Workspace &wksp, Bubbles &bubbles);
+	void initializeFirstContext(GlContext &ctx);
+
 };
 
 

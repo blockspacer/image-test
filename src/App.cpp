@@ -22,27 +22,57 @@ void App::monitorCallback(GLFWmonitor* monitor, int event) {
 	myWorkspace.setSize(largestMonitorExtent);
 }
 
+// may get called when a window moves to a higher dpi screen
 void App::framebufferSizeCallback(GLFWwindow* window, int width, int height) {
 	cout<<".";
 	myGlContext.changeCurrentContext(window);
     glViewport(0, 0, width, height);
     myRedrawQueue.redrawAllWindows();
+	cout<<"SIZE"<<endl;
+}
+
+void App::windowSizeCallback(GLFWwindow* window, int width, int height) {
+	myGlContext.changeCurrentContext(window);
+
+int w,h;
+
+	glfwGetFramebufferSize(window, &w, &h);
+
+	if (myGlContext.currentWindow().screenUnitsSizeChanged(w,h)) {
+	    glViewport(0, 0, width, height);
+	    myRedrawQueue.redrawAllWindows();
+	}
+	else{
+		return;
+	}
 }
 
 void App::webCanvasResize(int w, int h) {
 	framebufferSizeCallback(myGlContext.currentContext(), w, h);
 }
 
-void App::redrawCallback(GLFWwindow* pWin) {draw();};
+void App::redrawCallback(GLFWwindow* pWin) {
+	draw();};
+
+void App::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+cout<<".\n";
+	if (key==GLFW_KEY_F ) {
+#ifdef WEB
+		emscripten_resume_main_loop();
+#endif
+		cout<<"F\n";
+	}
+}
 
 void App::setCallbacks(GLFWwindow* pWin) {
 	cout<<"CALLMVBAN"<<endl;
 	glfwSetCursorPosCallback(pWin, cursorPositionCallback);
 	glfwSetMouseButtonCallback(pWin, mouseButtonCallback);
 	glfwSetMonitorCallback(monitorCallback);
-	glfwSetFramebufferSizeCallback(pWin, framebufferSizeCallback);
+	//glfwSetFramebufferSizeCallback(pWin, framebufferSizeCallback);
+	glfwSetWindowSizeCallback(pWin, windowSizeCallback);
 	glfwSetWindowRefreshCallback(pWin, redrawCallback);
-//	glfwSetWindowRefreshCallback
+	glfwSetKeyCallback(pWin, keyCallback);
 }
 
 // the first window is created in the `init` method, all other ones are made here, with the window they were requested from as their parent
@@ -61,10 +91,11 @@ void App::init() {
 	GlContext &ctx = myGlContext;
 
     ctx.createWindow(complex<float>(100.0f, 10.0f));
-    setCallbacks(ctx.window(0).glfwHandle);
+    setCallbacks(ctx.window(0).glfwHandle());
 
-    myText   .initializeFirstContext(ctx);
-	myBubbles.initializeFirstContext(ctx);
+    myText      .initializeFirstContext(ctx);
+	myBubbles   .initializeFirstContext(ctx);
+	myPanningBar.initializeFirstContext(ctx);
 //	glBindVertexArray(ctx.window(0).bubblesVAO);
 
 
@@ -107,12 +138,18 @@ void App::init() {
 }
 
 
+// panning bar changed
+// panning bar changed size
+
 void App::draw() {
+
+
+
 	GlContext &ctx = myGlContext;
 
 	for (int i = 0; i < ctx.windowCount(); ++i) {
 		Window& win = ctx.window(i);
-		if (myRedrawQueue.doRedrawEverything() || ! win.unused && win.needsRefresh) {
+		if (myRedrawQueue.doRedrawEverything() || ( win.inUse() && win.needsRefresh() )) {
 			ctx.changeWindow(i);
 			glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
 			glClear( GL_COLOR_BUFFER_BIT );
@@ -122,7 +159,7 @@ void App::draw() {
 //			myPanningBar.draw(ctx, i, myWorkspace, myBubbles);
 
 			ctx.swapBuffers();
-			win.needsRefresh = false;
+			win.markRefreshed();
 		}
 	}
 	myRedrawQueue.haveRedrawnEverything();

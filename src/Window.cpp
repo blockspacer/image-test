@@ -2,14 +2,22 @@
 
 #include "Workspace.h"
 
-Window::Window(WindowId _id) {
-	id = _id;
+Window::Window(WindowId id) {
+	myId = id;
 }
 
 void Window::setupVAOs() {
 	glGenVertexArrays(1, &textVAO);
 	glGenVertexArrays(1, &bubblesVAO);
 	glBindVertexArray(    bubblesVAO);
+}
+
+bool Window::screenUnitsSizeChanged(int w, int h) {
+	if (::x(mySizeInScreenUnits)==w && ::y(mySizeInScreenUnits)==h)
+		return false;
+	mySizeInScreenUnits.real(w);
+	mySizeInScreenUnits.imag(h);
+	return true;
 }
 
 bool Window::mouseMotion(Point pos, RedrawRequests &redrawReqests) {

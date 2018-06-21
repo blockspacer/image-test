@@ -188,8 +188,8 @@ void MessageCallback( GLenum source,
 
 
 
-vector<Window>  GlContext::windows;
-vector<Monitor> GlContext::sMonitors;
+// vector<Window>  GlContext::windows;
+// vector<Monitor> GlContext::sMonitors;
 
 Point GlContext::getMonitorsInfo() {
 	cout<<"Getting monitor specs\n";
@@ -244,19 +244,6 @@ Window &GlContext::lookupWindow(GLFWwindow* pWin) {
 
 
 
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-cout<<".\n";
-	if (key==GLFW_KEY_F ) {
-#ifdef WEB
-		emscripten_resume_main_loop();
-#endif
-		cout<<"F\n";
-	}
-}
-
-
-
 
 
 
@@ -275,7 +262,7 @@ void GlContext::changeCurrentContext(GLFWwindow *pWin) {
 
 void GlContext::changeWindow(WindowId id) {
 	myCurrentWindow = id;
-	changeCurrentContext(windows[id].glfwHandle);
+	changeCurrentContext(windows[id].glfwHandle());
 }
 
 WindowId GlContext::createWindow(complex<float> center) {
@@ -284,14 +271,13 @@ WindowId GlContext::createWindow(complex<float> center) {
 	// first window ever
 	if (windows.size() == 0) {
 		windows.emplace_back(newWin);
-		windows[0].glfwHandle = initializeFirstContext();
+		windows[0].setGlfwHandle(initializeFirstContext());
 	}
 	// re-use an old slot
 	else {
 		for (newWin = 0; newWin < windows.size(); newWin++) {
-			if (windows[newWin].unused) {
-				windows[newWin].unused = false;
-				windows[newWin].glfwHandle = setupSharedContext();
+			if (windows[newWin].isUnused()) {
+				windows[newWin].setGlfwHandle(setupSharedContext());
 				break;
 			}
 		}
@@ -300,7 +286,7 @@ WindowId GlContext::createWindow(complex<float> center) {
 	// add a window to the list
 	if (newWin == windows.size()) {
 		windows.emplace_back(newWin);
-		windows[newWin].glfwHandle = setupSharedContext();
+		windows[newWin].setGlfwHandle(setupSharedContext());
 	}
 
 	myCurrentWindow = newWin;
@@ -309,10 +295,8 @@ WindowId GlContext::createWindow(complex<float> center) {
 
 	glfwSwapInterval(1);
 
-glfwSetKeyCallback(windows[newWin].glfwHandle, key_callback);
-
 	windows[newWin].setupVAOs();
-	glfwSetWindowUserPointer(windows[newWin].glfwHandle, (void *) newWin);
+	glfwSetWindowUserPointer(windows[newWin].glfwHandle(), (void *) newWin);
 
 	#ifdef __APPLE__
 		glEnable(GL_PRIMITIVE_RESTART);
@@ -334,8 +318,8 @@ WindowId GlContext::createWindow(WindowId parent) {
 GLFWwindow* GlContext::setupSharedContext() {
 	GLFWwindow *pWin;
 	for (int i = 0; i < windows.size(); i++) {
-		if ( ! windows[i].unused) {
-			pWin = windows[i].glfwHandle;
+		if ( windows[i].inUse() ) {
+			pWin = windows[i].glfwHandle();
 			break;
 		}
 	}
