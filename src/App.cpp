@@ -33,17 +33,15 @@ void App::framebufferSizeCallback(GLFWwindow* window, int width, int height) {
 
 void App::windowSizeCallback(GLFWwindow* window, int width, int height) {
 	myGlContext.changeCurrentContext(window);
-
+cout<<"width "<<width<<endl;
 int w,h;
 
 	glfwGetFramebufferSize(window, &w, &h);
+cout<<"w "<<w<<endl;
 
 	if (myGlContext.currentWindow().screenUnitsSizeChanged(w,h)) {
-	    glViewport(0, 0, width, height);
+	    glViewport(0, 0, w, h);
 	    myRedrawQueue.redrawAllWindows();
-	}
-	else{
-		return;
 	}
 }
 
