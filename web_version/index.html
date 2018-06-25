@@ -121,7 +121,8 @@ console.log ("Hum", textCtx.measureText("green").width)
 
 		}
 
-        window.onresize = function() { 
+        window.onresize = function() {
+//            console.log("new w ", window.innerWidth);
             Module._resize_web_canvas(window.innerWidth, window.innerHeight);
         };
 

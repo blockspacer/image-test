@@ -14,15 +14,21 @@ out vec4 col;
 
 void main()
 {
-	if (outTexCoord.x < 0.0) {
-		col = outColor;
-		return;
-	}
-	else {
+	// textured triangle
+	if (-0.1 < outTexCoord.x) {
 //yyyyyy;oi		col = vec4(1.0,0.0,0.0,1.0);
 		col = texture(spriteSheets,  outTexCoord);
 		return;
 	}
+
+	// regular colored triangle
+//	if (-1.0 == outTexCoord.x) {
+		col = outColor;
+		return;
+//	}
+
+
+	// 
 //	    case  -2: outColor = overlay(texture(tex1,  Texcoord), Color); break;
 //	    case  -3: outColor = overlay(texture(tex2,  Texcoord), Color); break;
 //	    case  -4: outColor = overlay(texture(tex3,  Texcoord), Color); break;

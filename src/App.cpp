@@ -22,26 +22,44 @@ void App::monitorCallback(GLFWmonitor* monitor, int event) {
 	myWorkspace.setSize(largestMonitorExtent);
 }
 
-// may get called when a window moves to a higher dpi screen
-void App::framebufferSizeCallback(GLFWwindow* window, int width, int height) {
-	cout<<".";
-	myGlContext.changeCurrentContext(window);
-    glViewport(0, 0, width, height);
-    myRedrawQueue.redrawAllWindows();
-	cout<<"SIZE"<<endl;
+// - may get called when a window moves to a higher dpi screen
+// - currently called when a webgl window changes size
+void App::framebufferSizeCallback(GLFWwindow* pWin, int w, int h) {
+	Window &win = myGlContext.window(pWin);
+
+	if (win. isPixelSizeDifferent(w, h)) {
+		win.setPixelSize(w, h);
+
+		myGlContext.changeCurrentContext(pWin);
+		glViewport(0, 0, w, h);
+		myRedrawQueue.redrawAllWindows();
+	}
+	else {
+		cout << "Spurious frambuffer resize reported."<<endl;
+	}
 }
 
-void App::windowSizeCallback(GLFWwindow* window, int width, int height) {
-	myGlContext.changeCurrentContext(window);
-cout<<"width "<<width<<endl;
-int w,h;
+void App::windowSizeCallback(GLFWwindow* pWin, int w, int h) {
+	Window &win = myGlContext.window(pWin);
 
-	glfwGetFramebufferSize(window, &w, &h);
-cout<<"w "<<w<<endl;
+	if (win. isScreenunitSizeDifferent(w, h)) {
+		win.setScreenunitSize(w, h);
 
-	if (myGlContext.currentWindow().screenUnitsSizeChanged(w,h)) {
-	    glViewport(0, 0, w, h);
-	    myRedrawQueue.redrawAllWindows();
+//		myGlContext.changeCurrentContext(pWin);
+
+//		int fbw, fbh;
+//		glfwGetFramebufferSize(window, &fbw, &fbh);
+
+//		if (myGlContext.currentWindow().screenUnitsSizeChanged(w,h)) {
+//		    glViewport(0, 0, w, h);
+
+//		glViewport(0, 0, width, height);
+//		myRedrawQueue.redrawAllWindows();
+		
+
+	}
+	else {
+		cout << "Spurious window resize reported."<<endl;
 	}
 }
 
@@ -63,13 +81,14 @@ cout<<".\n";
 }
 
 void App::setCallbacks(GLFWwindow* pWin) {
-	cout<<"CALLMVBAN"<<endl;
 	glfwSetCursorPosCallback(pWin, cursorPositionCallback);
 	glfwSetMouseButtonCallback(pWin, mouseButtonCallback);
 	glfwSetMonitorCallback(monitorCallback);
-	//glfwSetFramebufferSizeCallback(pWin, framebufferSizeCallback);
+	glfwSetFramebufferSizeCallback(pWin, framebufferSizeCallback);
 	glfwSetWindowSizeCallback(pWin, windowSizeCallback);
+	#ifdef __APPLE__
 	glfwSetWindowRefreshCallback(pWin, redrawCallback);
+	#endif
 	glfwSetKeyCallback(pWin, keyCallback);
 }
 
@@ -89,7 +108,7 @@ void App::init() {
 	GlContext &ctx = myGlContext;
 
     ctx.createWindow(complex<float>(100.0f, 10.0f));
-    setCallbacks(ctx.window(0).glfwHandle());
+    setCallbacks(ctx.firstWindow().glfwHandle());
 
     myText      .initializeFirstContext(ctx);
 	myBubbles   .initializeFirstContext(ctx);
@@ -139,10 +158,18 @@ void App::init() {
 // panning bar changed
 // panning bar changed size
 
+double lastframe = 0.0;
+
 void App::draw() {
 
+	double time = glfwGetTime();
 
+	if (1.0 / (time - lastframe) > 75) {
+//		return;
+	}
+	lastframe = time;
 
+	bool anythingDrawn = false;
 	GlContext &ctx = myGlContext;
 
 	for (int i = 0; i < ctx.windowCount(); ++i) {
@@ -151,10 +178,14 @@ void App::draw() {
 			ctx.changeWindow(i);
 			glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
 			glClear( GL_COLOR_BUFFER_BIT );
-			myBubbles.draw(ctx, i);
-//			text.draw(ctx);
+			myPanningBar.draw(ctx, i, myWorkspace, myBubbles);
 
-//			myPanningBar.draw(ctx, i, myWorkspace, myBubbles);
+			myBubbles.draw(ctx, i);
+
+anythingDrawn = true;
+// now use panning bar to draw background
+
+//			text.draw(ctx);
 
 			ctx.swapBuffers();
 			win.markRefreshed();
@@ -162,6 +193,8 @@ void App::draw() {
 	}
 	myRedrawQueue.haveRedrawnEverything();
 
+if (anythingDrawn) {
+}
 
 //glDrawArrays(GL_TRIANGLES, 0, 3);//-works! and no need to load a GL_ELEMENT_ARRAY_BUFFER if there's no complex geometry
 	// glBindVertexArray(gApp->context.triangleVertexArray);

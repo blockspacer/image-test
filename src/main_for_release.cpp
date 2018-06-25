@@ -19,7 +19,7 @@ using std::endl;
 
 App gApp;
 
-#ifdef WEB
+#ifdef __EMSCRIPTEN__
 	extern "C" {
 		void resize_web_canvas(int wh, int hh) {
 			gApp.webCanvasResize(wh, hh);
@@ -63,7 +63,7 @@ int main() {
 	#else
 		sel::State luaInterpreterState{true};
 		luaInterpreterState("os = nil; io = nil; package = nil; debug = nil; require = nil");
-		// would be better to start an environment without *any* standard libraries and only add stuff as needed, but unsure how to do that
+		// would be better to start an environment without *any* standard libraries and only add stuff as nedeed, but unsure how to do that
 
 		read_in_user_settings_native_version(luaInterpreterState);
 	#endif
@@ -78,7 +78,7 @@ int main() {
 	#else
 //    	glfwSetWindowSizeCallback(pWin, native_window_size_callback);
 
-		while (!glfwWindowShouldClose(gApp.glContext().window(0).glfwHandle()) ){// && !glfwWindowShouldClose(pWin2)) {
+		while (!glfwWindowShouldClose(gApp.glContext().firstWindow().glfwHandle()) ){// && !glfwWindowShouldClose(pWin2)) {
 			RedrawRequests &rdq = gApp.redrawQueue();
 			if (rdq.newWindowRequested()) {
 				gApp.createWindow( rdq.newWindowParentId() );

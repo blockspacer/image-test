@@ -1,23 +1,22 @@
 #include "Window.h"
 
-#include "Workspace.h"
 
 Window::Window(WindowId id) {
 	myId = id;
 }
 
 void Window::setupVAOs() {
-	glGenVertexArrays(1, &textVAO);
 	glGenVertexArrays(1, &bubblesVAO);
-	glBindVertexArray(    bubblesVAO);
+	glGenVertexArrays(1, &textVAO);
+//	glBindVertexArray(    bubblesVAO);
+	glGenVertexArrays(1, &backgroundVAO);
+	glGenVertexArrays(1, &panningBarBubbleVAO);
 }
 
-bool Window::screenUnitsSizeChanged(int w, int h) {
-	if (::x(mySizeInScreenUnits)==w && ::y(mySizeInScreenUnits)==h)
-		return false;
-	mySizeInScreenUnits.real(w);
-	mySizeInScreenUnits.imag(h);
-	return true;
+int Window::panningBarPixelHeight(Workspace& wksp) {
+	const Point s = wksp.size();
+	cout<<"um"<<endl;
+	return (::y(s) * pixelWidth()) / ::x(s);
 }
 
 bool Window::mouseMotion(Point pos, RedrawRequests &redrawReqests) {

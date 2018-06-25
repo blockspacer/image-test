@@ -104,7 +104,9 @@ public:
 	Window   &lookupWindow(GLFWwindow* pWin);
 
 	int    windowCount() {return windows.size();};
+	Window &firstWindow() {return windows[0];};
 	Window &window(WindowId win) {return windows[win];};
+	Window &window(GLFWwindow* pWin) {return windows[(WindowId) glfwGetWindowUserPointer(pWin)];};
 	
 	Point getMonitorsInfo();
 	void swapBuffers() {glfwSwapBuffers(pCurrentContext);};

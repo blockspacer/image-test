@@ -159,12 +159,14 @@ class Bubbles {
 	GLuint myVertexBuffer,
 			myVertexIndices,
 			myDataTexture
+		,	myBackgroundBuffer
 			;
 
 	int myPositionVarying {-1},
 		myBubbleIdVarying {-1},
 		myBubbleInfoTextureUniform {-1},
-		myBubbleInfoTextureWidthUniform {-1}
+		myBubbleInfoTextureWidthUniform {-1},
+		myDrawDepthUniform {-1}
 		;
 	mat4 myTransformationMatrix;
 
@@ -177,6 +179,7 @@ public:
 	void initializeFirstContext(GlContext &ctx);
 	void setupSharedContext(GlContext &ctx, WindowId win);
 	void commonSetup();
+	GLuint dataTexture() {return myDataTexture;};
 
 	BubbleId createBubble(GlContext &ctx, float x, float y, float w, float h);
 	void uploadVertexData(GlContext &ctx, BubbleId id);

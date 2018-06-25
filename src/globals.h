@@ -208,15 +208,15 @@ using std::string;
 
 static void complain(string s) {
 	#ifdef __EMSCRIPTEN__
-		EM_ASM({
-			var str = Pointer_stringify($0);
-			var txt = document.createTextNode(str);
-			var sp = document.createElement('span');
-			sp.appendChild(txt);
-			var bod = document.getElementById('canvas').parentNode;
-			bod.insertBefore(sp, bod.childNodes[0]); 
+		// EM_ASM({
+		// 	var str = Pointer_stringify($0);
+		// 	var txt = document.createTextNode(str);
+		// 	var sp = document.createElement('span');
+		// 	sp.appendChild(txt);
+		// 	var bod = document.getElementById('canvas').parentNode;
+		// 	bod.insertBefore(sp, bod.childNodes[0]); 
 
-		}, s.c_str());
+		// }, s.c_str());
 	#endif
 	cout << s << std::endl;
 }

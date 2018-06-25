@@ -60,7 +60,7 @@ void TextLayout::initializeFirstContext(GlContext &ctx) {
 
 	myTextAtlas.test();
 	
-	glBindVertexArray(ctx.window(0).textVAO);
+	glBindVertexArray(ctx.firstWindow().textVAO);
 
 	glGenBuffers(1, &myVertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, myVertexBuffer);

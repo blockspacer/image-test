@@ -32,6 +32,7 @@ GLuint GlContext::compileShaderFromSourceString(GLenum type, std::string source)
 			free(infoLog);
 		}
 		glDeleteShader(shader);
+		exit(-1);
 		return 0;
 	}
 	return shader;
@@ -45,7 +46,6 @@ GLuint GlContext::linkShadersIntoProgram(GLuint vertex, GLuint fragment) {
 		complain("glCreateProgram() failed");
 		return 0;
 	}
-
 	glAttachShader(program, vertex);
 	glAttachShader(program, fragment);
 
@@ -365,7 +365,7 @@ glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
 	#ifdef __EMSCRIPTEN__
 		int width = EM_ASM_INT( {return window.innerWidth;}, 0 );
 		int height = EM_ASM_INT( {return window.innerHeight;}, 0 );
-		EM_ASM({var el = document.getElementById("message");el.parentNode.removeChild(el);}, 0);
+		EM_ASM({var el = document.getElementById('message');el.parentNode.removeChild(el);}, 0);
 	#else
 	    int width = 1024,
              height = 633;

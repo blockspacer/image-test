@@ -21,11 +21,20 @@ using glm::vec3;
 #include "Workspace.h"
 #include "Bubbles.h"
 
+struct ColoredVertex {
+	float x, y,
+			r, g, b, a, t;
+};
+
 class PanningBar {
 	mat4   myTransformationMatrix;
-	GLuint myUBO {0},
-			myVertexBuffer {0}
+	GLuint myUBO {0}
+		,	myVertexBuffer {0}
+		,	myPanningBarBubbleVertexBuffer {0};
+
 	;
+	ColoredVertex myBackgroundVertices[4]
+				, myPanningBarBubbleVertices[8];
 
 public:
 	void draw(GlContext &ctx, WindowId win, Workspace &wksp, Bubbles &bubbles);
