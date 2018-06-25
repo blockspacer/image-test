@@ -121,20 +121,26 @@ console.log ("Hum", textCtx.measureText("green").width)
 
 		}
 
-        window.onresize = function() {
-//            console.log("new w ", window.innerWidth);
-            Module._resize_web_canvas(window.innerWidth, window.innerHeight);
-        };
-
     </script>
 
 <!--        <script type="text/javascript" src="web_release.js.mem"></script> -->
 
+
+        <script type="text/javascript" src="web_release.js"></script>
+
+
         <script type="text/javascript">
+        window.onresize = function() {
+//            console.log("new w ", window.innerWidth);
+
+        var canvs = document.getElementById("canvs");
+            canvs.width = window.innerWidth;
+            canvs.height = window.innerHeight;
+            Module._resize_web_canvas(window.innerWidth, window.innerHeight);
+
+        };
+        Module._resize_web_canvas(window.innerWidth, window.innerHeight);
         </script>
-
-        <script async type="text/javascript" src="web_release.js"></script>
-
 
 <!-- 
         var canvasFullScreen

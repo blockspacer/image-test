@@ -89,7 +89,7 @@ void main() {
 // float y=-1000.0;
 // float w=2000.0;
 // float h=2000.0;
-		float o = 2.0;
+		float o = 1.8;
 		// if (0 == gl_VertexID)		gl_Position = transformation * vec4(x, y, 0.1, 1.0);
 		// else if (1 == gl_VertexID)	gl_Position = transformation * vec4(x, y+h, 0.1, 1.0);	
 		// else if (2 == gl_VertexID)	gl_Position = transformation * vec4(x+w, y+h, 0.1, 1.0);			
@@ -98,12 +98,12 @@ void main() {
 		else if (1 == gl_VertexID)	gl_Position = transformation * vec4(x,     y+o,   0.1, 1.0);	
 		else if (2 == gl_VertexID)	gl_Position = transformation * vec4(x,     y+h-o, 0.1, 1.0);			
 		else if (3 == gl_VertexID)	gl_Position = transformation * vec4(x+o,   y+h,   0.1, 1.0);			
-		else if (4 == gl_VertexID)	gl_Position = transformation * vec4(x+w-o*0.7, y+h,   0.1, 1.0);			
-		else if (5 == gl_VertexID)	gl_Position = transformation * vec4(x+w,   y+h-o*0.7, 0.1, 1.0);			
+		else if (4 == gl_VertexID)	gl_Position = transformation * vec4(x+w-o, y+h,   0.1, 1.0);			
+		else if (5 == gl_VertexID)	gl_Position = transformation * vec4(x+w,   y+h-o, 0.1, 1.0);			
 		else if (6 == gl_VertexID)	gl_Position = transformation * vec4(x+w,   y+o,   0.1, 1.0);			
 		else if (7 == gl_VertexID)	gl_Position = transformation * vec4(x+w-o, y,     0.1, 1.0);			
 
-		outColor = vec4(1.0,1.0,1.0,0.5); // get from bubble group 
+		outColor = vec4(0.9, 0.9, 0.9, 0.5); // get from bubble group 
 		outTexCoord = texCoord;
 		return;
 

@@ -117,11 +117,10 @@ position it so origin is at (-1,1)
 	float horizontalScale = 2 / wksp.width();
 	float pbph = win.panningBarPixelHeight(wksp);
 
-
 	float	verticalScale = (2 * pbph / win.pixelHeight()) / wksp.height();
+cout<<"hhhtx "<<wksp.width()<<endl;
+cout<<"veretx "<<wksp.height()<<endl;
 
-	Point s = wksp.size();
-	float scaling = 2.0f / ::x(s);
 	myTransformationMatrix = mat4(1.0f);
 	myTransformationMatrix = translate(myTransformationMatrix, vec3(-1.0, 1.0, 0.0));
 	myTransformationMatrix = scale(myTransformationMatrix, vec3(horizontalScale, -verticalScale, 1));
@@ -132,15 +131,16 @@ position it so origin is at (-1,1)
 
 	glBindVertexArray(win.panningBarBubbleVAO);
 
+
 	glBindBuffer(GL_ARRAY_BUFFER, myPanningBarBubbleVertexBuffer);
 	glEnableVertexAttribArray(myTexAttrib);
 	glVertexAttribPointer(myTexAttrib, 1, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), (const void*) (6*4));
 
-	// glEnableVertexAttribArray(myColAttrib);
-	// glVertexAttribPointer(myColAttrib, 4, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), (const void*) 8);
+	glEnableVertexAttribArray(myColAttrib);
+	glVertexAttribPointer(myColAttrib, 4, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), (const void*) 8);
 
-	// glEnableVertexAttribArray(myPosAttrib);
-	// glVertexAttribPointer(myPosAttrib, 2, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), (const void*) 0);
+	glEnableVertexAttribArray(myPosAttrib);
+	glVertexAttribPointer(myPosAttrib, 2, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), (const void*) 0);
 
 	// glActiveTexture(GL_TEXTURE0);
 	// glBindTexture(GL_TEXTURE_2D, bubbles.dataTexture());

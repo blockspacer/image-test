@@ -19,6 +19,18 @@ void App::mouseButtonCallback(GLFWwindow* window, int button, int action, int mo
 
 void App::monitorCallback(GLFWmonitor* monitor, int event) {
 	Point largestMonitorExtent = myGlContext.getMonitorsInfo();
+	#ifdef WEB // guess how big the user's screen is based on pixel size of the canvas
+		Window &win = myGlContext.firstWindow();
+
+		float assumed_dpi = 96.0f
+			, dpCM = assumed_dpi / 2.54; // centimetres per inch
+		
+		int w, h;
+		glfwGetFramebufferSize(win.glfwHandle(), &w, &h);
+		
+		largestMonitorExtent.real(w / dpCM);
+		largestMonitorExtent.imag(h / dpCM);
+	#endif
 	myWorkspace.setSize(largestMonitorExtent);
 }
 
@@ -33,6 +45,10 @@ void App::framebufferSizeCallback(GLFWwindow* pWin, int w, int h) {
 		myGlContext.changeCurrentContext(pWin);
 		glViewport(0, 0, w, h);
 		myRedrawQueue.redrawAllWindows();
+
+		#ifdef WEB
+			emscripten_resume_main_loop();
+		#endif
 	}
 	else {
 		cout << "Spurious frambuffer resize reported."<<endl;

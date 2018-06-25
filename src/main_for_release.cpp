@@ -24,7 +24,16 @@ App gApp;
 		void resize_web_canvas(int wh, int hh) {
 			gApp.webCanvasResize(wh, hh);
 		}
-	}
+	};
+
+	// EM_ASM({
+	// 	        window.onresize = function() {
+	// //            console.log("new w ", window.innerWidth);
+	//             Module._resize_web_canvas(window.innerWidth, window.innerHeight);
+	// }
+	//         };
+	//         );
+
 #endif
 
 static int framenum = 0;
