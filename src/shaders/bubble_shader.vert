@@ -111,7 +111,7 @@ void main() {
 	// triangle which fades to opacity where texCoord.y equals 0 or 1, and is fully opaque at 0.5
 	else if (-3.0 == texCoord.x) {
 		outColor = color;
-//		outColor = vec4(0.0,0.0,1.0,1.0);
+//		outColor = vec4(0.0,1.0,1.0,1.0);
 		outTexCoord = texCoord;
 		gl_Position = transformation * position;
 		return;

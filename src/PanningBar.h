@@ -37,11 +37,13 @@ class PanningBar {
 		,	myVertexBuffer {0}
 		,	myPanningBarBubbleVertexBuffer {0}
 		,	myWindowOutlineBuffer {0}
+		,	myWindowViewAreaBuffer {0}
 	;
 	ColoredVertex myBackgroundVertices[4]
 				, myPanningBarBubbleVertices[8]
 				;
 	vector<ColoredVertex> myWindowOutlineVertices;
+	vector<ColoredVertex> myWindowViewAreaVertices;
 
 public:
 	void draw(GlContext &ctx, WindowId win, Workspace &wksp, Bubbles &bubbles);
