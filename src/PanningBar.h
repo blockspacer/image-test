@@ -10,6 +10,7 @@ using glm::scale;
 using glm::translate;
 using glm::mat4;
 using glm::vec3;
+using glm::vec4;
 // using glm::;
 // using glm::;
 // using glm::;
@@ -24,7 +25,11 @@ using glm::vec3;
 struct ColoredVertex {
 	float x, y, z,
 		  r, g, b, a,
-		  t, v ;};
+		  t, v ;
+	ColoredVertex(float _x, float _y, float _z, float _r, float _g, float _b, float _a, float _t, float _v) :
+		x {_x}, y {_y}, z {_z}, r {_r}, g {_g}, b {_b}, a {_a}, t {_t}, v {_v} {}
+	ColoredVertex() {};
+};
 
 class PanningBar {
 	mat4   myTransformationMatrix;
@@ -36,13 +41,13 @@ class PanningBar {
 	ColoredVertex myBackgroundVertices[4]
 				, myPanningBarBubbleVertices[8]
 				;
-	vector<ColoredVertex> myWindowOutline;
+	vector<ColoredVertex> myWindowOutlineVertices;
 
 public:
 	void draw(GlContext &ctx, WindowId win, Workspace &wksp, Bubbles &bubbles);
 	void initializeFirstContext(GlContext &ctx);
 	void prepWindowOutline(Window& win);
-
+	PanningBar() {};
 };
 
 

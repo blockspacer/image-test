@@ -52,8 +52,8 @@ const float bubbleGroupInfoMembers        = 10.0;
 
 void main() {
 	// it's part of a texture
-	if (-0.1 < texCoord.x) {
-		outColor = vec4(0.0, 1.0, 0.0, 1.0);
+	if (texCoord.x >= 0.0) {
+//		outColor = vec4(0.0, 1.0, 0.0, 1.0);
 		gl_Position = transformation * position;
 		outTexCoord = texCoord;
 		return;
@@ -111,8 +111,9 @@ void main() {
 	// triangle which fades to opacity where texCoord.y equals 0 or 1, and is fully opaque at 0.5
 	else if (-3.0 == texCoord.x) {
 		outColor = color;
+//		outColor = vec4(0.0,0.0,1.0,1.0);
 		outTexCoord = texCoord;
-		gl_Position = position;
+		gl_Position = transformation * position;
 		return;
 	}
 	// it's part of a viewport area bubble

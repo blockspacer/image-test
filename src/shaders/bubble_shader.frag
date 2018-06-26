@@ -15,15 +15,17 @@ out vec4 col;
 void main()
 {
 	// textured triangle
-	if (-0.1 < outTexCoord.x) {
+	if (outTexCoord.x >= 0.0) {
 //yyyyyy;oi		col = vec4(1.0,0.0,0.0,1.0);
 		col = texture(spriteSheets,  outTexCoord);
+		col = vec4(1.0,0.0,1.0,1.0);
 		return;
 	}
 	// 
 	if (-3.0 == outTexCoord.x) {
 		const float pi = 3.1415926535897932384626433832795;
 		col = outColor;
+//		col = vec4(0.0,1.0,0.0,1.0);
 		col.a = sin(pi * outTexCoord.y);
 		return;
 	}

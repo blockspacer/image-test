@@ -48,10 +48,41 @@ void PanningBar::initializeFirstContext(GlContext &ctx) {
 
 		glBufferData(GL_ARRAY_BUFFER, sizeof(ColoredVertex) * 8, &myPanningBarBubbleVertices, GL_STATIC_DRAW);
 
+		glGenBuffers(1, &myWindowOutlineBuffer);
+}
+#include <functional>
+#include <cmath>
+// PanningBar::
+// last argument is a lambda called with the coords of the next point, and whether it's on the inside (0) or outside (1) of the curve
+// the arc is drawing starting near the x-axis and going anticlockwise
+void drawCornerStrip(Point center, Point xAxis, Point yAxis, float innerRadius, float outerRadius, size_t steps, bool doubleFirstPoint, std::function<void(Point v, float io)> func, float startAngle = 0.0f, float stopAngle = PI / 2.0f) {
+
+	float innerAngleStep = PI / (2.0f * steps + 2)
+		, outerAngleStep = (stopAngle - startAngle) / (steps + 1)
+		, innerAngle = 0.0f
+		, outerAngle = startAngle
+
+	;
+
+	Point p = center + innerRadius * xAxis;
+	func(p, 0.0f);
+	if (doubleFirstPoint) func(p, 0.0f);
+
+	float a = startAngle;
+
+	for (size_t i = 0; i <= steps; ++i) {
+		func(center + outerRadius * (float(sin(outerAngle))*yAxis + float(cos(outerAngle))*xAxis), 1.0f);
+		innerAngle += innerAngleStep;
+		func(center + innerRadius * (float(sin(innerAngle))*yAxis + float(cos(innerAngle))*xAxis), 0.0f);
+		outerAngle += outerAngleStep;
+	}
+
+	func(center + outerRadius * (float(sin(outerAngle))*yAxis + float(cos(outerAngle))*xAxis), 1.0f);
+
 }
 
 void PanningBar::prepWindowOutline(Window& win) {
-	myWindowOutline.clear();
+	myWindowOutlineVertices.clear();
 	Point tl = win.topLeft(),
 		  br = win.bottomRight();
 
@@ -60,23 +91,33 @@ void PanningBar::prepWindowOutline(Window& win) {
 		, b  = ::y(br)
 		, r  = ::x(br)
 		, w  = 4.0 // width of border
-		, cr = 1.0
+		, cr = 0.0
+		, cg = 0.7
 		, cb = 1.0
-		, cg = 1.0
 		, out = 0.0
 		, in = 1.0
 		;
 
+	auto lam = [&](Point p, float io) {
+		cout<<"yoo "<<::x(p)<<", "<<::y(p)<<endl;
+		myWindowOutlineVertices.emplace_back(::x(p), ::y(p), 0.0f, cr, cg, cb, 1.0f, -3.0f, io);
+	};
 
-	ColoredVertex v {t - w, l - w, cr, cg, cb, 1.0, 3.0, out};
+	SHOW_TYPE(lam);
 
-	myWindowOutline.push_back(v);
+	drawCornerStrip(Point(100,40), Point(1,0), Point(0,1), 10, 20, 3, true, lam);
+//	ColoredVertex v {t - w, l - w, 0.0f, cr, cg, cb, 1.0, 3.0, out};
+
+//	myWindowOutline.push_back(v);
+	glBindBuffer(GL_ARRAY_BUFFER, myWindowOutlineBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(ColoredVertex) * myWindowOutlineVertices.size(), &(myWindowOutlineVertices[0]), GL_STATIC_DRAW);
 
 
 }
 
 void PanningBar::draw(GlContext &ctx, WindowId winid, Workspace& wksp, Bubbles& bubbles) {
 	Window& win = ctx.window(winid);
+prepWindowOutline(win);
 //	glBindVertexArray(ctx.bubblesVAO);
 //glDrawArrays(GL_TRIANGLES, 0, 3);
 	glBindVertexArray(win.backgroundVAO);
@@ -110,13 +151,13 @@ void PanningBar::draw(GlContext &ctx, WindowId winid, Workspace& wksp, Bubbles& 
 	int myTexAttrib = glGetAttribLocation(shader, "texCoord");
 
 	glEnableVertexAttribArray(myPosAttrib);
-	glVertexAttribPointer(myPosAttrib, 2, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), (const void*) 0);
+	glVertexAttribPointer(myPosAttrib, 3, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), (const void*) 0);
 
 	glEnableVertexAttribArray(myColAttrib);
-	glVertexAttribPointer(myColAttrib, 4, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), (const void*) 8);
+	glVertexAttribPointer(myColAttrib, 4, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), (const void*) 12);
 
 	glEnableVertexAttribArray(myTexAttrib);
-	glVertexAttribPointer(myTexAttrib, 1, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), (const void*) (6*4));
+	glVertexAttribPointer(myTexAttrib, 2, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), (const void*) (7*4));
 
 
 /*
@@ -143,10 +184,10 @@ cout<<"veretx "<<wksp.height()<<endl;
 
 	glBindBuffer(GL_ARRAY_BUFFER, myPanningBarBubbleVertexBuffer);
 	glEnableVertexAttribArray(myTexAttrib);
-	glVertexAttribPointer(myTexAttrib, 1, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), (const void*) (6*4));
+	glVertexAttribPointer(myTexAttrib, 1, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), (const void*) (7*4));
 
 	glEnableVertexAttribArray(myColAttrib);
-	glVertexAttribPointer(myColAttrib, 4, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), (const void*) 8);
+	glVertexAttribPointer(myColAttrib, 4, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), (const void*) 12);
 
 	glEnableVertexAttribArray(myPosAttrib);
 	glVertexAttribPointer(myPosAttrib, 2, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), (const void*) 0);
@@ -157,6 +198,23 @@ cout<<"veretx "<<wksp.height()<<endl;
 cout<<"horiz "<<bubbles.count()<<endl;
 	glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 8, bubbles.count());
 	// glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+
+
+	glBindBuffer(GL_ARRAY_BUFFER, myWindowOutlineBuffer);
+
+	glEnableVertexAttribArray(myPosAttrib);
+	glVertexAttribPointer(myPosAttrib, 3, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), (const void*) 0);
+
+
+	glEnableVertexAttribArray(myColAttrib);
+	glVertexAttribPointer(myColAttrib, 4, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), (const void*) 12);
+
+	glEnableVertexAttribArray(myTexAttrib);
+	glVertexAttribPointer(myTexAttrib, 2, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), (const void*) (7*4));
+
+	glEnable (GL_BLEND); glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, myWindowOutlineVertices.size());
 
 check_gl_errors("draw");
 }
