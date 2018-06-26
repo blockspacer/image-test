@@ -22,7 +22,7 @@ Bubbles::Bubbles() {
 // the x-coordinate of the texture passed to the shader, if negative, tells the shader program to do something other than texture a triangle
 // see shaders/bubble_shader.vert
 float encodeId(BubbleId id) {
-	return -3.0f - float(id);
+	return -100.0f - float(id);
 }
 
 BubbleId Bubbles::createBubble(GlContext &ctx, float x, float y, float w, float h) {

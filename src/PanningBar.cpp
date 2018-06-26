@@ -44,27 +44,36 @@ void PanningBar::initializeFirstContext(GlContext &ctx) {
 
 		for (int i = 0; i<8; ++i) {
 			myPanningBarBubbleVertices[i].t = - 2.0f;
-			myPanningBarBubbleVertices[i].r = 0.0f;
-			myPanningBarBubbleVertices[i].g = 1.0f;
-			myPanningBarBubbleVertices[i].b = 0.0f;
-			myPanningBarBubbleVertices[i].a = 1.0f;
 		}
-		myPanningBarBubbleVertices[0].x = -1000.0f;
-		myPanningBarBubbleVertices[0].y = -1000.0f;
-
-		myPanningBarBubbleVertices[1].x = 1000.0f;
-		myPanningBarBubbleVertices[1].y = -1000.0f;
-
-		myPanningBarBubbleVertices[2].x = 1000.0f;
-		myPanningBarBubbleVertices[2].y = 1000.0f;
-
-		myPanningBarBubbleVertices[3].x = -1000.0f;
-		myPanningBarBubbleVertices[3].y = 1000.0f;
 
 		glBufferData(GL_ARRAY_BUFFER, sizeof(ColoredVertex) * 8, &myPanningBarBubbleVertices, GL_STATIC_DRAW);
 
 }
 
+void PanningBar::prepWindowOutline(Window& win) {
+	myWindowOutline.clear();
+	Point tl = win.topLeft(),
+		  br = win.bottomRight();
+
+	float t  = ::y(tl)
+		, l  = ::x(tl)
+		, b  = ::y(br)
+		, r  = ::x(br)
+		, w  = 4.0 // width of border
+		, cr = 1.0
+		, cb = 1.0
+		, cg = 1.0
+		, out = 0.0
+		, in = 1.0
+		;
+
+
+	ColoredVertex v {t - w, l - w, cr, cg, cb, 1.0, 3.0, out};
+
+	myWindowOutline.push_back(v);
+
+
+}
 
 void PanningBar::draw(GlContext &ctx, WindowId winid, Workspace& wksp, Bubbles& bubbles) {
 	Window& win = ctx.window(winid);

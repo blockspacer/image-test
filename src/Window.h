@@ -60,6 +60,8 @@ public:
 	int 	pixelHeight() { return ::y(myPixelSize); };
 	int 	panningBarPixelHeight(Workspace& wksp);
 
+	Point 	topLeft()     { return topLeftInWorkspaceCM ;};
+	Point 	bottomRight() { return topLeftInWorkspaceCM + widthHeightInWorkspaceCM ;};
 
 	WindowId id() {return myId;};
 

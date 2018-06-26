@@ -103,14 +103,21 @@ void main() {
 		else if (6 == gl_VertexID)	gl_Position = transformation * vec4(x+w,   y+o,   0.1, 1.0);			
 		else if (7 == gl_VertexID)	gl_Position = transformation * vec4(x+w-o, y,     0.1, 1.0);			
 
-		outColor = vec4(0.9, 0.9, 0.9, 0.5); // get from bubble group 
+		outColor = vec4(1.0, 0.8, 1.0, 1.0); // get from bubble group 
 		outTexCoord = texCoord;
 		return;
 
 	}
+	// triangle which fades to opacity where texCoord.y equals 0 or 1, and is fully opaque at 0.5
+	else if (-3.0 == texCoord.x) {
+		outColor = color;
+		outTexCoord = texCoord;
+		gl_Position = position;
+		return;
+	}
 	// it's part of a viewport area bubble
 	else {
-		float bubbleId = - texCoord.x - 3.0;
+		float bubbleId = - texCoord.x - 100.0;
 		vec2 xDataPositionInTexture = 
 			vec2(((bubbleId * bubbleInfoMembers) + bubbleX)/widthOfBubbleData, 0.5);
 		vec2 yDataPositionInTexture =

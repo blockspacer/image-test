@@ -20,6 +20,13 @@ void main()
 		col = texture(spriteSheets,  outTexCoord);
 		return;
 	}
+	// 
+	if (-3.0 == outTexCoord.x) {
+		const float pi = 3.1415926535897932384626433832795;
+		col = outColor;
+		col.a = sin(pi * outTexCoord.y);
+		return;
+	}
 
 	// regular colored triangle
 //	if (-1.0 == outTexCoord.x) {

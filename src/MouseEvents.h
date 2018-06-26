@@ -1,9 +1,9 @@
 #pragma once
 
 #include "globals.h"
+#include "GlContext.h"
 #include "RedrawRequests.h"
 #include "MouseEventInterface.h"
-#include "GlContext.h"
 #include "Window.h"
 #include "Bubbles.h"
 #include "PanningBar.h"
