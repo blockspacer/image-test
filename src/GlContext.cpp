@@ -207,8 +207,6 @@ Point GlContext::getMonitorsInfo() {
 		glfwGetMonitorPos(ms[i], &posX, &posY);
 		int widthMM, heightMM;
 		glfwGetMonitorPhysicalSize(ms[i], &widthMM, &heightMM);
-				
-cout << "PH  NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN "<<widthMM<<endl;
 		sMonitors.emplace_back(ms[i], complex<float>(widthMM / 10.0f, heightMM/10.0f),
 			complex<float>(w, h),
 			complex<float>(posX, posY),

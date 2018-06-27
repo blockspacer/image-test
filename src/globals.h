@@ -104,10 +104,13 @@ static bool gBools[maximumBoolean];
 #include <complex>
 using std::complex;
 using Point = complex<float>;
+using PointD = complex<double>;
 // float x(Point);
 // float y(Point);
 static float x(Point p) {return real(p);}
 static float y(Point p) {return imag(p);}
+static float x(PointD p) {return real(p);}
+static float y(PointD p) {return imag(p);}
 
 //const double PI  = 3.141592653589793238463;
 

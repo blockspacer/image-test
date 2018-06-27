@@ -192,8 +192,9 @@ void App::draw() {
 		Window& win = ctx.window(i);
 		if (myRedrawQueue.doRedrawEverything() || ( win.inUse() && win.needsRefresh() )) {
 			ctx.changeWindow(i);
-			glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
-			glClear( GL_COLOR_BUFFER_BIT );
+			glClearColor(1.0f, 0.0f, 0.4f, 1.0f);
+			glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 			myPanningBar.draw(ctx, i, myWorkspace, myBubbles);
 
 			myBubbles.draw(ctx, i);

@@ -25,11 +25,7 @@ public:
 	float  blueFloat() const {return blue  / 255.0f;}
 	float alphaFloat() const {return alpha / 255.0f;}
 
-	float   redPremultipliedFloat() const {return (alphaFloat() * red  ) / 255.0f;}
-	float greenPremultipliedFloat() const {return (alphaFloat() * green) / 255.0f;}
-	float  bluePremultipliedFloat() const {return (alphaFloat() * blue ) / 255.0f;}
-
-	float rPremul32F() const {return (alphaFloat() * red  ) / 255.0f;}
+	float rPremul32F() const {return (alphaFloat() * red)   / 255.0f;}
 	float gPremul32F() const {return (alphaFloat() * green) / 255.0f;}
 	float bPremul32F() const {return (alphaFloat() * blue ) / 255.0f;}
 
@@ -37,7 +33,7 @@ public:
 
 //	uint32_t packIntoInt() {return alpha << 24 | blue << 16}
 
-	Color(float r, float g, float b, float a = 1.0f) : red((uint8_t) r*255), green((uint8_t) g*255), blue((uint8_t) b*255), alpha ((uint8_t) a*255) {};
+	Color(float r, float g, float b, float a = 1.0f) : red((uint8_t) (r*255)), green((uint8_t) (g*255)), blue((uint8_t) (b*255)), alpha ((uint8_t) (a*255)) {};
 	Color(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255) : red(r), green(g), blue(b), alpha(a) {};
 	Color() : red {255}, green {0}, blue {255}, alpha {255} {};
 	Color(const Color &c) : red(c.redInt()), green(c.greenInt()), blue(c.blueInt()), alpha(c.alphaInt()) {};
