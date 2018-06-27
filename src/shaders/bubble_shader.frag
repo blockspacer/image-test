@@ -27,12 +27,14 @@ void main()
 		col = outColor;
 //		col = vec4(0.0,1.0,0.0,1.0);
 		col.a = sin(pi * outTexCoord.y);
+		col.rgb *= col.a;
 		return;
 	}
 
 	// regular colored triangle
 //	if (-1.0 == outTexCoord.x) {
 		col = outColor;
+//		col.rgb *= col.a;
 		return;
 //	}
 

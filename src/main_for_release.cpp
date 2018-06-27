@@ -41,6 +41,9 @@ static int framenum = 0;
 void draw_frame() {
 	gApp.draw();
 #ifdef WEB
+	// glClearColor(1, 1, 1, 1);
+	//glColorMask(false, false, false, true);
+	//glClear(GL_COLOR_BUFFER_BIT);
 	emscripten_pause_main_loop();
 #endif
 }

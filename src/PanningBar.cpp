@@ -56,7 +56,7 @@ void PanningBar::initializeFirstContext(GlContext &ctx) {
 // PanningBar::
 // last argument is a lambda called with the coords of the next point, and whether it's on the inside (0) or outside (1) of the curve
 // the arc is drawing starting near the x-axis and going anticlockwise
-void drawCornerStrip(Point center, Point xAxis, Point yAxis, float innerRadius, float outerRadius, size_t steps, bool doubleFirstPoint, std::function<void(Point v, float io)> func, float startAngle = 0.0f, float stopAngle = PI / 2.0f) {
+void drawCornerStrip(Point center, Point xAxis, Point yAxis, float innerRadius, float outerRadius, size_t steps, bool doubleFirstPoint, std::function<void(Point v, float io, bool last)> func, float startAngle = 0.0f, float stopAngle = PI / 2.0f) {
 
 	float innerAngleStep = PI / (2.0f * steps + 2)
 		, outerAngleStep = (stopAngle - startAngle) / (steps + 1)
@@ -66,23 +66,25 @@ void drawCornerStrip(Point center, Point xAxis, Point yAxis, float innerRadius, 
 	;
 
 	Point p = center + innerRadius * xAxis;
-	func(p, 0.0f);
+	func(p, 0.0f,false);
 	if (doubleFirstPoint) {
-		func(p, 0.0f);
-func(p, 0.0f);
-}
+		func(p, 0.0f,false);
+		func(p, 0.0f,false);
+	}
 	float a = startAngle;
 
 	for (size_t i = 0; i <= steps; ++i) {
-		func(center + outerRadius * (float(sin(outerAngle))*yAxis + float(cos(outerAngle))*xAxis), 1.0f);
+		func(center + outerRadius * (float(sin(outerAngle))*yAxis + float(cos(outerAngle))*xAxis), 1.0f, false);
 		innerAngle += innerAngleStep;
-		func(center + innerRadius * (float(sin(innerAngle))*yAxis + float(cos(innerAngle))*xAxis), 0.0f);
+		func(center + innerRadius * (float(sin(innerAngle))*yAxis + float(cos(innerAngle))*xAxis), 0.0f, (i==steps));
 		outerAngle += outerAngleStep;
 	}
 
-	func(center + outerRadius * (float(sin(outerAngle))*yAxis + float(cos(outerAngle))*xAxis), 1.0f);
+	func(center + outerRadius * (float(sin(outerAngle))*yAxis + float(cos(outerAngle))*xAxis), 1.0f, false);
 
 }
+
+#include "Colors.h"
 
 void PanningBar::prepWindowOutline(Window& win) {
 	myWindowOutlineVertices.clear();
@@ -108,66 +110,77 @@ b=t+50;
 Point c {l,t};
 c+=Point(r,b);
 c/=2.0f;
-	auto lam = [&](Point p, float io) {
-		myWindowOutlineVertices.emplace_back(::x(p), ::y(p), 0.0f, cr, cg, cb, 1.0f, -3.0f, io);
-		if (io == 0.0f) {
-			myWindowViewAreaVertices.emplace_back(::x(p), ::y(p), 0.0f, cr, cg, cb, 0.3f, -1.0f, io);
-			myWindowViewAreaVertices.emplace_back(::x(c), ::y(c), 0.0f, cr, cg, cb, 0.3f, -1.0f, io);
+Color col {0.0f, 1.0f, 0.7f};
 
-		}
+	auto lam = [&](Point p, float io, bool last) {
+		myWindowOutlineVertices.emplace_back(::x(p), ::y(p), 0.0f, col.rPremul32F(), col.gPremul32F(), col.bPremul32F(), 1.0f, -3.0f, io);
 	};
-
-	float in = 3, out = 6;
+//3 6
+	float in = 4, out = 8;
 
 	drawCornerStrip(Point(r-in,b-in), Point(1,0), Point(0,1), in, out, 3, true, lam);
 //	myWindowOutlineVertices.emplace_back(r, b, 0.0f, cr, cg, cb, 0.0f, -3.0f, 0.0f);
 //	myWindowOutlineVertices.emplace_back(l, b+6, 0.0f, cr, cg, cb, 0.0f, -3.0f, 1.0f);
 	drawCornerStrip(Point(l+in,b-in), Point(0,1), Point(-1,0), in, out, 3, false, lam);
-
 	drawCornerStrip(Point(l+in,t+in), Point(-1,0), Point(0,-1), in, out, 3, false, lam);
-
 	drawCornerStrip(Point(r-in,t+in), Point(0,-1), Point(1,0), in, out, 3, false, lam);
-
 	myWindowOutlineVertices.emplace_back(r, b-in, 0.0f, cr, cg, cb, 0.0f, -3.0f, 0.0f);
 	myWindowOutlineVertices.emplace_back(r-in+out, b-in, 0.0f, cr, cg, cb, 0.0f, -3.0f, 1.0f);
-
-	myWindowOutlineVertices.emplace_back(r-in+out, b-in, 0.0f, cr, cg, cb, 0.0f, -3.0f, 1.0f);
 	myWindowOutlineVertices.emplace_back(r-in+out, b-in, 0.0f, cr, cg, cb, 0.0f, -3.0f, 1.0f);
 
+	Color col2 = col;
+	col2.setAlpha(0.3f);
+
+	auto tint = [&](float x, float y) {
+		myWindowViewAreaVertices.emplace_back(x, y, 0.0f, col2.rPremul32F(), col2.gPremul32F(), col2.bPremul32F(), col2.alphaFloat(), -1.0f, 0.0f);
+	};
 
 
+	float mid = in / 2.0f;
 
-l = 250;
+	tint(l      , t + mid);
+	tint(l      , t + mid); tint(::x(c), ::y(c));
+	tint(l + mid, t      ); tint(::x(c), ::y(c));
+	tint(r - mid, t      ); tint(::x(c), ::y(c));
+	tint(r      , t + mid); tint(::x(c), ::y(c));
+	tint(r      , b - mid); tint(::x(c), ::y(c));
+	tint(r - mid, b      ); tint(::x(c), ::y(c));
+	tint(l + mid, b      ); tint(::x(c), ::y(c));
+	tint(l      , b - mid); tint(::x(c), ::y(c));
+	tint(l      , t + mid);
+	tint(l      , t + mid);
+
+l = 50;
 r = l+40;
-t =45;
+t = 60;
 b=t+50;
 c=Point(l,t);
 c+=Point(r,b);
 c/=2.0f;
 
-	auto lam2 = [&](Point p, float io) {
-		myWindowOutlineVertices.emplace_back(::x(p), ::y(p), 0.0f, cr, cg, cb, 1.0f, -3.0f, io);
-		if (io == 0.0f) {
-			myWindowViewAreaVertices.emplace_back(::x(p), ::y(p), 0.0f, cr, cg, cb, 0.3f, -1.0f, io);
-			myWindowViewAreaVertices.emplace_back(::x(c), ::y(c), 0.0f, cr, cg, cb, 0.3f, -1.0f, io);
-
-		}
-	};
-
-
-	drawCornerStrip(Point(r-in,b-in), Point(1,0), Point(0,1), in, out, 3, true, lam2);
+	drawCornerStrip(Point(r-in,b-in), Point(1,0), Point(0,1), in, out, 3, true, lam);
 //	myWindowOutlineVertices.emplace_back(r, b, 0.0f, cr, cg, cb, 0.0f, -3.0f, 0.0f);
 //	myWindowOutlineVertices.emplace_back(l, b+6, 0.0f, cr, cg, cb, 0.0f, -3.0f, 1.0f);
-	drawCornerStrip(Point(l+in,b-in), Point(0,1), Point(-1,0), in, out, 3, false, lam2);
-
-	drawCornerStrip(Point(l+in,t+in), Point(-1,0), Point(0,-1), in, out, 3, false, lam2);
-
-	drawCornerStrip(Point(r-in,t+in), Point(0,-1), Point(1,0), in, out, 3, false, lam2);
-
+	drawCornerStrip(Point(l+in,b-in), Point(0,1), Point(-1,0), in, out, 3, false, lam);
+	drawCornerStrip(Point(l+in,t+in), Point(-1,0), Point(0,-1), in, out, 3, false, lam);
+	drawCornerStrip(Point(r-in,t+in), Point(0,-1), Point(1,0), in, out, 3, false, lam);
 	myWindowOutlineVertices.emplace_back(r, b-in, 0.0f, cr, cg, cb, 0.0f, -3.0f, 0.0f);
 	myWindowOutlineVertices.emplace_back(r-in+out, b-in, 0.0f, cr, cg, cb, 0.0f, -3.0f, 1.0f);
-
 	myWindowOutlineVertices.emplace_back(r-in+out, b-in, 0.0f, cr, cg, cb, 0.0f, -3.0f, 1.0f);
+
+
+	tint(l      , t + mid);
+	tint(l      , t + mid); tint(::x(c), ::y(c));
+	tint(l + mid, t      ); tint(::x(c), ::y(c));
+	tint(r - mid, t      ); tint(::x(c), ::y(c));
+	tint(r      , t + mid); tint(::x(c), ::y(c));
+	tint(r      , b - mid); tint(::x(c), ::y(c));
+	tint(r - mid, b      ); tint(::x(c), ::y(c));
+	tint(l + mid, b      ); tint(::x(c), ::y(c));
+	tint(l      , b - mid); tint(::x(c), ::y(c));
+	tint(l      , t + mid);
+	tint(l      , t + mid);
+
 
 
 
@@ -281,8 +294,15 @@ cout<<"horiz "<<bubbles.count()<<endl;
 	glEnableVertexAttribArray(myTexAttrib);
 	glVertexAttribPointer(myTexAttrib, 2, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), (const void*) (7*4));
 
-	glEnable (GL_BLEND); glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	glEnable (GL_BLEND);
+	//glBlendFunc (GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+	// glBlendEquationSeparate(GL_FUNC_ADD,GL_FUNC_ADD);
+	// glBlendFuncSeparate(GL_ONE,GL_ONE_MINUS_SRC_ALPHA,GL_ONE,GL_ONE_MINUS_SRC_ALPHA);
+
+	glEnable(GL_SCISSOR_TEST);
+	glScissor(0, win.pixelHeight() - win.panningBarPixelHeight(wksp), win.pixelWidth(), pbph);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, myWindowOutlineVertices.size());
 
 
@@ -305,6 +325,7 @@ cout<<"horiz "<<bubbles.count()<<endl;
 	glVertexAttribPointer(myTexAttrib, 2, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), (const void*) (7*4));
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, myWindowViewAreaVertices.size());
+	glDisable(GL_SCISSOR_TEST);
 
 
 

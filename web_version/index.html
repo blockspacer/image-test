@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="styles/main.css">
     -->
 
-        <script src="fengari-web.js" type="text/javascript" async=false></script>
+        <script src="fengari-web.js" type="text/javascript"></script>
         <script type="text/javascript" async=false>
         </script>
 <style>
@@ -42,9 +42,9 @@ canvas {
 }
 </style>
     </head>
-    <body id=bod>
+    <body id=bod style="background-color: black;">
     <span id=message>Please wait while the code loads, this should only happen once as your browser will cache it.<br />Loading it is slow because this program was written expecting it to be downloaded and run on your local machine (where it will work about ten to twenty times faster than running it in a browser), and making a browser-capable version was kinda an afterthought.</span>
-    <canvas class="topleft" id="canvs"></canvas>
+    <canvas class="topleft" id="canvs"  style="background: black;"></canvas>
 
     <script type="text/javascript">
         var canvs = document.getElementById("canvs");
@@ -126,12 +126,12 @@ console.log ("Hum", textCtx.measureText("green").width)
 <!--        <script type="text/javascript" src="web_release.js.mem"></script> -->
 
 
-        <script type="text/javascript" src="web_release.js"></script>
+        <script type="text/javascript" src="web_release.js" ></script>
 
 
         <script type="text/javascript">
         window.onresize = function() {
-//            console.log("new w ", window.innerWidth);
+console.log("new w ", window.innerWidth);
 
         var canvs = document.getElementById("canvs");
             canvs.width = window.innerWidth;

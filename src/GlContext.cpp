@@ -382,6 +382,14 @@ glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
         exit(-1);
     }
 
+	#ifdef WEB
+		// glClearColor(1,1,1,1);
+		// glClear(GL_COLOR_BUFFER_BIT);
+		 
+		// // Turn off rendering to alpha
+		// glColorMask(true, true, true, false);
+    #endif
+
     glfwMakeContextCurrent(pCurrentContext);
    	
    	glfwSetWindowUserPointer(pCurrentContext, (void *) 0);
