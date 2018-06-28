@@ -24,7 +24,12 @@ public:
 	bool newWindowRequested() {return myNewWindowFlag;};
 	WindowId newWindowParentId() {return myNewWindowParentId;};
 
-	void redrawAllWindows() {myRedrawEverythingFlag = true;};
+	void redrawAllWindows() {
+		myRedrawEverythingFlag = true;
+		#ifdef WEB
+			emscripten_resume_main_loop();
+		#endif
+	};
 	bool doRedrawEverything() {return myRedrawEverythingFlag;}
 	void haveRedrawnEverything() {myRedrawEverythingFlag = false;}
 

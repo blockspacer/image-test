@@ -148,8 +148,8 @@ void App::init() {
 	// myBubbles.uploadBubbleVertexDataToContext(myGlContext, newb4);
 
 
-	myBubbles.createBubble(ctx, -0.5f, -0.0f, 10.0f, 10.0f);
-	myBubbles.createBubble(ctx, 0.0f, -0.3f, 10.0f, 10.0f);
+//	myBubbles.createBubble(ctx, -0.5f, -0.0f, 10.0f, 10.0f);
+//	myBubbles.createBubble(ctx, 0.0f, -0.3f, 10.0f, 10.0f);
 	// myBubbles.createBubble(ctx, 0.5f, 0.3f, 10.0f, 10.0f);
 	// myBubbles.createBubble(ctx, 0.5f, -0.7f, 10.0f, 10.0f);
 	// myBubbles.createBubble(ctx, -0.8f, -0.7f, 10.0f, 10.0f);
@@ -198,12 +198,12 @@ void App::draw() {
 		Window& win = ctx.window(i);
 		if (myRedrawQueue.doRedrawEverything() || ( win.inUse() && win.needsRefresh() )) {
 			ctx.changeWindow(i);
-			glClearColor(1.0f, 0.0f, 0.4f, 1.0f);
+			glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 			glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			myPanningBar.draw(ctx, i, myWorkspace, myBubbles);
 
-			myBubbles.draw(ctx, i);
+			myBubbles.draw(ctx, i, myWorkspace);
 
 anythingDrawn = true;
 // now use panning bar to draw background

@@ -18,7 +18,7 @@ class Window : public MouseEventInterface {
 	GLFWwindow  *myGlfwHandle;
 	GLFWmonitor *myGlfwMonitorHandle;
 	bool	    unused {false};
-	complex<float> myViewportCentre {50.0f, 50.0f}
+	complex<float> myViewportCentre {32.0f, 38.0f}
 				,   myScreenunitSize
 				,   myPixelSize
 	;
@@ -64,8 +64,9 @@ public:
 	float 	screenunitsPerCM() { return myScreenunitsPerCM   ;};
 	void 	setScreenunitsPerCM(float s) {myScreenunitsPerCM = s;};
 
-	Point 	topLeft(Workspace &wksp)     { return myViewportCentre - 0.5f * viewportPixelSize(wksp) * myScreenunitsPerCM;};
-	Point 	bottomRight(Workspace &wksp) { return myViewportCentre + 0.5f * viewportPixelSize(wksp) * myScreenunitsPerCM;};
+	Point 	viewportCenter() {return myViewportCentre;};
+	Point 	topLeft(Workspace &wksp)     { return myViewportCentre - 0.5f * viewportPixelSize(wksp) / myScreenunitsPerCM;};
+	Point 	bottomRight(Workspace &wksp) { return myViewportCentre + 0.5f * viewportPixelSize(wksp) / myScreenunitsPerCM;};
 
 	WindowId id() {return myId;};
 

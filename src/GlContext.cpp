@@ -392,7 +392,7 @@ Point GlContext::getMonitorsInfo() {
 // see if window is now over a different resolution monitor to what it was before
 	// if so, redraw it
 	// and all other windows' panning bars
-void GlContext::windowMoved(GLFWwindow* pWin, int xpos, int ypos, RedrawRequests &myRedrawQueue) {
+void GlContext::windowMoved(GLFWwindow* pWin, int xpos, int ypos, RedrawRequests &redrawQueue) {
 	Window &win = window(pWin);
 
 	float bestSUpCM = 0.0f;
@@ -413,6 +413,7 @@ void GlContext::windowMoved(GLFWwindow* pWin, int xpos, int ypos, RedrawRequests
 	if (bestSUpCM != 0.0f && win.screenunitsPerCM() != bestSUpCM) {
 		win.setScreenunitsPerCM(bestSUpCM);
 
+		redrawQueue.redrawAllWindows();
 		// todo: mark window for redraw -- it's the same screenunit size, but can see more (or less) of the woskspace
 		// mark all panning bars for redraw
 

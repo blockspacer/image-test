@@ -53,7 +53,7 @@ BubbleId Bubbles::createBubble(GlContext &ctx, float x, float y, float w, float 
 	myBubbleVertices.clear();
 
 	myBubbleVertices.emplace_back(0.0f, 0.0f, encodeId(bubbleId));
-	float r = 0.2f;
+	float r = 1.0f;
 	for (int i = 0; i < VERTICES_PER_BUBBLE - 1; i++) {
 		myBubbleVertices.emplace_back(float(r * cos((2.0*PI / VERTICES_PER_BUBBLE) * i)), float(r * sin((2.0*PI / VERTICES_PER_BUBBLE) * i)), encodeId(bubbleId));
 	}
@@ -307,10 +307,11 @@ void Bubbles::initializeFirstContext(GlContext &ctx) {
 	myDrawDepthUniform = glGetUniformLocation(shader, "drawDepth");
 }
 
-void Bubbles::draw(GlContext &ctx, WindowId win) {
+void Bubbles::draw(GlContext &ctx, WindowId winId, Workspace& wksp) {
+	Window &win = ctx.window(winId);
 //	glBindVertexArray(ctx.bubblesVAO);
 //glDrawArrays(GL_TRIANGLES, 0, 3);
-	glBindVertexArray(ctx.window(win).bubblesVAO);
+	glBindVertexArray(win.bubblesVAO);
 //cout<<"Drawing window "<<win<<endl;
 //cout<<"Drawing bubbles with VAO "<<ctx.windows[win].bubblesVAO<<endl;
 
@@ -319,16 +320,32 @@ void Bubbles::draw(GlContext &ctx, WindowId win) {
 	// map those to the parts of the window which aren't the panning bar
 	// draw all bubbles
 
-	
+	float wh    = win.pixelHeight()
+		, pbh   = win.panningBarPixelHeight(wksp)
+		, avail = pbh / wh
+	;
 
-	myTransformationMatrix = scale(mat4(1.0f), vec3(0.05, 0.05, 1));
-	myTransformationMatrix = translate(myTransformationMatrix, vec3(0.0, 0.0, 0.0));
+	Point tl = win.topLeft(wksp)
+		, br = win.bottomRight(wksp)
+		, c  = win.viewportCenter()
+	;
+
+	float w = ::x(br) - ::x(tl)
+		, h = ::y(br) - ::y(tl);
+
+	cout<<"W "<<w<<endl;
+
+	myTransformationMatrix = mat4(1.0f);
+	myTransformationMatrix = translate(myTransformationMatrix, vec3(0.0, -avail, 0.0));
+
+	myTransformationMatrix = scale(myTransformationMatrix, vec3(2.0/w, -(2.0-2*avail)/h, 1));
+	myTransformationMatrix = translate(myTransformationMatrix, vec3(-::x(c), -::y(c), 0.0));
+	// myTransformationMatrix = translate(myTransformationMatrix, vec3(::x(c), ::y(c), 0.0));
 
 	ctx.setMatrix(myTransformationMatrix);
 	//glUniformMatrix4fv(myTransformationUniform, 1, GL_FALSE, glm::value_ptr(myTransformationMatrix));
 
 	glDrawElements(GL_TRIANGLE_FAN, myBubbles.size() * (VERTICES_PER_BUBBLE + 1), GL_UNSIGNED_SHORT, 0);
-cout << myBubbles.size()<<" bubbles drawn\n";
 
 check_gl_errors("draw");
 }

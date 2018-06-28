@@ -184,6 +184,6 @@ public:
 	BubbleId createBubble(GlContext &ctx, float x, float y, float w, float h);
 	void uploadVertexData(GlContext &ctx, BubbleId id);
 	void uploadBubblePositions();
-	void draw(GlContext &ctx, WindowId id);
+	void draw(GlContext &ctx, WindowId id, Workspace& wksp);
 	size_t count() {return myBubbles.size();};
 };

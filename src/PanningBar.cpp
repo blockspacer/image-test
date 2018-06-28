@@ -58,26 +58,29 @@ void PanningBar::prepWindowOutline(Window& win, Workspace& wksp) {
 	Point tl = win.topLeft(wksp),
 		  br = win.bottomRight(wksp);
 
+
 	float t  = ::y(tl)
 		, l  = ::x(tl)
 		, b  = ::y(br)
 		, r  = ::x(br)
-		, w  = 4.0 // width of border
-		, cr = 0.0
-		, cg = 0.7
-		, cb = 1.0
-		// , out = 0.0
-		// , in = 1.0
-		;
-l = 50;
-r = l+180;
-t = 40;
-b=t+40;
+;
+
+//		, w  = 4.0 // width of border
+// 		, cr = 0.0
+// 		, cg = 0.7
+// 		, cb = 1.0
+// 		// , out = 0.0
+// 		// , in = 1.0
+// 		;
+// l = 50;
+// r = l+180;
+// t = 40;
+// b=t+40;
 
 Point c {l+r,t+b};
 c/=2.0f;
 
-	Color col {0.0f, 0.6f, 1.0f, 0.7f};
+	Color col {0.0f, 0.6f, 1.0f, 1.0f};
 
 	auto lam = [&](Point p, float io) {
 		myWindowOutlineVertices.emplace_back(::x(p), ::y(p), 0.0f, col.rPremul32F(), col.gPremul32F(), col.bPremul32F(), col.alphaFloat(), -3.0f, io);
@@ -86,9 +89,6 @@ c/=2.0f;
 	size_t sideSteps = 8, cornerSteps = 3;
 
 	float in = 2, out = 10;//8
-
-
-//3 6
 
 
 	GlContext::drawCurvedOutline(l, t, r, b, 3, 6, lam, 5);
