@@ -18,13 +18,11 @@ class Window : public MouseEventInterface {
 	GLFWwindow  *myGlfwHandle;
 	GLFWmonitor *myGlfwMonitorHandle;
 	bool	    unused {false};
-	complex<float> topLeftInWorkspaceCM
-				,   widthHeightInWorkspaceCM
-				,   positionInScreenUnits
+	complex<float> myViewportCentre {50.0f, 50.0f}
 				,   myScreenunitSize
 				,   myPixelSize
 	;
-	float screenUnitsPerCM;
+	float myScreenunitsPerCM {37.8}; // based on assumed dpi of 96
 
 	bool		iNeedRefresh {true};
 
@@ -38,7 +36,7 @@ public:
 
 	void setupVAOs();
 
-	complex<float> center() {return topLeftInWorkspaceCM + 0.5f * widthHeightInWorkspaceCM;};
+	complex<float> center() {return myViewportCentre;};
 
 	void	setGlfwHandle(GLFWwindow* pWin) {myGlfwHandle = pWin; unused = false;};
 	GLFWwindow* glfwHandle() {return myGlfwHandle;};
@@ -59,9 +57,15 @@ public:
 	int 	pixelWidth () { return ::x(myPixelSize); };
 	int 	pixelHeight() { return ::y(myPixelSize); };
 	int 	panningBarPixelHeight(Workspace& wksp);
+	Point	viewportPixelSize(Workspace & wksp) {return myPixelSize - Point(0, panningBarPixelHeight(wksp));};
 
-	Point 	topLeft()     { return topLeftInWorkspaceCM ;};
-	Point 	bottomRight() { return topLeftInWorkspaceCM + widthHeightInWorkspaceCM ;};
+	int 	screenunitWidth()  { return ::x(myScreenunitSize);};
+	int 	screenunitHeight() { return ::y(myScreenunitSize);};
+	float 	screenunitsPerCM() { return myScreenunitsPerCM   ;};
+	void 	setScreenunitsPerCM(float s) {myScreenunitsPerCM = s;};
+
+	Point 	topLeft(Workspace &wksp)     { return myViewportCentre - 0.5f * viewportPixelSize(wksp) * myScreenunitsPerCM;};
+	Point 	bottomRight(Workspace &wksp) { return myViewportCentre + 0.5f * viewportPixelSize(wksp) * myScreenunitsPerCM;};
 
 	WindowId id() {return myId;};
 

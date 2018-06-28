@@ -315,6 +315,11 @@ void Bubbles::draw(GlContext &ctx, WindowId win) {
 //cout<<"Drawing bubbles with VAO "<<ctx.windows[win].bubblesVAO<<endl;
 
 
+// what are the top-left and bottom-right corners of the window's viewport?
+	// map those to the parts of the window which aren't the panning bar
+	// draw all bubbles
+
+	
 
 	myTransformationMatrix = scale(mat4(1.0f), vec3(0.05, 0.05, 1));
 	myTransformationMatrix = translate(myTransformationMatrix, vec3(0.0, 0.0, 0.0));

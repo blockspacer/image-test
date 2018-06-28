@@ -18,6 +18,7 @@ using glm::mat4;
 #include "Window.h"
 
 #include <algorithm>
+#include <functional>
 
 
 struct Monitor {
@@ -68,7 +69,7 @@ class GlContext {
 	WindowId    myCurrentWindow;
 
 	vector<Window>  windows;
-	vector<Monitor> sMonitors;
+	vector<Monitor> myMonitors;
 
 
 
@@ -85,6 +86,9 @@ class GlContext {
 	bool checkglerror(int err, int errnum, string errname, string label);
 	void check_gl_errors(string label);
 	void check_gl_errors();
+
+	static void drawCurvedOutlineCorner(Point center, Point xAxis, Point yAxis, float innerRadius, float outerRadius, size_t steps, std::function<void(Point v, float io)> func, float startAngle, float stopAngle);
+	static void drawCurvedOutlineSide(PointD center, PointD xAxis, PointD yAxis, Point innerEdgeStart, float innerEdgeSide, std::function<void(Point v, float io)> func, size_t steps, double distToCenter, double radius, double startAngle);
 
 public:
 	GLuint shaderHandle() {return myShaderProgramHandle;};
@@ -109,9 +113,11 @@ public:
 	Window &window(GLFWwindow* pWin) {return windows[(WindowId) glfwGetWindowUserPointer(pWin)];};
 	
 	Point getMonitorsInfo();
-	void swapBuffers() {glfwSwapBuffers(pCurrentContext);};
+	void  windowMoved(GLFWwindow* pWin, int xpos, int ypos, RedrawRequests &myRedrawQueue);
+	void  swapBuffers() {glfwSwapBuffers(pCurrentContext);};
 
 	void setMatrix(mat4& m);
+	static void drawCurvedOutline(float leftX, float topY, float rightX, float bottomY, float innerCornerRadius, float outerCornerRadius, std::function<void(Point v, float io)> vertexAccumulatorFunction, size_t cornerSteps, size_t sideSteps = 0);
 };
 
 	bool checkglerror(int err, int errnum, string errname, string label);

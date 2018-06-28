@@ -34,7 +34,7 @@ class App {
 	static PanningBar     myPanningBar;
 	static Workspace      myWorkspace;
 
-static	void setCallbacks(GLFWwindow* pWin);
+	static	void setCallbacks(GLFWwindow* pWin);
 
 	static void cursorPositionCallback(GLFWwindow* window, double xpos, double ypos);
 	static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
@@ -44,6 +44,7 @@ static	void setCallbacks(GLFWwindow* pWin);
 	static void windowSizeCallback(GLFWwindow* window, int width, int height);
 	static void redrawCallback(GLFWwindow*);
 	static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+	static void windowPosCallback(GLFWwindow* pWin, int xpos, int ypos);
 public:
 	GlContext      &glContext()   {return myGlContext;};
 	RedrawRequests &redrawQueue() {return myRedrawQueue;};

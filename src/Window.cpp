@@ -15,7 +15,6 @@ void Window::setupVAOs() {
 
 int Window::panningBarPixelHeight(Workspace& wksp) {
 	const Point s = wksp.size();
-	cout<<"um pixelWidth"<<pixelWidth()<<endl;
 	return (::y(s) * pixelWidth()) / ::x(s);
 }
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 //#include "glm/mat3x3.hpp"
 #include "include/glm/glm.hpp"
 #include "include/glm/gtx/transform.hpp"
@@ -48,7 +50,7 @@ class PanningBar {
 public:
 	void draw(GlContext &ctx, WindowId win, Workspace &wksp, Bubbles &bubbles);
 	void initializeFirstContext(GlContext &ctx);
-	void prepWindowOutline(Window& win);
+	void prepWindowOutline(Window& win, Workspace& wksp);
 	PanningBar() {};
 };
 

@@ -96,6 +96,11 @@ cout<<".\n";
 	}
 }
 
+void App::windowPosCallback(GLFWwindow* pWin, int xpos, int ypos) {
+	myGlContext.windowMoved(pWin, xpos, ypos, myRedrawQueue);
+}
+
+
 void App::setCallbacks(GLFWwindow* pWin) {
 	glfwSetCursorPosCallback(pWin, cursorPositionCallback);
 	glfwSetMouseButtonCallback(pWin, mouseButtonCallback);
@@ -106,6 +111,7 @@ void App::setCallbacks(GLFWwindow* pWin) {
 	glfwSetWindowRefreshCallback(pWin, redrawCallback);
 	#endif
 	glfwSetKeyCallback(pWin, keyCallback);
+	glfwSetWindowPosCallback(pWin, windowPosCallback);
 }
 
 // the first window is created in the `init` method, all other ones are made here, with the window they were requested from as their parent

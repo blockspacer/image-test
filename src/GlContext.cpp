@@ -188,14 +188,170 @@ void MessageCallback( GLenum source,
 
 
 
+#include <cmath>
+// the lambda is called with the coords of the next point, and whether it's on the inside (0) or outside (1) of the curve
+// the arc is drawing starting near the x-axis and going anticlockwise
+void GlContext::drawCurvedOutlineCorner(Point center, Point xAxis, Point yAxis, float innerRadius, float outerRadius, size_t steps, std::function<void(Point v, float io)> func, float startAngle = 0.0f, float stopAngle = 0.0f) {
+
+	float innerAngleStep = PI / (2.0f * steps + 2)
+		, outerAngleStep = (PI / 2 - stopAngle - startAngle) / (steps + 1)
+		//(stopAngle - startAngle) / (steps + 1)
+		, innerAngle = 0.0f
+		, outerAngle = startAngle
+
+	;
+
+	Point p = center + innerRadius * xAxis;
+	func(p, 0.0f);
+	float a = startAngle;
+
+	for (size_t i = 0; i <= steps; ++i) {
+		func(center + outerRadius * (float(sin(outerAngle))*yAxis + float(cos(outerAngle))*xAxis), 1.0f);
+		innerAngle += innerAngleStep;
+		func(center + innerRadius * (float(sin(innerAngle))*yAxis + float(cos(innerAngle))*xAxis), 0.0f);
+		outerAngle += outerAngleStep;
+	}
+
+	func(center + outerRadius * (float(sin(outerAngle))*yAxis + float(cos(outerAngle))*xAxis), 1.0f);
+}
+
+void GlContext::drawCurvedOutlineSide(PointD center, PointD xAxis, PointD yAxis, Point innerEdgeStart, float innerEdgeSide, std::function<void(Point v, float io)> func, size_t steps = 0, double distToCenter=0.0, double radius=0.0, double startAngle = 0.0) {
+
+	if (! steps) return;
+
+	double angle     = -startAngle
+		,  angleStep = (2*startAngle) / (steps+1)
+	;
+
+	Point innerStep {::x(xAxis), ::y(xAxis)};
+	innerStep *= (innerEdgeSide  / (steps + 1));
+
+	Point inner = innerEdgeStart;
+
+	for (size_t i = 0; i < steps; i++) {
+		inner += innerStep;
+		func(inner, 0.0f);
+
+		angle += angleStep;
+		PointD p = center + xAxis * (radius * sin(angle)) + yAxis * (radius * cos(angle));
+		func(Point(float(::x(p)), float(::y(p))), 1.0f);
+	}
+}
+
+void GlContext::drawCurvedOutline(float leftX, float topY, float rightX, float bottomY, float innerCornerRadius, float outerCornerRadius, std::function<void(Point v, float io)> vertexAccumulatorFunction, size_t cornerSteps, size_t sideSteps) {
+
+	float &l = leftX, &t = topY, &r = rightX, &b = bottomY, &in = innerCornerRadius, &out = outerCornerRadius;
+	std::function<void(Point v, float io)> &func = vertexAccumulatorFunction;
+
+	if (r-l<2*in) l = r + 2*in;
+	if (b-t<2*in) b = t + 2*in;
+
+	float margin = 1.5; // times the corner circle radius
+	margin = fmax(1.01, margin);
+
+	float  topLength = 0.0f, sideLength = 0.0f, topAngle = 0.0f, sideAngle = 0.0f;
+	double topRadius = 0.0, sideRadius = 0.0, topCenterDist = 0.0, sideCenterDist = 0.0;
+
+	if (sideSteps) {
+		 topLength = (r-l-2*in);
+		sideLength = (b-t-2*in);
+
+		 topAngle = 2 * atan( ( topLength / (2 * out * (margin - 1))) );
+		sideAngle = 2 * atan( (sideLength / (2 * out * (margin - 1))) );
+
+		if  (topAngle > PI/2)  topAngle = PI - topAngle;
+		if (sideAngle > PI/2) sideAngle = PI - sideAngle;
+
+		 topAngle = fmin( topAngle, PI/4);
+		sideAngle = fmin(sideAngle, PI/4);
+
+		 topRadius = out +  (topLength / (2 * sin (topAngle)));
+		sideRadius = out + (sideLength / (2 * sin(sideAngle)));
+
+		 topCenterDist =  topLength / (2 * tan (topAngle));
+		sideCenterDist = sideLength / (2 * tan(sideAngle));
+	}
+
+	const Point up    { 0, -1};
+	const Point down  { 0,  1};
+	const Point left  {-1,  0};
+	const Point right { 1,  0};
+
+	const PointD upD    { 0, -1};
+	const PointD downD  { 0,  1};
+	const PointD leftD  {-1,  0};
+	const PointD rightD { 1,  0};
+
+
+	func(Point(r,b-in),0.0f); // double first point so it forms an infinitely thin triangle from the last one on the strip (which was drawing the last bubble)
+	drawCurvedOutlineCorner(Point(r-in,b-in), right, down, in, out, cornerSteps, func, sideAngle, topAngle);
+
+	drawCurvedOutlineSide(PointD((r+l)/2.0, b-in-topCenterDist), leftD, downD, Point(r-in, b), topLength, func, sideSteps, topCenterDist, topRadius, topAngle);
+
+	drawCurvedOutlineCorner(Point(l+in,b-in), down, left, in, out, cornerSteps, func, topAngle, sideAngle);
+
+	drawCurvedOutlineSide(PointD(l + in + sideCenterDist, (t+b)/2.0), upD, leftD, Point(l, b-in), sideLength, func, sideSteps, sideCenterDist,  sideRadius, sideAngle);
+
+	drawCurvedOutlineCorner(Point(l+in,t+in), left, up, in, out, cornerSteps, func, sideAngle, topAngle);
+
+	drawCurvedOutlineSide(PointD((r+l)/2.0, t+in+ topCenterDist ), rightD, upD, Point(l+in, t), topLength, func, sideSteps, topCenterDist,  topRadius, topAngle);
+
+	drawCurvedOutlineCorner(Point(r-in,t+in), up, right, in, out, cornerSteps, func, topAngle, sideAngle);
+
+	drawCurvedOutlineSide(PointD(r - in - sideCenterDist, (t+b)/2.0), downD, rightD, Point(r, t+in), sideLength, func, sideSteps, sideCenterDist,  sideRadius, sideAngle);
+
+	func(Point(r,b-in),0.0f);
+	func(Point(r-in+out*cos(sideAngle),b-in+out*sin(sideAngle)),1.0f);
+	func(Point(r-in+out*cos(sideAngle),b-in+out*sin(sideAngle)),1.0f);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // vector<Window>  GlContext::windows;
-// vector<Monitor> GlContext::sMonitors;
+// vector<Monitor> GlContext::myMonitors;
 
 Point GlContext::getMonitorsInfo() {
 	cout<<"Getting monitor specs\n";
 	int count;
 	GLFWmonitor** ms = glfwGetMonitors(&count);
-	sMonitors.clear();
+	myMonitors.clear();
 	for (int i=0; i<count; ++i) {
 		const GLFWvidmode* mode = glfwGetVideoMode(ms[i]);
 		int w = mode->width;
@@ -207,25 +363,25 @@ Point GlContext::getMonitorsInfo() {
 		glfwGetMonitorPos(ms[i], &posX, &posY);
 		int widthMM, heightMM;
 		glfwGetMonitorPhysicalSize(ms[i], &widthMM, &heightMM);
-		sMonitors.emplace_back(ms[i], complex<float>(widthMM / 10.0f, heightMM/10.0f),
+		myMonitors.emplace_back(ms[i], complex<float>(widthMM / 10.0f, heightMM/10.0f),
 			complex<float>(w, h),
 			complex<float>(posX, posY),
 			(10.0f * w) / widthMM,
 			name);
-		cout<< sMonitors[sMonitors.size()-1].screenUnitsPerCM <<endl;
+		cout<< myMonitors[myMonitors.size()-1].screenUnitsPerCM <<endl;
 	}
 
-	sort(sMonitors.begin(), sMonitors.end(), [](Monitor a, Monitor b) {
+	sort(myMonitors.begin(), myMonitors.end(), [](Monitor a, Monitor b) {
 		return ::x(a.position) < ::x(b.position);
 	});
 
 	Point largestExtent {0,0};
 	for (int i=0; i<count; ++i) {
-//		sMonitors[i].print();
-		if (::x(sMonitors[i].physicalSize) > ::x(largestExtent))
-			largestExtent.real(::x(sMonitors[i].physicalSize));
-		if (::y(sMonitors[i].physicalSize) > ::y(largestExtent))
-			largestExtent.imag(::y(sMonitors[i].physicalSize));
+//		myMonitors[i].print();
+		if (::x(myMonitors[i].physicalSize) > ::x(largestExtent))
+			largestExtent.real(::x(myMonitors[i].physicalSize));
+		if (::y(myMonitors[i].physicalSize) > ::y(largestExtent))
+			largestExtent.imag(::y(myMonitors[i].physicalSize));
 	}
 
 
@@ -233,6 +389,35 @@ Point GlContext::getMonitorsInfo() {
 //	setWorkspaceSize
 }
 
+// see if window is now over a different resolution monitor to what it was before
+	// if so, redraw it
+	// and all other windows' panning bars
+void GlContext::windowMoved(GLFWwindow* pWin, int xpos, int ypos, RedrawRequests &myRedrawQueue) {
+	Window &win = window(pWin);
+
+	float bestSUpCM = 0.0f;
+
+	for (const auto &mon : myMonitors) {
+		// cout<<"\nxpos "<<xpos + win.screenunitWidth()/2<<endl;
+		// cout<<"wppp "<<::x(mon.position) + ::x(mon.screenUnitsSize)<<endl;
+		// cout<<"rdpi "<<mon.screenUnitsPerCM<<endl;
+		if (::x(mon.position) <= xpos + win.screenunitWidth()/2 
+			&& xpos + win.screenunitWidth()/2 < ::x(mon.position) + ::x(mon.screenUnitsSize)
+			&& ::y(mon.position) <= ypos + win.screenunitHeight()/2 
+			&& ypos + win.screenunitHeight()/2 < ::y(mon.position) + ::y(mon.screenUnitsSize)
+			) {
+			bestSUpCM = mon.screenUnitsPerCM;
+		}
+	}
+
+	if (bestSUpCM != 0.0f && win.screenunitsPerCM() != bestSUpCM) {
+		win.setScreenunitsPerCM(bestSUpCM);
+
+		// todo: mark window for redraw -- it's the same screenunit size, but can see more (or less) of the woskspace
+		// mark all panning bars for redraw
+
+	}
+}
 
 Window &GlContext::lookupWindow(GLFWwindow* pWin) {
 	return (windows[size_t(glfwGetWindowUserPointer(pWin))]);
