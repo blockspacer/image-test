@@ -324,7 +324,7 @@ void Bubbles::draw(GlContext &ctx, WindowId winId, Workspace& wksp) {
 		, pbh   = win.panningBarPixelHeight(wksp)
 		, avail = pbh / wh
 	;
-
+cout<<"aaa"<<endl;
 	Point tl = win.topLeft(wksp)
 		, br = win.bottomRight(wksp)
 		, c  = win.viewportCenter()
@@ -333,7 +333,9 @@ void Bubbles::draw(GlContext &ctx, WindowId winId, Workspace& wksp) {
 	float w = ::x(br) - ::x(tl)
 		, h = ::y(br) - ::y(tl);
 
-	cout<<"W "<<w<<endl;
+	cout<<"W "<<win.viewportPixelSize(wksp)<<endl;
+cout<<win.screenunitWidth()<<endl;
+cout<<win.pixelWidth()<<endl;
 
 	myTransformationMatrix = mat4(1.0f);
 	myTransformationMatrix = translate(myTransformationMatrix, vec3(0.0, -avail, 0.0));

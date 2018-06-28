@@ -57,16 +57,19 @@ public:
 	int 	pixelWidth () { return ::x(myPixelSize); };
 	int 	pixelHeight() { return ::y(myPixelSize); };
 	int 	panningBarPixelHeight(Workspace& wksp);
-	Point	viewportPixelSize(Workspace & wksp) {return myPixelSize - Point(0, panningBarPixelHeight(wksp));};
+	Point	viewportPixelSize(Workspace & wksp) { return myPixelSize - Point(0, panningBarPixelHeight(wksp));};
+	Point 	viewportScreenunitSize(Workspace &wksp) {cout<<"222"<<endl;return viewportPixelSize(wksp) / float(pixelsPerScreenunit());};
+	Point	viewportCMsize(Workspace &wksp) {cout<<"111"<<endl;return viewportScreenunitSize(wksp) / myScreenunitsPerCM;};
 
 	int 	screenunitWidth()  { return ::x(myScreenunitSize);};
 	int 	screenunitHeight() { return ::y(myScreenunitSize);};
 	float 	screenunitsPerCM() { return myScreenunitsPerCM   ;};
 	void 	setScreenunitsPerCM(float s) {myScreenunitsPerCM = s;};
+	int 	pixelsPerScreenunit() {cout<<"vvv "<<pixelWidth()<<" "<<screenunitWidth()<<endl; return (!screenunitWidth()) ? 1 : pixelWidth() / screenunitWidth();};
 
 	Point 	viewportCenter() {return myViewportCentre;};
-	Point 	topLeft(Workspace &wksp)     { return myViewportCentre - 0.5f * viewportPixelSize(wksp) / myScreenunitsPerCM;};
-	Point 	bottomRight(Workspace &wksp) { return myViewportCentre + 0.5f * viewportPixelSize(wksp) / myScreenunitsPerCM;};
+	Point 	topLeft(Workspace &wksp)     {cout<<"000"<<endl; return myViewportCentre - 0.5f * viewportCMsize(wksp);};
+	Point 	bottomRight(Workspace &wksp) { return myViewportCentre + 0.5f * viewportCMsize(wksp);};
 
 	WindowId id() {return myId;};
 
