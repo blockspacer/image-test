@@ -119,6 +119,10 @@ void App::createWindow(WindowId parent) {
 	WindowId newId = myGlContext.createWindow(parent);
 	Window&  win = myGlContext.window(newId);
 
+	int xpos, ypos;
+	glfwGetWindowPos(win.glfwHandle(), &xpos, &ypos);
+	myGlContext.windowMoved(win.glfwHandle(), xpos, ypos, myRedrawQueue);	
+
     myText   .setupSharedContext(myGlContext);
 	myBubbles.setupSharedContext(myGlContext, newId);
 //	glBindVertexArray(win.bubblesVAO);

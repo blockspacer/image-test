@@ -483,6 +483,16 @@ WindowId GlContext::createWindow(complex<float> center) {
 	windows[newWin].setupVAOs();
 	glfwSetWindowUserPointer(windows[newWin].glfwHandle(), (void *) newWin);
 
+	int w, h;
+	glfwGetFramebufferSize(windows[newWin].glfwHandle(), &w, &h);
+	windows[newWin].setPixelSize(w, h);
+
+	glfwGetWindowSize(windows[newWin].glfwHandle(), &w, &h);
+	windows[newWin].setScreenunitSize(w, h);
+
+	// todo: prompt window to think about which monitor it's on
+
+
 	#ifdef __APPLE__
 		glEnable(GL_PRIMITIVE_RESTART);
 		glPrimitiveRestartIndex(0xffff);
@@ -497,6 +507,13 @@ WindowId GlContext::createWindow(complex<float> center) {
 
 WindowId GlContext::createWindow(WindowId parent) {
 	WindowId newId = createWindow(windows[parent].center());
+
+	int xpos, ypos;
+	glfwGetWindowPos(windows[newId].glfwHandle(), &xpos, &ypos);
+	glfwSetWindowPos(windows[newId].glfwHandle(), xpos+50, ypos+50);
+
+	// todo: if new one would be off screen then jump back up to the top
+
 	return newId;
 }
 
