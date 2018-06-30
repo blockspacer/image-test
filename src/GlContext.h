@@ -68,7 +68,7 @@ class GlContext {
 	GLFWwindow* pCurrentContext;
 	WindowId    myCurrentWindow;
 
-	vector<Window>  windows;
+	vector<Window>  myWindows;
 	vector<Monitor> myMonitors;
 
 
@@ -102,15 +102,15 @@ public:
 	GLFWwindow* currentContext() {return pCurrentContext;};
 	void     changeCurrentContext(GLFWwindow *pWin);
 	void     changeWindow(WindowId win);
-	bool     isCurrentWindow(WindowId id) {return windows[id].glfwHandle() != pCurrentContext;};
+	bool     isCurrentWindow(WindowId id) {return myWindows[id].glfwHandle() != pCurrentContext;};
 	WindowId currentWindowId() {return myCurrentWindow;};
-	Window   &currentWindow () {return windows[myCurrentWindow];};
+	Window   &currentWindow () {return myWindows[myCurrentWindow];};
 	Window   &lookupWindow(GLFWwindow* pWin);
 
-	int    windowCount() {return windows.size();};
-	Window &firstWindow() {return windows[0];};
-	Window &window(WindowId win) {return windows[win];};
-	Window &window(GLFWwindow* pWin) {return windows[(WindowId) glfwGetWindowUserPointer(pWin)];};
+	int    windowCount() {return myWindows.size();};
+	Window &firstWindow() {return myWindows[0];};
+	Window &window(WindowId win) {return myWindows[win];};
+	Window &window(GLFWwindow* pWin) {return myWindows[(WindowId) glfwGetWindowUserPointer(pWin)];};
 	
 	Point getMonitorsInfo();
 	void  windowMoved(GLFWwindow* pWin, int xpos, int ypos, RedrawRequests &myRedrawQueue);
@@ -118,6 +118,7 @@ public:
 
 	void setMatrix(mat4& m);
 	static void drawCurvedOutline(float leftX, float topY, float rightX, float bottomY, float innerCornerRadius, float outerCornerRadius, std::function<void(Point v, float io)> vertexAccumulatorFunction, size_t cornerSteps, size_t sideSteps = 0);
+	void forEachWindow(std::function<void(Window& win)>);
 };
 
 	bool checkglerror(int err, int errnum, string errname, string label);

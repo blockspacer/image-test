@@ -342,7 +342,7 @@ void GlContext::drawCurvedOutline(float leftX, float topY, float rightX, float b
 
 
 
-// vector<Window>  GlContext::windows;
+// vector<Window>  GlContext::myWindows;
 // vector<Monitor> GlContext::myMonitors;
 
 Point GlContext::getMonitorsInfo() {
@@ -389,7 +389,7 @@ Point GlContext::getMonitorsInfo() {
 
 // see if window is now over a different resolution monitor to what it was before
 	// if so, redraw it
-	// and all other windows' panning bars
+	// and all other myWindows' panning bars
 void GlContext::windowMoved(GLFWwindow* pWin, int xpos, int ypos, RedrawRequests &redrawQueue) {
 	Window &win = window(pWin);
 
@@ -419,9 +419,12 @@ void GlContext::windowMoved(GLFWwindow* pWin, int xpos, int ypos, RedrawRequests
 }
 
 Window &GlContext::lookupWindow(GLFWwindow* pWin) {
-	return (windows[size_t(glfwGetWindowUserPointer(pWin))]);
+	return (myWindows[size_t(glfwGetWindowUserPointer(pWin))]);
 }
 
+void GlContext::forEachWindow(std::function<void(Window& win)> callMe) {
+	for (myWindows)
+}
 
 
 
@@ -445,31 +448,31 @@ void GlContext::changeCurrentContext(GLFWwindow *pWin) {
 
 void GlContext::changeWindow(WindowId id) {
 	myCurrentWindow = id;
-	changeCurrentContext(windows[id].glfwHandle());
+	changeCurrentContext(myWindows[id].glfwHandle());
 }
 
 WindowId GlContext::createWindow(complex<float> center) {
 	WindowId newWin {0};
 
 	// first window ever
-	if (windows.size() == 0) {
-		windows.emplace_back(newWin);
-		windows[0].setGlfwHandle(initializeFirstContext());
+	if (myWindows.size() == 0) {
+		myWindows.emplace_back(newWin);
+		myWindows[0].setGlfwHandle(initializeFirstContext());
 	}
 	// re-use an old slot
 	else {
-		for (newWin = 0; newWin < windows.size(); newWin++) {
-			if (windows[newWin].isUnused()) {
-				windows[newWin].setGlfwHandle(setupSharedContext());
+		for (newWin = 0; newWin < myWindows.size(); newWin++) {
+			if (myWindows[newWin].isUnused()) {
+				myWindows[newWin].setGlfwHandle(setupSharedContext());
 				break;
 			}
 		}
 	}
 
 	// add a window to the list
-	if (newWin == windows.size()) {
-		windows.emplace_back(newWin);
-		windows[newWin].setGlfwHandle(setupSharedContext());
+	if (newWin == myWindows.size()) {
+		myWindows.emplace_back(newWin);
+		myWindows[newWin].setGlfwHandle(setupSharedContext());
 	}
 
 	myCurrentWindow = newWin;
@@ -478,15 +481,15 @@ WindowId GlContext::createWindow(complex<float> center) {
 
 	glfwSwapInterval(1);
 
-	windows[newWin].setupVAOs();
-	glfwSetWindowUserPointer(windows[newWin].glfwHandle(), (void *) newWin);
+	myWindows[newWin].setupVAOs();
+	glfwSetWindowUserPointer(myWindows[newWin].glfwHandle(), (void *) newWin);
 
 	int w, h;
-	glfwGetFramebufferSize(windows[newWin].glfwHandle(), &w, &h);
-	windows[newWin].setPixelSize(w, h);
+	glfwGetFramebufferSize(myWindows[newWin].glfwHandle(), &w, &h);
+	myWindows[newWin].setPixelSize(w, h);
 
-	glfwGetWindowSize(windows[newWin].glfwHandle(), &w, &h);
-	windows[newWin].setScreenunitSize(w, h);
+	glfwGetWindowSize(myWindows[newWin].glfwHandle(), &w, &h);
+	myWindows[newWin].setScreenunitSize(w, h);
 
 	// todo: prompt window to think about which monitor it's on
 
@@ -504,11 +507,11 @@ WindowId GlContext::createWindow(complex<float> center) {
 }
 
 WindowId GlContext::createWindow(WindowId parent) {
-	WindowId newId = createWindow(windows[parent].center());
+	WindowId newId = createWindow(myWindows[parent].center());
 
 	int xpos, ypos;
-	glfwGetWindowPos(windows[newId].glfwHandle(), &xpos, &ypos);
-	glfwSetWindowPos(windows[newId].glfwHandle(), xpos+50, ypos+50);
+	glfwGetWindowPos(myWindows[newId].glfwHandle(), &xpos, &ypos);
+	glfwSetWindowPos(myWindows[newId].glfwHandle(), xpos+50, ypos+50);
 
 	// todo: if new one would be off screen then jump back up to the top
 
@@ -517,9 +520,9 @@ WindowId GlContext::createWindow(WindowId parent) {
 
 GLFWwindow* GlContext::setupSharedContext() {
 	GLFWwindow *pWin;
-	for (int i = 0; i < windows.size(); i++) {
-		if ( windows[i].inUse() ) {
-			pWin = windows[i].glfwHandle();
+	for (int i = 0; i < myWindows.size(); i++) {
+		if ( myWindows[i].inUse() ) {
+			pWin = myWindows[i].glfwHandle();
 			break;
 		}
 	}
