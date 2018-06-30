@@ -1,7 +1,5 @@
 #include "PanningBar.h"
 
-
-
 void PanningBar::initializeFirstContext(GlContext &ctx) {
 	GLuint shader = ctx.shaderHandle();
 
@@ -267,4 +265,60 @@ position it so origin is at (-1,1)
 
 check_gl_errors("draw");
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+bool operator<(const Point &a, const Point &b) {return ::x(a) < ::x(b)  || ::y(a) < ::y(b);}
+bool operator>(const Point &a, const Point &b) {return ::x(a) > ::x(b)  || ::y(a) > ::y(b);}
+bool operator<=(const Point &a, const Point &b) {return ::x(a) <=::x(b) || ::y(a) <=::y(b);}
+bool operator>=(const Point &a, const Point &b) {return ::x(a) >=::x(b) && ::y(a) >=::y(b);}
+bool operator==(const Point &a, const Point &b) {return ::x(a) ==::x(b) && ::y(a) ==::y(b);}
+bool operator!=(const Point &a, const Point &b) {return ::x(a) !=::x(b) || ::y(a) !=::y(b);}
+
+
+bool PanningBar::mouseMotion(Point pos, Window &win, GlContext &ctx, Workspace &wksp, Bubbles &bubls, RedrawRequests &redrawReqests) {
+
+	cout<<pos<<endl;
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

@@ -12,8 +12,7 @@ using std::complex;
 #include "Workspace.h"
 
 
-
-class Window : public MouseEventInterface {
+class Window {
 	WindowId    myId;
 	GLFWwindow  *myGlfwHandle;
 	GLFWmonitor *myGlfwMonitorHandle;
@@ -73,7 +72,7 @@ public:
 
 	WindowId id() {return myId;};
 
-	bool mouseMotion(Point pos, RedrawRequests &redrawReqests);
+//	bool mouseMotion(Point pos, Workspace &wksp, RedrawRequests &redrawReqests);
 //	void discoverMonitor
 };
 

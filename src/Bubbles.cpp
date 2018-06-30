@@ -342,18 +342,23 @@ void Bubbles::draw(GlContext &ctx, WindowId winId, Workspace& wksp) {
 check_gl_errors("draw");
 }
 
-/*
-i've got an intensely weird bug: all my objects are appearing the correct sizes, but their positions are off by a factor of two
-
-if i alter the view matrix to correct the positions, then they're shrunk to half-size
-
-i'm generating the geometry myself in the program, so it's not some weird scaling happening during object loading or whatever. i'm SURE everything's being made in the correct locations and sizes, but... obviously not
-
-these two things both think their width is twenty, one thinks its x co-ordinate is 10, the other 20. they're drawn using a single triangle strip and a single draw call (there's a zero width triangle connecting them)
 
 
-:? 
-??????
 
 
-*/
+bool Bubbles::mouseMotion(Point pos, GlContext &ctx, Workspace &wksp, RedrawRequests &redrawReqests) {
+	redrawReqests.redrawAllWindows();
+
+	// if going to or from a bubble's halo, or a different part of one, mark it for redrawing (for that window only?)
+	return true;
+
+	// if over a menu, highlight selected option if it's changed
+
+}
+
+
+
+
+
+
+

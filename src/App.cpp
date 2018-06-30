@@ -10,7 +10,7 @@ Bubbles        App::myBubbles;
 
 
 void App::cursorPositionCallback(GLFWwindow* window, double xpos, double ypos) {
-	myMouseHandler.moved(window, xpos, ypos, myGlContext, myPanningBar, myRedrawQueue);
+	myMouseHandler.moved(window, xpos, ypos, myGlContext, myWorkspace, myPanningBar, myBubbles, myRedrawQueue);
 }
 
 void App::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {

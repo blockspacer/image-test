@@ -185,4 +185,7 @@ public:
 	void uploadBubblePositions();
 	void draw(GlContext &ctx, WindowId id, Workspace& wksp);
 	size_t count() {return myBubbles.size();};
+
+	bool mouseMotion(Point pos, GlContext &ctx, Workspace &wksp, RedrawRequests &redrawReqests);
+
 };

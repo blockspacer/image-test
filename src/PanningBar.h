@@ -23,6 +23,7 @@ using glm::vec4;
 #include "GlContext.h"
 #include "Workspace.h"
 #include "Bubbles.h"
+#include "MouseEventInterface.h"
 
 struct ColoredVertex {
 	float x, y, z,
@@ -34,8 +35,10 @@ struct ColoredVertex {
 };
 
 class PanningBar {
-	mat4   myTransformationMatrix;
-	GLuint myUBO {0}
+	bool	myMouseOverWindow {false};
+	WindowId myMouseOverWindowId {0};
+	mat4    myTransformationMatrix;
+	GLuint 	myUBO {0}
 		,	myVertexBuffer {0}
 		,	myPanningBarBubbleVertexBuffer {0}
 		,	myWindowOutlineBuffer {0}
@@ -52,6 +55,9 @@ public:
 	void initializeFirstContext(GlContext &ctx);
 	void prepWindowOutline(Window& win, Workspace& wksp);
 	PanningBar() {};
+	bool mouseMotion(Point pos, Window &win, GlContext &ctx, Workspace &wksp, Bubbles &bubls, RedrawRequests &redrawReqests);
+
+
 };
 
 
