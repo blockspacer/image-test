@@ -86,7 +86,7 @@ c/=2.0f;
 		myWindowOutlineVertices.emplace_back(::x(p), ::y(p), 0.0f, col.rPremul32F(), col.gPremul32F(), col.bPremul32F(), col.alphaFloat(), -3.0f, io);
 	};
 
-	size_t sideSteps = 8, cornerSteps = 3;
+//	size_t sideSteps = 8, cornerSteps = 3;
 
 	float in = 2, out = 10;//8
 

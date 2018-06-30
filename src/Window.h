@@ -18,7 +18,7 @@ class Window : public MouseEventInterface {
 	GLFWwindow  *myGlfwHandle;
 	GLFWmonitor *myGlfwMonitorHandle;
 	bool	    unused {false};
-	complex<float> myViewportCentre {32.0f, 38.0f}
+	complex<float> myViewportCentre {15.0f, 10.0f}
 				,   myScreenunitSize
 				,   myPixelSize
 	;

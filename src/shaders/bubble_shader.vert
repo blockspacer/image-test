@@ -35,6 +35,7 @@ const float bubbleY = 1.5;
 const float bubbleW = 2.5;
 const float bubbleH = 3.5;
 const float bubbleMouseOver = 4.5;
+const float bubbleGroupId = 5.5;
 const float bubbleInfoMembers = 6.0;
 
 const float bubbleGroupGradientLeft       = 0.5;
@@ -85,6 +86,7 @@ void main() {
 		float y = texture(bubbleData, yDataPos).r;
 		float w = texture(bubbleData, wDataPos).r;
 		float h = texture(bubbleData, hDataPos).r;
+
 // float x = -1000.0;
 // float y=-1000.0;
 // float w=2000.0;

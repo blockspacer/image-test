@@ -23,10 +23,10 @@ using glm::vec3;
 // using glm::;
 // using glm::;
 
-#define VERTICES_PER_BUBBLE_SIDE   8
-#define VERTICES_PER_BUBBLE_CORNER 6
+#define STEPS_PER_BUBBLE_SIDE   8
+#define STEPS_PER_BUBBLE_CORNER 5
 
-#define VERTICES_PER_BUBBLE (4 * (VERTICES_PER_BUBBLE_SIDE + VERTICES_PER_BUBBLE_CORNER) + 1)
+#define VERTICES_PER_BUBBLE (4 + (STEPS_PER_BUBBLE_CORNER+2 + STEPS_PER_BUBBLE_SIDE)*4*2)
 
 // drugs and wires playlist https://open.spotify.com/user/cryoclaire/playlist/7pSKHOUu7vRxFTPmrlghbB
 
@@ -51,8 +51,8 @@ struct BubbleGroup {
 };
 
 struct BubbleVertex {
-	GLfloat x, y, id;
-	BubbleVertex(GLfloat x, GLfloat y, GLfloat id) : x {x}, y{y}, id{id} {}; 
+	GLfloat x, y, id, insideOrOutside;
+	BubbleVertex(GLfloat x, GLfloat y, GLfloat id, GLfloat io) : x {x}, y{y}, id{id}, insideOrOutside {io} {}; 
 };
 
 enum BubbleInfoMembers {bubbleX, bubbleY,
@@ -113,12 +113,14 @@ struct BubbleInfo {
 		{};
 
 		BubbleInfo(
-		GLfloat x,
-		GLfloat y
-		) : x{x},
-			y{y},
-			w{10.0f},
-			h{10.0f},
+		GLfloat _x,
+		GLfloat _y,
+		GLfloat _w,
+		GLfloat _h
+		) : x{_x},
+			y{_y},
+			w{_w},
+			h{_h},
 			mouseOver{0.0f},
 			groupId{0.0f}
 		{};
@@ -151,13 +153,11 @@ class Bubbles {
 	vector<BubbleGroup> myGroups;
 	
 	vector<BubbleVertex> myBubbleVertices;
-	vector<GLshort>      myBubbleIndices;
 	vector<BubbleInfo>   myBubblePositions;
 
     size_t mySpaceAvailable {1};
 
 	GLuint myVertexBuffer,
-			myVertexIndices,
 			myDataTexture
 		,	myBackgroundBuffer
 			;
@@ -170,7 +170,6 @@ class Bubbles {
 		;
 	mat4 myTransformationMatrix;
 
-	void generateBubbleVertexIndices(size_t first, size_t last);
 	void setupBuffers(GlContext &ctx);
 	void setupBuffersInOtherContexts(GlContext &ctx);
 	void enlargeBubbleBuffers(GlContext &ctx);

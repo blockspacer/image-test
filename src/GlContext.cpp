@@ -243,7 +243,7 @@ void GlContext::drawCurvedOutline(float leftX, float topY, float rightX, float b
 	float &l = leftX, &t = topY, &r = rightX, &b = bottomY, &in = innerCornerRadius, &out = outerCornerRadius;
 	std::function<void(Point v, float io)> &func = vertexAccumulatorFunction;
 
-	if (r-l<2*in) l = r + 2*in;
+	if (r-l<2*in) r = l + 2*in;
 	if (b-t<2*in) b = t + 2*in;
 
 	float margin = 1.5; // times the corner circle radius
@@ -282,7 +282,6 @@ void GlContext::drawCurvedOutline(float leftX, float topY, float rightX, float b
 	const PointD leftD  {-1,  0};
 	const PointD rightD { 1,  0};
 
-
 	func(Point(r,b-in),0.0f); // double first point so it forms an infinitely thin triangle from the last one on the strip (which was drawing the last bubble)
 	drawCurvedOutlineCorner(Point(r-in,b-in), right, down, in, out, cornerSteps, func, sideAngle, topAngle);
 
@@ -304,7 +303,6 @@ void GlContext::drawCurvedOutline(float leftX, float topY, float rightX, float b
 	func(Point(r-in+out*cos(sideAngle),b-in+out*sin(sideAngle)),1.0f);
 	func(Point(r-in+out*cos(sideAngle),b-in+out*sin(sideAngle)),1.0f);
 }
-
 
 
 

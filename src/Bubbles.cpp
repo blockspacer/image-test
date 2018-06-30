@@ -28,7 +28,8 @@ float encodeId(BubbleId id) {
 BubbleId Bubbles::createBubble(GlContext &ctx, float x, float y, float w, float h) {
 	// run through bubbles and find first unused one
 	BubbleId bubbleId  = myBubbles.size();
-
+cout<<"in "<<y<<endl;
+cout<<h<<endl;
 	for (size_t i=0; i<myBubbles.size(); i++) {
 		if (myBubbles[i].unused) {
 			bubbleId = i;
@@ -52,16 +53,32 @@ BubbleId Bubbles::createBubble(GlContext &ctx, float x, float y, float w, float 
 
 	myBubbleVertices.clear();
 
-	myBubbleVertices.emplace_back(0.0f, 0.0f, encodeId(bubbleId));
-	float r = 1.0f;
-	for (int i = 0; i < VERTICES_PER_BUBBLE - 1; i++) {
-		myBubbleVertices.emplace_back(float(r * cos((2.0*PI / VERTICES_PER_BUBBLE) * i)), float(r * sin((2.0*PI / VERTICES_PER_BUBBLE) * i)), encodeId(bubbleId));
-	}
+
+	Color col {0.0f, 0.6f, 1.0f, 1.0f};
+
+	auto lam = [&](Point p, float io) {
+		cout<<io<<endl;
+		if (io==0.0)
+			cout<<"point "<<p<<endl;
+		myBubbleVertices.emplace_back(::x(p), ::y(p), encodeId(bubbleId), io);
+	};
+
+	float in = 0.3, out = 1;//8
+
+	GlContext::drawCurvedOutline(0, 0, w, h, in, out, lam, STEPS_PER_BUBBLE_CORNER, STEPS_PER_BUBBLE_SIDE);
+
+	// myBubbleVertices.emplace_back(0.0f, 0.0f, encodeId(bubbleId));
+	// float r = 1.0f;
+	// for (int i = 0; i < VERTICES_PER_BUBBLE - 1; i++) {
+	// 	myBubbleVertices.emplace_back(float(r * cos((2.0*PI / VERTICES_PER_BUBBLE) * i)), float(r * sin((2.0*PI / VERTICES_PER_BUBBLE) * i)), encodeId(bubbleId));
+	// }
 
 	uploadVertexData(ctx, bubbleId);
 
 	myBubblePositions[bubbleId].x = x;
 	myBubblePositions[bubbleId].y = y;
+	myBubblePositions[bubbleId].w = w;
+	myBubblePositions[bubbleId].h = h;
 	uploadBubblePositions();
 
 
@@ -103,27 +120,9 @@ void Bubbles::uploadBubblePositions() {
 
 
 
-void Bubbles::generateBubbleVertexIndices(size_t first, size_t last) {
-	myBubbleIndices.clear();
-
-	int idx = (VERTICES_PER_BUBBLE) * first;
-	int firstInBub;
-
-	cout<<"Generating vertex indexes: first vertex "<<first<<"\tlast vertex "<<last<<endl;
-	for (size_t i = first; i<last; i++) {
-		myBubbleIndices.push_back(idx); // centre of bubble
-		++idx;
-		firstInBub = idx;
-		for (int j = 0; j < VERTICES_PER_BUBBLE - 1; j++) {
-			myBubbleIndices.push_back(idx);
-			++idx;
-		}
-		myBubbleIndices.push_back(firstInBub); // last vertex goes over first one
-		myBubbleIndices.push_back(0xffff);
-	}
-}
 
 void Bubbles::enlargeBubbleBuffers(GlContext &ctx) {
+cout<<"enlarge"<<endl;
 	size_t oldSpaceAvailable = mySpaceAvailable;
 	mySpaceAvailable *= 2;
 
@@ -138,8 +137,9 @@ void Bubbles::enlargeBubbleBuffers(GlContext &ctx) {
 
 	glDeleteBuffers(1, &ctx.spareHandle);
 
-	generateBubbleVertexIndices(oldSpaceAvailable, mySpaceAvailable);
+//	generateBubbleVertexIndices(oldSpaceAvailable, mySpaceAvailable);
 
+/*
 	size_t sizeOfOldData = oldSpaceAvailable * (VERTICES_PER_BUBBLE + 2) * sizeof(GLushort);
 
 	ctx.spareHandle =                 myVertexIndices;
@@ -152,6 +152,7 @@ void Bubbles::enlargeBubbleBuffers(GlContext &ctx) {
 	glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_ELEMENT_ARRAY_BUFFER, 0,0, sizeOfOldData);
 	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, sizeOfOldData, sizeOfOldData, myBubbleIndices.data());
 	glDeleteBuffers(1, &ctx.spareHandle);
+*/
 
 	setupBuffersInOtherContexts(ctx);
 //	create new texture
@@ -216,7 +217,6 @@ void Bubbles::setupBuffers(GlContext &ctx) {
 void Bubbles::setupBuffersInOtherContexts(GlContext &ctx) {
 	WindowId orig = ctx.currentWindowId();
 	
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, myVertexIndices);
 	setupBuffers(ctx);
 
 	if (ctx.windowCount() > 1) {
@@ -226,8 +226,6 @@ void Bubbles::setupBuffersInOtherContexts(GlContext &ctx) {
 				ctx.changeWindow(i);
 
 				setupBuffers(ctx);
-
-				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, myVertexIndices);
 			}
 		}
 
@@ -254,13 +252,13 @@ void Bubbles::setupSharedContext(GlContext &ctx, WindowId win) {
 
 	setupBuffers(ctx);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, myVertexIndices);
 	glBindTexture(GL_TEXTURE_2D, myDataTexture);
 
 	commonSetup();
 }
 
 void Bubbles::initializeFirstContext(GlContext &ctx) {
+
 	GLuint shader = ctx.shaderHandle();
 
 	//create a dummy bubble positioned off screen, marked unused
@@ -274,14 +272,7 @@ void Bubbles::initializeFirstContext(GlContext &ctx) {
 	myPositionVarying = glGetAttribLocation(shader, "position");
 	myBubbleIdVarying = glGetAttribLocation(shader, "texCoord");
 
-	glGenBuffers(1,                      &myVertexIndices);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, myVertexIndices);
-
-	generateBubbleVertexIndices(size_t(0), size_t(1));
-
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, (VERTICES_PER_BUBBLE + 2) * sizeof(GLushort), myBubbleIndices.data(), GL_STATIC_DRAW);
-
-	myBubblePositions.emplace_back(-0.5f, -0.0f);
+	myBubblePositions.emplace_back(-0.5f, -0.0f, 3.0f, 3.0f);
 
 	glGenTextures(1,            &myDataTexture);
 	glBindTexture(GL_TEXTURE_2D, myDataTexture);
@@ -298,6 +289,7 @@ void Bubbles::initializeFirstContext(GlContext &ctx) {
 		0);
 
 	setupBuffers(ctx);
+
 	commonSetup();
 
 
@@ -305,6 +297,7 @@ void Bubbles::initializeFirstContext(GlContext &ctx) {
 	myBubbleInfoTextureUniform = glGetUniformLocation(shader, "bubbleData");
 	myBubbleInfoTextureWidthUniform = glGetUniformLocation(shader, "widthOfBubbleData");
 	myDrawDepthUniform = glGetUniformLocation(shader, "drawDepth");
+
 }
 
 void Bubbles::draw(GlContext &ctx, WindowId winId, Workspace& wksp) {
@@ -324,7 +317,7 @@ void Bubbles::draw(GlContext &ctx, WindowId winId, Workspace& wksp) {
 		, pbh   = win.panningBarPixelHeight(wksp)
 		, avail = pbh / wh
 	;
-cout<<"aaa"<<endl;
+
 	Point tl = win.topLeft(wksp)
 		, br = win.bottomRight(wksp)
 		, c  = win.viewportCenter()
@@ -333,21 +326,34 @@ cout<<"aaa"<<endl;
 	float w = ::x(br) - ::x(tl)
 		, h = ::y(br) - ::y(tl);
 
-	cout<<"W "<<win.viewportPixelSize(wksp)<<endl;
-cout<<win.screenunitWidth()<<endl;
-cout<<win.pixelWidth()<<endl;
 
 	myTransformationMatrix = mat4(1.0f);
 	myTransformationMatrix = translate(myTransformationMatrix, vec3(0.0, -avail, 0.0));
 
-	myTransformationMatrix = scale(myTransformationMatrix, vec3(2.0/w, -(2.0-2*avail)/h, 1));
+	myTransformationMatrix = scale(myTransformationMatrix, vec3(2.0/w, -(1-avail)*2.0/h, 1));
 	myTransformationMatrix = translate(myTransformationMatrix, vec3(-::x(c), -::y(c), 0.0));
 	// myTransformationMatrix = translate(myTransformationMatrix, vec3(::x(c), ::y(c), 0.0));
 
 	ctx.setMatrix(myTransformationMatrix);
 	//glUniformMatrix4fv(myTransformationUniform, 1, GL_FALSE, glm::value_ptr(myTransformationMatrix));
 
-	glDrawElements(GL_TRIANGLE_FAN, myBubbles.size() * (VERTICES_PER_BUBBLE + 1), GL_UNSIGNED_SHORT, 0);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, myBubbles.size() * VERTICES_PER_BUBBLE);
 
 check_gl_errors("draw");
 }
+
+/*
+i've got an intensely weird bug: all my objects are appearing the correct sizes, but their positions are off by a factor of two
+
+if i alter the view matrix to correct the positions, then they're shrunk to half-size
+
+i'm generating the geometry myself in the program, so it's not some weird scaling happening during object loading or whatever. i'm SURE everything's being made in the correct locations and sizes, but... obviously not
+
+these two things both think their width is twenty, one thinks its x co-ordinate is 10, the other 20. they're drawn using a single triangle strip and a single draw call (there's a zero width triangle connecting them)
+
+
+:? 
+??????
+
+
+*/

@@ -34,13 +34,17 @@ void App::monitorCallback(GLFWmonitor* monitor, int event) {
 	myWorkspace.setSize(largestMonitorExtent);
 }
 
+bool firstFrameResize  = true; // fix for my linux window manager (i3) which seems bad about callbacks
+bool firstWindowResize = true;
+
 // - may get called when a window moves to a higher dpi screen
 // - currently called when a webgl window changes size
 void App::framebufferSizeCallback(GLFWwindow* pWin, int w, int h) {
 	Window &win = myGlContext.window(pWin);
 
-	if (win. isPixelSizeDifferent(w, h)) {
+	if (firstFrameResize || win. isPixelSizeDifferent(w, h)) {
 		win.setPixelSize(w, h);
+		::firstFrameResize = false;
 
 		myGlContext.changeCurrentContext(pWin);
 		glViewport(0, 0, w, h);
@@ -58,7 +62,8 @@ void App::framebufferSizeCallback(GLFWwindow* pWin, int w, int h) {
 void App::windowSizeCallback(GLFWwindow* pWin, int w, int h) {
 	Window &win = myGlContext.window(pWin);
 
-	if (win. isScreenunitSizeDifferent(w, h)) {
+	if (firstWindowResize || win. isScreenunitSizeDifferent(w, h)) {
+		::firstWindowResize = false;
 		win.setScreenunitSize(w, h);
 
 //		myGlContext.changeCurrentContext(pWin);
@@ -157,9 +162,13 @@ void App::init() {
 	// myBubbles.createBubble(ctx, 0.5f, 0.3f, 10.0f, 10.0f);
 	// myBubbles.createBubble(ctx, 0.5f, -0.7f, 10.0f, 10.0f);
 	// myBubbles.createBubble(ctx, -0.8f, -0.7f, 10.0f, 10.0f);
-	myBubbles.createBubble(ctx, 15.0f, 13.0f, 20.0f, 20.0f);
-	myBubbles.createBubble(ctx, 35.0f, 33.0f, 20.0f, 20.0f);
-	myBubbles.createBubble(ctx, 55.0f, 53.0f, 20.0f, 20.0f);	
+	myBubbles.createBubble(ctx, 15.0f, 10.0f, 20.0f, 2.0f);
+
+	myBubbles.createBubble(ctx, 15.0f, 20.0f, 20.0f, 2.0f);
+	// myBubbles.createBubble(ctx, 10.0f, 20.0f, 20.0f, 20.0f);
+
+
+
 // myBubbles.createBubble(ctx, 0.5f, 0.3f, 10.0f, 10.0f);
 
 //   pWin  = myGlContext.windows[0].glfwHandle;
