@@ -34,6 +34,9 @@ class App {
 	static PanningBar     myPanningBar;
 	static Workspace      myWorkspace;
 
+	static bool myFirstFrameResize; // fix for my linux window manager (i3) which seems bad about callbacks
+	static bool myFirstWindowResize;
+
 	static	void setCallbacks(GLFWwindow* pWin);
 
 	static void cursorPositionCallback(GLFWwindow* window, double xpos, double ypos);
@@ -45,6 +48,8 @@ class App {
 	static void redrawCallback(GLFWwindow*);
 	static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 	static void windowPosCallback(GLFWwindow* pWin, int xpos, int ypos);
+
+	static void windowJustCreated() {myFirstFrameResize = true; myFirstWindowResize = true;};
 public:
 	GlContext      &glContext()   {return myGlContext;};
 	RedrawRequests &redrawQueue() {return myRedrawQueue;};

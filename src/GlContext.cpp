@@ -423,7 +423,8 @@ Window &GlContext::lookupWindow(GLFWwindow* pWin) {
 }
 
 void GlContext::forEachWindow(std::function<void(Window& win)> callMe) {
-	for (myWindows)
+	for (auto win : myWindows)
+		callMe(win);
 }
 
 
@@ -491,9 +492,9 @@ WindowId GlContext::createWindow(complex<float> center) {
 	glfwGetWindowSize(myWindows[newWin].glfwHandle(), &w, &h);
 	myWindows[newWin].setScreenunitSize(w, h);
 
-	// todo: prompt window to think about which monitor it's on
 
-
+	glEnable(GL_DEPTH_TEST);  
+	
 	#ifdef __APPLE__
 		glEnable(GL_PRIMITIVE_RESTART);
 		glPrimitiveRestartIndex(0xffff);

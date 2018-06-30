@@ -138,8 +138,6 @@ prepWindowOutline(win, wksp);
 
 	glBindBuffer(GL_ARRAY_BUFFER, myVertexBuffer);
 
-
-
 	if (wksp.sizeChanged()) {
 		Point tl = wksp.topLeft()
 			, br = wksp.bottomRight();
@@ -190,9 +188,7 @@ position it so origin is at (-1,1)
 	ctx.setMatrix(myTransformationMatrix);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-
 	glBindVertexArray(win.panningBarBubbleVAO);
-
 
 	glBindBuffer(GL_ARRAY_BUFFER, myPanningBarBubbleVertexBuffer);
 	glEnableVertexAttribArray(myTexAttrib);
@@ -281,31 +277,70 @@ check_gl_errors("draw");
 
 
 
-bool operator<(const Point &a, const Point &b) {return ::x(a) < ::x(b)  || ::y(a) < ::y(b);}
-bool operator>(const Point &a, const Point &b) {return ::x(a) > ::x(b)  || ::y(a) > ::y(b);}
-bool operator<=(const Point &a, const Point &b) {return ::x(a) <=::x(b) || ::y(a) <=::y(b);}
+bool operator< (const Point &a, const Point &b) {return ::x(a) <::x(b)  && ::y(a) <::y(b);}
+bool operator> (const Point &a, const Point &b) {return ::x(a) >::x(b)  && ::y(a) >::y(b);}
+bool operator<=(const Point &a, const Point &b) {return ::x(a) <=::x(b) && ::y(a) <=::y(b);}
 bool operator>=(const Point &a, const Point &b) {return ::x(a) >=::x(b) && ::y(a) >=::y(b);}
 bool operator==(const Point &a, const Point &b) {return ::x(a) ==::x(b) && ::y(a) ==::y(b);}
 bool operator!=(const Point &a, const Point &b) {return ::x(a) !=::x(b) || ::y(a) !=::y(b);}
 
+bool contains(const float x, const float min, const float max) {
+	return min <= x && x < max;
+}
+
+bool contains(const Point &p, const Point &topLeft, const Point &bottomRight) {
+	return contains(::x(p), ::x(topLeft), ::x(bottomRight))
+		&& contains(::y(p), ::y(topLeft), ::y(bottomRight));
+}
+
+bool contains(const Point &p, Window &win, Workspace &wksp) {
+	return contains(p, win.topLeft(wksp), win. bottomRight(wksp));
+}
 
 bool PanningBar::mouseMotion(Point pos, Window &win, GlContext &ctx, Workspace &wksp, Bubbles &bubls, RedrawRequests &redrawReqests) {
+	myMousePos = pos;
 
+	if (myMouseBeingDragged) {
+
+	}
+	else {
+		if (contains(pos, win, wksp)) {
+			// mouse is over 
+			myMouseOverWindowOutline = true;
+			myMouseOverWindowId = win.id();
+		}
+		else {
+			bool foundOne = false;
+			auto lambda = [&](Window& potentialWin) {
+				if (potentialWin.id() != win.id() 
+					&& contains(pos, potentialWin, wksp)) {
+					foundOne = true;
+				}
+			};
+			ctx.forEachWindow(lambda);
+			myMouseOverWindowOutline = foundOne;
+		}
+	}
 	cout<<pos<<endl;
-
-
-
-
-
-
-
-
-
 
 
 }
 
+void PanningBar::mouseButtonInput(Window &win, int button, int action, int mods, GlContext &ctx, PanningBar &pBar, RedrawRequests &redrawQueue) {
+	if (action == GLFW_PRESS) {
+		if ( ! myMouseBeingDragged) {
+			win.setViewportCenter(myMousePos);
+			redrawQueue.redrawAllWindows();
 
+		}
+
+	}
+	else {
+		myMouseBeingDragged = false;
+		cout<<"release!"<<endl;
+	}
+
+}
 
 
 

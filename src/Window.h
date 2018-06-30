@@ -67,6 +67,7 @@ public:
 	int 	pixelsPerScreenunit() { return (!screenunitWidth()) ? 1 : pixelWidth() / screenunitWidth();};
 
 	Point 	viewportCenter() {return myViewportCentre;};
+	void 	setViewportCenter(const Point &p) {myViewportCentre = p;};
 	Point 	topLeft(Workspace &wksp)     { return myViewportCentre - 0.5f * viewportCMsize(wksp);};
 	Point 	bottomRight(Workspace &wksp) { return myViewportCentre + 0.5f * viewportCMsize(wksp);};
 

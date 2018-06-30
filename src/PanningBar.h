@@ -35,7 +35,8 @@ struct ColoredVertex {
 };
 
 class PanningBar {
-	bool	myMouseOverWindow {false};
+	bool 	 myMouseBeingDragged {false};
+	bool	 myMouseOverWindowOutline {false};
 	WindowId myMouseOverWindowId {0};
 	mat4    myTransformationMatrix;
 	GLuint 	myUBO {0}
@@ -50,12 +51,17 @@ class PanningBar {
 	vector<ColoredVertex> myWindowOutlineVertices;
 	vector<ColoredVertex> myWindowViewAreaVertices;
 
+	Point myDragOffset {0,0}
+		, myMousePos {0,0};
+
+
 public:
 	void draw(GlContext &ctx, WindowId win, Workspace &wksp, Bubbles &bubbles);
 	void initializeFirstContext(GlContext &ctx);
 	void prepWindowOutline(Window& win, Workspace& wksp);
 	PanningBar() {};
 	bool mouseMotion(Point pos, Window &win, GlContext &ctx, Workspace &wksp, Bubbles &bubls, RedrawRequests &redrawReqests);
+	void mouseButtonInput(Window &win, int button, int action, int mods, GlContext &ctx, PanningBar &pBar, RedrawRequests &redrawQueue);
 
 
 };

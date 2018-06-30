@@ -13,8 +13,9 @@ void MouseEvents::moved(GLFWwindow* window, double xpos, double ypos, GlContext 
 	// if mouse button is down and myMouseTarget isn't OverNothing then send it to that target
 
 	if (ypos <= pbph) {
-		Point wkspPos = pos * (::x(wksp.size()) / win.screenunitWidth()) - wksp.topLeft();
+		myMouseTarget = Panningbar;
 
+		Point wkspPos = pos * (::x(wksp.size()) / win.screenunitWidth()) - wksp.topLeft();
 		panBar.mouseMotion(wkspPos, win, ctx, wksp, bubls, redrawQueue);
 		cout << "over panning bar"<<endl;
 	}
@@ -25,15 +26,19 @@ void MouseEvents::moved(GLFWwindow* window, double xpos, double ypos, GlContext 
 
 }
 
-void MouseEvents::buttonInput(GLFWwindow* window, int button, int action, int mods, GlContext &ctx, RedrawRequests &redrawQueue) {
+void MouseEvents::buttonInput(GLFWwindow* window, int button, int action, int mods, GlContext &ctx, PanningBar &panBar, RedrawRequests &redrawQueue) {
 	Window &win = ctx.lookupWindow(window);
 
 	bool handled = false;
 
+	if (myMouseTarget == Panningbar) {
+		panBar.mouseButtonInput(win, button, action, mods, ctx, panBar, redrawQueue);
+	}
+
 	if (action == GLFW_PRESS) {
-		WindowId parent = win.id();
-		SHOW_TYPE(parent)
-		redrawQueue.newWindow(parent);
+		// WindowId parent = win.id();
+		// SHOW_TYPE(parent)
+		// redrawQueue.newWindow(parent);
 	}
 
 //	bool handled = win.mouseButtonInput( Point(float(xpos),float(ypos)), redrawQueue );

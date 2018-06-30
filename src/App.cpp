@@ -8,13 +8,14 @@ GlContext      App::myGlContext;
 TextLayout     App::myText;
 Bubbles        App::myBubbles;
 
+bool App::myFirstFrameResize = true, App::myFirstWindowResize = true;
 
 void App::cursorPositionCallback(GLFWwindow* window, double xpos, double ypos) {
 	myMouseHandler.moved(window, xpos, ypos, myGlContext, myWorkspace, myPanningBar, myBubbles, myRedrawQueue);
 }
 
 void App::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
-	myMouseHandler.buttonInput(window, button, action, mods, myGlContext, myRedrawQueue);
+	myMouseHandler.buttonInput(window, button, action, mods, myGlContext, myPanningBar, myRedrawQueue);
 }
 
 void App::monitorCallback(GLFWmonitor* monitor, int event) {
@@ -34,17 +35,14 @@ void App::monitorCallback(GLFWmonitor* monitor, int event) {
 	myWorkspace.setSize(largestMonitorExtent);
 }
 
-bool firstFrameResize  = true; // fix for my linux window manager (i3) which seems bad about callbacks
-bool firstWindowResize = true;
-
 // - may get called when a window moves to a higher dpi screen
 // - currently called when a webgl window changes size
 void App::framebufferSizeCallback(GLFWwindow* pWin, int w, int h) {
 	Window &win = myGlContext.window(pWin);
 
-	if (firstFrameResize || win. isPixelSizeDifferent(w, h)) {
+	if (true || myFirstFrameResize || win. isPixelSizeDifferent(w, h)) {
 		win.setPixelSize(w, h);
-		::firstFrameResize = false;
+		myFirstFrameResize = false;
 
 		myGlContext.changeCurrentContext(pWin);
 		glViewport(0, 0, w, h);
@@ -55,15 +53,15 @@ void App::framebufferSizeCallback(GLFWwindow* pWin, int w, int h) {
 		#endif
 	}
 	else {
-		cout << "Spurious frambuffer resize reported."<<endl;
+		cout << "Spurious frambuffer "<<win.id()<<" resize reported."<<endl;
 	}
 }
 
 void App::windowSizeCallback(GLFWwindow* pWin, int w, int h) {
 	Window &win = myGlContext.window(pWin);
 
-	if (firstWindowResize || win. isScreenunitSizeDifferent(w, h)) {
-		::firstWindowResize = false;
+	if (true||myFirstWindowResize || win. isScreenunitSizeDifferent(w, h)) {
+		myFirstWindowResize = false;
 		win.setScreenunitSize(w, h);
 
 //		myGlContext.changeCurrentContext(pWin);
@@ -80,7 +78,7 @@ void App::windowSizeCallback(GLFWwindow* pWin, int w, int h) {
 
 	}
 	else {
-		cout << "Spurious window resize reported."<<endl;
+		cout << "Spurious window "<<win.id()<<" resize reported."<<endl;
 	}
 }
 
@@ -124,6 +122,7 @@ void App::createWindow(WindowId parent) {
 	WindowId newId = myGlContext.createWindow(parent);
 	Window&  win = myGlContext.window(newId);
 
+	windowJustCreated();
 	int xpos, ypos;
 	glfwGetWindowPos(win.glfwHandle(), &xpos, &ypos);
 	myGlContext.windowMoved(win.glfwHandle(), xpos, ypos, myRedrawQueue);	
@@ -133,6 +132,12 @@ void App::createWindow(WindowId parent) {
 //	glBindVertexArray(win.bubblesVAO);
 	setCallbacks(win.glfwHandle());
 
+//		glViewport(0, 0, w, h);
+cout<<"ntesiroa "<<win.screenunitWidth()<<endl;
+cout<<"ntesiroa "<<win.screenunitHeight()<<endl;
+//		glViewport(0, 0, w, h);
+
+	myRedrawQueue.redrawAllWindows();
 }
 
 void App::init() {
