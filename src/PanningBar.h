@@ -35,6 +35,7 @@ struct ColoredVertex {
 };
 
 class PanningBar {
+	bool 	 myMouseOverMe {false};
 	bool 	 myMouseBeingDragged {false};
 	bool	 myMouseOverWindowOutline {false};
 	WindowId myMouseOverWindowId {0};
@@ -62,7 +63,8 @@ public:
 	PanningBar() {};
 	bool mouseMotion(Point pos, Window &win, GlContext &ctx, Workspace &wksp, Bubbles &bubls, RedrawRequests &redrawReqests);
 	void mouseButtonInput(Window &win, int button, int action, int mods, GlContext &ctx, PanningBar &pBar, RedrawRequests &redrawQueue);
-
+	void mouseOverYou(RedrawRequests &redrawQueue)    { myMouseOverMe = true ; };
+	void mouseNotOverYou(RedrawRequests &redrawQueue) { myMouseOverMe = false; };
 
 };
 

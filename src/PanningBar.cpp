@@ -36,6 +36,10 @@ void PanningBar::initializeFirstContext(GlContext &ctx) {
 		myBackgroundVertices[2].t = -1.0f;
 		myBackgroundVertices[3].t = -1.0f;
 
+		for (int i = 0; i < 4; ++i)
+			myBackgroundVertices[0].z = GlContext::getLayerValue(Layer::PB_background);
+cout<<"background depth "<<GlContext::getLayerValue(Layer::PB_background)<<endl;
+GlContext::showLayerValues();
 
 		glGenBuffers(1, &myPanningBarBubbleVertexBuffer);
 		glBindBuffer(GL_ARRAY_BUFFER, myPanningBarBubbleVertexBuffer);
@@ -80,8 +84,11 @@ c/=2.0f;
 
 	Color col {0.0f, 0.6f, 1.0f, 1.0f};
 
+	float depth = GlContext::getLayerValue(Layer::PB_currentWindowOutline);
+cout<<"outline depth "<<depth<<endl;
+
 	auto lam = [&](Point p, float io) {
-		myWindowOutlineVertices.emplace_back(::x(p), ::y(p), 0.0f, col.rPremul32F(), col.gPremul32F(), col.bPremul32F(), col.alphaFloat(), -3.0f, io);
+		myWindowOutlineVertices.emplace_back(::x(p), ::y(p), depth, col.rPremul32F(), col.gPremul32F(), col.bPremul32F(), col.alphaFloat(), -3.0f, io);
 	};
 
 //	size_t sideSteps = 8, cornerSteps = 3;
@@ -100,10 +107,12 @@ c/=2.0f;
 
 
 	Color col2 = col;
-	col2.setAlpha(0.3f);
+//	col2.setAlpha(0.8f);
+
+	depth = GlContext::getLayerValue(Layer::PB_currentWindowViewArea);
 
 	auto tint = [&](float x, float y) {
-		myWindowViewAreaVertices.emplace_back(x, y, 0.0f, col2.rPremul32F(), col2.gPremul32F(), col2.bPremul32F(), col2.alphaFloat(), -1.0f, 0.0f);
+		myWindowViewAreaVertices.emplace_back(x, y, depth, col2.rPremul32F(), col2.gPremul32F(), col2.bPremul32F(), col2.alphaFloat(), -1.0f, 0.0f);
 	};
 
 
@@ -151,6 +160,8 @@ prepWindowOutline(win, wksp);
 		myBackgroundVertices[3].x = ::x(tl);
 		myBackgroundVertices[3].y = ::y(tl);
 
+		cout<<myBackgroundVertices[0].z<<" mbvz"<<endl;
+
 		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(ColoredVertex)*4, &myBackgroundVertices);
 
 		wksp.sizeHasNotChanged();
@@ -171,7 +182,6 @@ prepWindowOutline(win, wksp);
 	glEnableVertexAttribArray(myTexAttrib);
 	glVertexAttribPointer(myTexAttrib, 2, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), (const void*) (7*4));
 
-
 /*
 scale to fit panning bar in window
 position it so origin is at (-1,1)
@@ -186,6 +196,7 @@ position it so origin is at (-1,1)
 	myTransformationMatrix = scale(myTransformationMatrix, vec3(horizontalScale, -verticalScale, 1));
 
 	ctx.setMatrix(myTransformationMatrix);
+
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 	glBindVertexArray(win.panningBarBubbleVAO);
@@ -323,7 +334,7 @@ bool PanningBar::mouseMotion(Point pos, Window &win, GlContext &ctx, Workspace &
 	}
 	cout<<pos<<endl;
 
-
+	return true;
 }
 
 void PanningBar::mouseButtonInput(Window &win, int button, int action, int mods, GlContext &ctx, PanningBar &pBar, RedrawRequests &redrawQueue) {

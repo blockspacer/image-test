@@ -8,8 +8,6 @@ GlContext      App::myGlContext;
 TextLayout     App::myText;
 Bubbles        App::myBubbles;
 
-bool App::myFirstFrameResize = true, App::myFirstWindowResize = true;
-
 void App::cursorPositionCallback(GLFWwindow* window, double xpos, double ypos) {
 	myMouseHandler.moved(window, xpos, ypos, myGlContext, myWorkspace, myPanningBar, myBubbles, myRedrawQueue);
 }
@@ -20,7 +18,8 @@ void App::mouseButtonCallback(GLFWwindow* window, int button, int action, int mo
 
 void App::monitorCallback(GLFWmonitor* monitor, int event) {
 	Point largestMonitorExtent = myGlContext.getMonitorsInfo();
-	#ifdef WEB // guess how big the user's screen is based on pixel size of the canvas
+	#ifdef NATIVE
+	#else // guess how big the web user's screen is based on pixel size of the canvas
 		Window &win = myGlContext.firstWindow();
 
 		float assumed_dpi = 96.0f
@@ -40,29 +39,21 @@ void App::monitorCallback(GLFWmonitor* monitor, int event) {
 void App::framebufferSizeCallback(GLFWwindow* pWin, int w, int h) {
 	Window &win = myGlContext.window(pWin);
 
-	if (true || myFirstFrameResize || win. isPixelSizeDifferent(w, h)) {
-		win.setPixelSize(w, h);
-		myFirstFrameResize = false;
+	win.setPixelSize(w, h);
+	
+	myGlContext.changeCurrentContext(pWin);
+	glViewport(0, 0, w, h);
+	myRedrawQueue.redrawAllWindows();
 
-		myGlContext.changeCurrentContext(pWin);
-		glViewport(0, 0, w, h);
-		myRedrawQueue.redrawAllWindows();
-
-		#ifdef WEB
-			emscripten_resume_main_loop();
-		#endif
-	}
-	else {
-		cout << "Spurious frambuffer "<<win.id()<<" resize reported."<<endl;
-	}
+	#ifdef WEB
+		emscripten_resume_main_loop();
+	#endif
 }
 
 void App::windowSizeCallback(GLFWwindow* pWin, int w, int h) {
 	Window &win = myGlContext.window(pWin);
 
-	if (true||myFirstWindowResize || win. isScreenunitSizeDifferent(w, h)) {
-		myFirstWindowResize = false;
-		win.setScreenunitSize(w, h);
+	win.setScreenunitSize(w, h);
 
 //		myGlContext.changeCurrentContext(pWin);
 
@@ -75,11 +66,6 @@ void App::windowSizeCallback(GLFWwindow* pWin, int w, int h) {
 //		glViewport(0, 0, width, height);
 //		myRedrawQueue.redrawAllWindows();
 		
-
-	}
-	else {
-		cout << "Spurious window "<<win.id()<<" resize reported."<<endl;
-	}
 }
 
 void App::webCanvasResize(int w, int h) {
@@ -122,7 +108,6 @@ void App::createWindow(WindowId parent) {
 	WindowId newId = myGlContext.createWindow(parent);
 	Window&  win = myGlContext.window(newId);
 
-	windowJustCreated();
 	int xpos, ypos;
 	glfwGetWindowPos(win.glfwHandle(), &xpos, &ypos);
 	myGlContext.windowMoved(win.glfwHandle(), xpos, ypos, myRedrawQueue);	
@@ -151,30 +136,12 @@ void App::init() {
 	myPanningBar.initializeFirstContext(ctx);
 //	glBindVertexArray(ctx.window(0).bubblesVAO);
 
-
-	// BubbleId newb = myBubbles.createBubble(5.0f,5.0f,5.0f,5.0f);
-	// myBubbles.uploadBubbleVertexDataToContext(myGlContext, newb);
-	// BubbleId newb2 = myBubbles.createBubble(5.0f,5.0f,5.0f,5.0f);
-	// myBubbles.uploadBubbleVertexDataToContext(myGlContext, newb2);
-	// BubbleId newb3 = myBubbles.createBubble(5.0f,5.0f,5.0f,5.0f);
-	// myBubbles.uploadBubbleVertexDataToContext(myGlContext, newb3);
-	// BubbleId newb4 = myBubbles.createBubble(5.0f,5.0f,5.0f,5.0f);
-	// myBubbles.uploadBubbleVertexDataToContext(myGlContext, newb4);
-
-
-//	myBubbles.createBubble(ctx, -0.5f, -0.0f, 10.0f, 10.0f);
-//	myBubbles.createBubble(ctx, 0.0f, -0.3f, 10.0f, 10.0f);
-	// myBubbles.createBubble(ctx, 0.5f, 0.3f, 10.0f, 10.0f);
-	// myBubbles.createBubble(ctx, 0.5f, -0.7f, 10.0f, 10.0f);
-	// myBubbles.createBubble(ctx, -0.8f, -0.7f, 10.0f, 10.0f);
 	myBubbles.createBubble(ctx, 15.0f, 10.0f, 20.0f, 2.0f);
 
 	myBubbles.createBubble(ctx, 15.0f, 20.0f, 20.0f, 2.0f);
 	// myBubbles.createBubble(ctx, 10.0f, 20.0f, 20.0f, 20.0f);
 
 
-
-// myBubbles.createBubble(ctx, 0.5f, 0.3f, 10.0f, 10.0f);
 
 //   pWin  = myGlContext.windows[0].glfwHandle;
 

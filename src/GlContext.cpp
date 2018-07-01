@@ -1,6 +1,17 @@
 #include "GlContext.h"
 
-using std::endl;
+
+float GlContext::getLayerValue(Layer n) {
+	return (float) n / (float) Layer::maxLayer;
+}
+
+// bubble_shader.vert needs to know these
+void GlContext::showLayerValues() {
+	cout<<"pb bub "                 << getLayerValue(Layer::PB_bubble)  <<endl;
+	cout<<"bub halo "            << getLayerValue(Layer::bubbleHalo) <<endl;
+ 	cout<<"bub halo highlighted "<< getLayerValue(Layer::bubbleHaloHighlighted) <<endl;
+
+}
 
 GLuint GlContext::compileShaderFromSourceString(GLenum type, std::string source) {
 	GLuint shader;
@@ -353,14 +364,19 @@ Point GlContext::getMonitorsInfo() {
 	for (int i=0; i<count; ++i) {
 		const GLFWvidmode* mode = glfwGetVideoMode(ms[i]);
 		int w = mode->width;
+
 		int h = mode->height;
 		int r = mode->refreshRate;
+
 		int posX, posY;
 		string name;
 		name = glfwGetMonitorName(ms[i]);
+
 		glfwGetMonitorPos(ms[i], &posX, &posY);
+
 		int widthMM, heightMM;
 		glfwGetMonitorPhysicalSize(ms[i], &widthMM, &heightMM);
+
 		myMonitors.emplace_back(ms[i], complex<float>(widthMM / 10.0f, heightMM/10.0f),
 			complex<float>(w, h),
 			complex<float>(posX, posY),
@@ -597,7 +613,6 @@ glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
    	
    	glfwSetWindowUserPointer(pCurrentContext, (void *) 0);
 
-   	getMonitorsInfo();
 
 
 	glewExperimental = true; // Needed for core profile or something
@@ -607,6 +622,7 @@ glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
 	}
 
 	#ifdef NATIVE
+	   	getMonitorsInfo();
 		#ifdef DEBUG
 			#ifndef __APPLE__
 				glEnable              ( GL_DEBUG_OUTPUT );

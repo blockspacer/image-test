@@ -37,32 +37,28 @@ struct Monitor {
 	}
 };
 
-/*
-drawing order should be front to back except for text:
-
-panning bar bubbles
-panning bar background
-
-[menu, menu text]
-help line
-
-bubbles contents background
-background
-overlays
-text
-*/
-
+// nb: remember to update constants in vertex shader if these change!
 enum struct Layer {
-menu, 
-helpLine, 
-bubbleContentsOverlay, 
-bubbleContentsBackground, 
-bubbleHalo, 
-panningBarWindowOutline, 
-panningBarBubble, 
-panningBar, 
-background
+	menu, 
+	helpLine, 
+	PB_potentialWindowOutline, 
+	PB_potentialWindowViewArea, 
+	PB_currentWindowOutline,
+	PB_currentWindowViewArea,
+	PB_otherWindowOutline,
+	PB_otherWindowViewArea,
+	PB_bubble,                  // *
+	PB_background,
+	bubbleContentsOverlay, 
+	bubbleHaloHighlighted,      // *
+	bubbleHalo,                 // *
+	bubbleContentsBackground, 
+	panningBar, 
+	background,
+	maxLayer
 };
+
+
 
 class GlContext {
 	GLFWwindow* pCurrentContext;
@@ -119,9 +115,25 @@ public:
 	void setMatrix(mat4& m);
 	static void drawCurvedOutline(float leftX, float topY, float rightX, float bottomY, float innerCornerRadius, float outerCornerRadius, std::function<void(Point v, float io)> vertexAccumulatorFunction, size_t cornerSteps, size_t sideSteps = 0);
 	void forEachWindow(std::function<void(Window& win)>);
+
+	static void showLayerValues();
+	static float getLayerValue(Layer n);
 };
 
 	bool checkglerror(int err, int errnum, string errname, string label);
 	void check_gl_errors(string label);
 	void check_gl_errors();
 
+//template 
+class EnlargeableArrayBuffer{
+	GLuint myVBO {0};
+	size_t mySize {0};
+
+
+public:
+	EnlargeableArrayBuffer(size_t size);
+	void bind();
+	void upload();
+	size_t count();
+	size_t elementSize();
+};

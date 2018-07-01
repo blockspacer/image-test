@@ -43,3 +43,12 @@ public:
 };
 
 
+/*
+
+a single window's panning bar (when the user mouses over it)
+all windows' panning bars (when bubbles or viewports move or change size)
+
+all windows containing a view of a bubble
+all windows containing a view of a bubble group
+
+*/

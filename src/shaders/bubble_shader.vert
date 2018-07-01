@@ -50,6 +50,11 @@ const float bubbleGroupGradientRightGreen = 8.5;
 const float bubbleGroupGradientRightBlue  = 9.5;
 const float bubbleGroupInfoMembers        = 10.0;
 
+// defined in GlContext.h
+const float PB_bubble_layer             = 0.5;
+const float bubbleHaloHighlighted_layer = 0.75;
+const float bubbleHalo_layer            = 0.6875;
+
 
 void main() {
 	// it's part of a texture
@@ -65,7 +70,7 @@ void main() {
 		outTexCoord = texCoord;
 		vec4 p = position;
 		gl_Position = transformation * p;
-		gl_Position.z = 0.02;
+		gl_Position.z = 0.99999;
 		return;
 	}
 	// -2 => panning bar bubble
@@ -92,18 +97,14 @@ void main() {
 // float w=2000.0;
 // float h=2000.0;
 		float o = 1.8;
-		// if (0 == gl_VertexID)		gl_Position = transformation * vec4(x, y, 0.1, 1.0);
-		// else if (1 == gl_VertexID)	gl_Position = transformation * vec4(x, y+h, 0.1, 1.0);	
-		// else if (2 == gl_VertexID)	gl_Position = transformation * vec4(x+w, y+h, 0.1, 1.0);			
-		// else if (3 == gl_VertexID)	gl_Position = transformation * vec4(x+w, y, 0.1, 1.0);			
-		if 		(0 == gl_VertexID)	gl_Position = transformation * vec4(x+o,   y,     0.015, 1.0);
-		else if (1 == gl_VertexID)	gl_Position = transformation * vec4(x,     y+o,   0.015, 1.0);	
-		else if (2 == gl_VertexID)	gl_Position = transformation * vec4(x,     y+h-o, 0.015, 1.0);			
-		else if (3 == gl_VertexID)	gl_Position = transformation * vec4(x+o,   y+h,   0.015, 1.0);			
-		else if (4 == gl_VertexID)	gl_Position = transformation * vec4(x+w-o, y+h,   0.015, 1.0);			
-		else if (5 == gl_VertexID)	gl_Position = transformation * vec4(x+w,   y+h-o, 0.015, 1.0);			
-		else if (6 == gl_VertexID)	gl_Position = transformation * vec4(x+w,   y+o,   0.015, 1.0);			
-		else if (7 == gl_VertexID)	gl_Position = transformation * vec4(x+w-o, y,     0.015, 1.0);			
+		if 		(0 == gl_VertexID)	gl_Position = transformation * vec4(x+o,   y,     PB_bubble_layer, 1.0);
+		else if (1 == gl_VertexID)	gl_Position = transformation * vec4(x,     y+o,   PB_bubble_layer, 1.0);
+		else if (2 == gl_VertexID)	gl_Position = transformation * vec4(x,     y+h-o, PB_bubble_layer, 1.0);
+		else if (3 == gl_VertexID)	gl_Position = transformation * vec4(x+o,   y+h,   PB_bubble_layer, 1.0);
+		else if (4 == gl_VertexID)	gl_Position = transformation * vec4(x+w-o, y+h,   PB_bubble_layer, 1.0);
+		else if (5 == gl_VertexID)	gl_Position = transformation * vec4(x+w,   y+h-o, PB_bubble_layer, 1.0);
+		else if (6 == gl_VertexID)	gl_Position = transformation * vec4(x+w,   y+o,   PB_bubble_layer, 1.0);
+		else if (7 == gl_VertexID)	gl_Position = transformation * vec4(x+w-o, y,     PB_bubble_layer, 1.0);
 
 		outColor = vec4(1.0, 0.8, 1.0, 1.0); // get from bubble group 
 		outTexCoord = texCoord;
@@ -129,7 +130,7 @@ void main() {
 		float xOffset = texture(bubbleData, xDataPositionInTexture).r;
 		float yOffset = texture(bubbleData, yDataPositionInTexture).r;
 
-		gl_Position = transformation * (position + vec4(xOffset, yOffset, 0.03f, 0.0f));
+		gl_Position = transformation * (position + vec4(xOffset, yOffset, bubbleHalo_layer, 0.0f));
 		// gl_Position = transformation * (position + vec4(-15.0, 0.0, 0.0f, 0.0f));
 
 		outColor = vec4(0.0, 1.0, 0.5, 1.0);

@@ -28,8 +28,7 @@ float encodeId(BubbleId id) {
 BubbleId Bubbles::createBubble(GlContext &ctx, float x, float y, float w, float h) {
 	// run through bubbles and find first unused one
 	BubbleId bubbleId  = myBubbles.size();
-cout<<"in "<<y<<endl;
-cout<<h<<endl;
+
 	for (size_t i=0; i<myBubbles.size(); i++) {
 		if (myBubbles[i].unused) {
 			bubbleId = i;
@@ -57,9 +56,6 @@ cout<<h<<endl;
 	Color col {0.0f, 0.6f, 1.0f, 1.0f};
 
 	auto lam = [&](Point p, float io) {
-		cout<<io<<endl;
-		if (io==0.0)
-			cout<<"point "<<p<<endl;
 		myBubbleVertices.emplace_back(::x(p), ::y(p), encodeId(bubbleId), io);
 	};
 
@@ -122,7 +118,6 @@ void Bubbles::uploadBubblePositions() {
 
 
 void Bubbles::enlargeBubbleBuffers(GlContext &ctx) {
-cout<<"enlarge"<<endl;
 	size_t oldSpaceAvailable = mySpaceAvailable;
 	mySpaceAvailable *= 2;
 
