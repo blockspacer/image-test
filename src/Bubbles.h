@@ -6,6 +6,7 @@
 #include "GlContext.h"
 
 #include "Window.h"
+#include "EnlargeableArrayBuffer.h"
 
 //#include "glm/mat3x3.hpp"
 #include "include/glm/glm.hpp"
@@ -154,6 +155,8 @@ class Bubbles {
 	
 	vector<BubbleVertex> myBubbleVertices;
 	vector<BubbleInfo>   myBubblePositions;
+
+	EnlargeableArrayBuffer myBubbleHalos {VERTICES_PER_BUBBLE};
 
     size_t mySpaceAvailable {1};
 

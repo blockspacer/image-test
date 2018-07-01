@@ -123,17 +123,3 @@ public:
 	bool checkglerror(int err, int errnum, string errname, string label);
 	void check_gl_errors(string label);
 	void check_gl_errors();
-
-//template 
-class EnlargeableArrayBuffer{
-	GLuint myVBO {0};
-	size_t mySize {0};
-
-
-public:
-	EnlargeableArrayBuffer(size_t size);
-	void bind();
-	void upload();
-	size_t count();
-	size_t elementSize();
-};
