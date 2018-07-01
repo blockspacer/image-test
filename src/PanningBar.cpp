@@ -37,9 +37,8 @@ void PanningBar::initializeFirstContext(GlContext &ctx) {
 		myBackgroundVertices[3].t = -1.0f;
 
 		for (int i = 0; i < 4; ++i)
-			myBackgroundVertices[0].z = GlContext::getLayerValue(Layer::PB_background);
-cout<<"background depth "<<GlContext::getLayerValue(Layer::PB_background)<<endl;
-GlContext::showLayerValues();
+			myBackgroundVertices[i].z = GlContext::getLayerValue(Layer::PB_background);
+
 
 		glGenBuffers(1, &myPanningBarBubbleVertexBuffer);
 		glBindBuffer(GL_ARRAY_BUFFER, myPanningBarBubbleVertexBuffer);
@@ -85,7 +84,6 @@ c/=2.0f;
 	Color col {0.0f, 0.6f, 1.0f, 1.0f};
 
 	float depth = GlContext::getLayerValue(Layer::PB_currentWindowOutline);
-cout<<"outline depth "<<depth<<endl;
 
 	auto lam = [&](Point p, float io) {
 		myWindowOutlineVertices.emplace_back(::x(p), ::y(p), depth, col.rPremul32F(), col.gPremul32F(), col.bPremul32F(), col.alphaFloat(), -3.0f, io);
@@ -107,7 +105,7 @@ cout<<"outline depth "<<depth<<endl;
 
 
 	Color col2 = col;
-//	col2.setAlpha(0.8f);
+	col2.setAlpha(0.3f);
 
 	depth = GlContext::getLayerValue(Layer::PB_currentWindowViewArea);
 
@@ -209,7 +207,7 @@ position it so origin is at (-1,1)
 	glVertexAttribPointer(myColAttrib, 4, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), (const void*) 12);
 
 	glEnableVertexAttribArray(myPosAttrib);
-	glVertexAttribPointer(myPosAttrib, 2, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), (const void*) 0);
+	glVertexAttribPointer(myPosAttrib, 3, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), (const void*) 0);
 
 	// glActiveTexture(GL_TEXTURE0);
 	// glBindTexture(GL_TEXTURE_2D, bubbles.dataTexture());

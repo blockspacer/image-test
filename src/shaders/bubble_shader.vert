@@ -70,7 +70,7 @@ void main() {
 		outTexCoord = texCoord;
 		vec4 p = position;
 		gl_Position = transformation * p;
-		gl_Position.z = 0.99999;
+//		gl_Position.z = 0.5625;
 		return;
 	}
 	// -2 => panning bar bubble
@@ -97,6 +97,8 @@ void main() {
 // float w=2000.0;
 // float h=2000.0;
 		float o = 1.8;
+		float sm = min(w, h);
+		o = min(o, sm/2);
 		if 		(0 == gl_VertexID)	gl_Position = transformation * vec4(x+o,   y,     PB_bubble_layer, 1.0);
 		else if (1 == gl_VertexID)	gl_Position = transformation * vec4(x,     y+o,   PB_bubble_layer, 1.0);
 		else if (2 == gl_VertexID)	gl_Position = transformation * vec4(x,     y+h-o, PB_bubble_layer, 1.0);
