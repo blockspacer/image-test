@@ -69,7 +69,7 @@ BubbleId Bubbles::createBubble(GlContext &ctx, float x, float y, float w, float 
 	// 	myBubbleVertices.emplace_back(float(r * cos((2.0*PI / VERTICES_PER_BUBBLE) * i)), float(r * sin((2.0*PI / VERTICES_PER_BUBBLE) * i)), encodeId(bubbleId));
 	// }
 
-	uploadVertexData(ctx, bubbleId);
+	myBubbleHalos.upload(bubbleId, ctx, myBubbleVertices.data());
 
 	myBubblePositions[bubbleId].x = x;
 	myBubblePositions[bubbleId].y = y;
@@ -77,17 +77,7 @@ BubbleId Bubbles::createBubble(GlContext &ctx, float x, float y, float w, float 
 	myBubblePositions[bubbleId].h = h;
 	uploadBubblePositions();
 
-
-
 	return bubbleId;
-}
-
-
-void Bubbles::uploadVertexData(GlContext &ctx, BubbleId id) {
-	
-	glBindBuffer(GL_ARRAY_BUFFER, myVertexBuffer);
-
-	glBufferSubData(GL_ARRAY_BUFFER, id * VERTICES_PER_BUBBLE * sizeof(BubbleVertex), VERTICES_PER_BUBBLE * sizeof(BubbleVertex), myBubbleVertices.data());
 }
 
 void Bubbles::uploadBubblePositions() {
@@ -122,7 +112,7 @@ void Bubbles::enlargeBubbleBuffers(GlContext &ctx) {
 	mySpaceAvailable *= 2;
 
 	//replace vertex buffer
-	ctx.spareHandle =                 myVertexBuffer;
+/*	ctx.spareHandle =                 myVertexBuffer;
 	glBindBuffer(GL_COPY_READ_BUFFER, myVertexBuffer);
 	glGenBuffers(1, &myVertexBuffer);
 	setupBuffers(ctx);
@@ -131,6 +121,8 @@ void Bubbles::enlargeBubbleBuffers(GlContext &ctx) {
 	glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_ARRAY_BUFFER, 0, 0, oldSpaceAvailable * VERTICES_PER_BUBBLE * sizeof(BubbleVertex));
 
 	glDeleteBuffers(1, &ctx.spareHandle);
+*/
+
 
 //	generateBubbleVertexIndices(oldSpaceAvailable, mySpaceAvailable);
 
@@ -196,13 +188,13 @@ void Bubbles::enlargeBubbleBuffers(GlContext &ctx) {
 // }
 
 void Bubbles::setupBuffers(GlContext &ctx) {
-	glBindBuffer(GL_ARRAY_BUFFER, myVertexBuffer);
+//	glBindBuffer(GL_ARRAY_BUFFER, myVertexBuffer);
 
-	glEnableVertexAttribArray(myPositionVarying);
-	glVertexAttribPointer(myPositionVarying, 2, GL_FLOAT, GL_FALSE, sizeof(BubbleVertex), (const void*) 0);
+//	glEnableVertexAttribArray(myPositionVarying);
+//	glVertexAttribPointer(myPositionVarying, 2, GL_FLOAT, GL_FALSE, sizeof(BubbleVertex), (const void*) 0);
 
-	glEnableVertexAttribArray(myBubbleIdVarying);
-	glVertexAttribPointer(myBubbleIdVarying, 2,  GL_FLOAT, GL_FALSE, sizeof(BubbleVertex), (const void*) (2*sizeof(GLfloat)));
+//	glEnableVertexAttribArray(myBubbleIdVarying);
+//	glVertexAttribPointer(myBubbleIdVarying, 2,  GL_FLOAT, GL_FALSE, sizeof(BubbleVertex), (const void*) (2*sizeof(GLfloat)));
 
 	glUniform1f(myBubbleInfoTextureWidthUniform, float(mySpaceAvailable * BubblePositionInfoMemberCount));
 
@@ -242,8 +234,11 @@ void Bubbles::commonSetup() {
 	glBufferData(GL_ARRAY_BUFFER, mySpaceAvailable * VERTICES_PER_BUBBLE * sizeof(BubbleVertex), nullptr, GL_STATIC_DRAW);
 }
 
-void Bubbles::setupSharedContext(GlContext &ctx, WindowId win) {
-	glBindVertexArray(ctx.window(win).bubblesVAO);
+void Bubbles::setupSharedContext(GlContext &ctx, WindowId winid) {
+
+	myBubbleHalos.setup(ctx.window(winid));
+
+	glBindVertexArray(ctx.window(winid).bubblesVAO);
 
 	setupBuffers(ctx);
 
@@ -257,15 +252,25 @@ void Bubbles::initializeFirstContext(GlContext &ctx) {
 	GLuint shader = ctx.shaderHandle();
 
 	//create a dummy bubble positioned off screen, marked unused
-	// so the create new bubbles function doesn't have to treat there being none as a special case
+	// so the function to create new bubbles doesn't have to treat there being none as a special case
 	myBubbles.emplace_back(0.0f,0.0f,0.0f,0.0f,0.0f);
-
-	glBindVertexArray(ctx.firstWindow().bubblesVAO);
-
-	glGenBuffers(1, &myVertexBuffer);
 
 	myPositionVarying = glGetAttribLocation(shader, "position");
 	myBubbleIdVarying = glGetAttribLocation(shader, "texCoord");
+
+	auto bubbleHaloSetupFunc = [&](Window& win) {
+		myBubbleHalos.bindBuffer();
+		glBindVertexArray(win.bubblesVAO);
+
+		glEnableVertexAttribArray(myPositionVarying);
+		glVertexAttribPointer(myPositionVarying, 2, GL_FLOAT, GL_FALSE, sizeof(BubbleVertex), (const void*) 0);
+
+		glEnableVertexAttribArray(myBubbleIdVarying);
+		glVertexAttribPointer(myBubbleIdVarying, 2,  GL_FLOAT, GL_FALSE, sizeof(BubbleVertex), (const void*) (2*sizeof(GLfloat)));
+	};
+
+	myBubbleHalos.init(bubbleHaloSetupFunc);
+	myBubbleHalos.setup(ctx.firstWindow());
 
 	myBubblePositions.emplace_back(-0.5f, -0.0f, 3.0f, 3.0f);
 
@@ -292,49 +297,36 @@ void Bubbles::initializeFirstContext(GlContext &ctx) {
 	myBubbleInfoTextureUniform = glGetUniformLocation(shader, "bubbleData");
 	myBubbleInfoTextureWidthUniform = glGetUniformLocation(shader, "widthOfBubbleData");
 	myDrawDepthUniform = glGetUniformLocation(shader, "drawDepth");
+cout<<"bubbles first init'd"<<endl;
 
 }
 
 void Bubbles::draw(GlContext &ctx, WindowId winId, Workspace& wksp) {
 	Window &win = ctx.window(winId);
-//	glBindVertexArray(ctx.bubblesVAO);
-//glDrawArrays(GL_TRIANGLES, 0, 3);
-	glBindVertexArray(win.bubblesVAO);
-//cout<<"Drawing window "<<win<<endl;
-//cout<<"Drawing bubbles with VAO "<<ctx.windows[win].bubblesVAO<<endl;
-
-
-// what are the top-left and bottom-right corners of the window's viewport?
-	// map those to the parts of the window which aren't the panning bar
-	// draw all bubbles
 
 	float wh    = win.pixelHeight()
 		, pbh   = win.panningBarPixelHeight(wksp)
-		, avail = pbh / wh
-	;
+		, avail = pbh / wh ;
 
 	Point tl = win.topLeft(wksp)
 		, br = win.bottomRight(wksp)
-		, c  = win.viewportCenter()
-	;
+		, c  = win.viewportCenter() ;
 
 	float w = ::x(br) - ::x(tl)
 		, h = ::y(br) - ::y(tl);
-
 
 	myTransformationMatrix = mat4(1.0f);
 	myTransformationMatrix = translate(myTransformationMatrix, vec3(0.0, -avail, 0.0));
 
 	myTransformationMatrix = scale(myTransformationMatrix, vec3(2.0/w, -(1-avail)*2.0/h, 1));
 	myTransformationMatrix = translate(myTransformationMatrix, vec3(-::x(c), -::y(c), 0.0));
-	// myTransformationMatrix = translate(myTransformationMatrix, vec3(::x(c), ::y(c), 0.0));
 
 	ctx.setMatrix(myTransformationMatrix);
-	//glUniformMatrix4fv(myTransformationUniform, 1, GL_FALSE, glm::value_ptr(myTransformationMatrix));
 
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, myBubbles.size() * VERTICES_PER_BUBBLE);
+	glBindVertexArray(win.bubblesVAO);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, myBubbleHalos.count() * VERTICES_PER_BUBBLE);
 
-check_gl_errors("draw");
+	check_gl_errors("Bubble draw.");
 }
 
 

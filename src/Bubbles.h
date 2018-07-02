@@ -99,18 +99,6 @@ struct BubbleInfo {
 			h{h},
 			mouseOver{mouseOver},
 			groupId{groupId}
-			// gradientLeft{gradientLeft}, 
-			// gradientRight{gradientRight},
-			
-			// gradientYIntercept{gradientYIntercept},
-			// gradientGradient{gradientGradient},
-
-			// gradientLeftRed{gradientLeftRed},
-			// gradientLeftGreen{gradientLeftGreen}, 
-			// gradientLeftBlue{gradientLeftBlue},
-			// gradientRightRed{gradientRightRed},
-			// gradientRightGreen{gradientRightGreen}, 
-			// gradientRightBlue{gradientRightBlue}
 		{};
 
 		BubbleInfo(
@@ -127,41 +115,28 @@ struct BubbleInfo {
 		{};
 
 		BubbleInfo()
-		 : x{0.0f},
-			y{0.0f},
+		 : x{15.0f},
+			y{15.0f},
 			w{10.0f},
-			h{10.0f},
+			h{100.0f},
 			mouseOver{0.0f},
 			groupId{0.0f}
-			// gradientLeft{-1.0f}, 
-			// gradientRight{1.0f},
-			
-			// gradientYIntercept{1.0f},
-			// gradientGradient{-1.0f},
-
-			// gradientLeftRed{0.5f},
-			// gradientLeftGreen{0.0f}, 
-			// gradientLeftBlue{0.5f},
-
-			// gradientRightRed{0.0f},
-			// gradientRightGreen{0.5f}, 
-			// gradientRightBlue{0.0f}
 		{};
 };
 
 class Bubbles {
 	vector<Bubble>      myBubbles;
 	vector<BubbleGroup> myGroups;
-	
+
 	vector<BubbleVertex> myBubbleVertices;
 	vector<BubbleInfo>   myBubblePositions;
 
-	EnlargeableArrayBuffer myBubbleHalos {VERTICES_PER_BUBBLE};
+	EnlargeableArrayBuffer myBubbleHalos {VERTICES_PER_BUBBLE * sizeof(BubbleVertex)};
+	EnlargeableDataTexture<BubbleInfo> myBubblePositionDataTex;
 
     size_t mySpaceAvailable {1};
 
-	GLuint myVertexBuffer,
-			myDataTexture
+	GLuint myDataTexture
 		,	myBackgroundBuffer
 			;
 

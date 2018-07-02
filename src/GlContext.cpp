@@ -440,9 +440,21 @@ Window &GlContext::lookupWindow(GLFWwindow* pWin) {
 
 void GlContext::forEachWindow(std::function<void(Window& win)> callMe) {
 	for (auto win : myWindows)
-		callMe(win);
+		if (win.inUse())
+			callMe(win);
 }
 
+void GlContext::callFromEachContext(std::function<void(Window& win)> callMe) {
+	callMe(currentWindow());
+	WindowId startId = currentWindowId();
+	for (auto win : myWindows) {
+		if (win.inUse() && win.id() != startId){
+			changeWindow(win.id());
+			callMe(win);
+		}
+	}
+	changeWindow(startId);
+}
 
 
 

@@ -115,6 +115,8 @@ public:
 	void setMatrix(mat4& m);
 	static void drawCurvedOutline(float leftX, float topY, float rightX, float bottomY, float innerCornerRadius, float outerCornerRadius, std::function<void(Point v, float io)> vertexAccumulatorFunction, size_t cornerSteps, size_t sideSteps = 0);
 	void forEachWindow(std::function<void(Window& win)>);
+	void callFromEachContext(std::function<void(Window& win)> callMe);
+
 
 	static void showLayerValues();
 	static float getLayerValue(Layer n);
