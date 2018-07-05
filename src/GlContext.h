@@ -125,3 +125,27 @@ public:
 	bool checkglerror(int err, int errnum, string errname, string label);
 	void check_gl_errors(string label);
 	void check_gl_errors();
+
+struct Vertex {
+	float	x, y, z;
+	uint8_t	r, g, b, a;
+	float	t, v ;
+	Vertex(float _x, float _y, float _z, uint8_t _r, uint8_t _g, uint8_t _b, uint8_t _a, float _t, float _v) :
+		x {_x}, y {_y}, z {_z}, r {_r}, g {_g}, b {_b}, a {_a}, t {_t}, v {_v} {}
+
+	Vertex(float _x, float _y, float _z, Color c, float _t, float _v=0.0f) :
+		x {_x}, y {_y}, z {_z}, r (c.redPremultipliedInt()), g (c.greenPremultipliedInt()), b (c.bluePremultipliedInt()), a (c.alphaInt()), t {_t}, v {_v} {}
+
+	Vertex(float _x, float _y, float _z, float _t, float _v) :
+		x {_x}, y {_y}, z {_z}, r {255}, g {255}, b {255}, a {255}, t {_t}, v {_v} {}
+
+	Vertex() {};
+	void setColor(Color c) {r = c.redPremultipliedInt(); g = c.greenPremultipliedInt(); b = c.bluePremultipliedInt(); a = 255; c.alphaInt();};
+	void setXY(Point p) {x = ::x(p); y = ::y(p);};
+	void setXY(float _x, float _y) {x = _x; y = _y;};
+	void setXYZ(float _x, float _y, float _z) {x = _x; y = _y; z = _z;};
+	void setType(float _t, float _v = 0.0f) {t = _t; v = _v;};
+
+};
+
+

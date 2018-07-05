@@ -1,43 +1,51 @@
 #include "PanningBar.h"
 
+void PanningBar::setupAttribArray() {
+	glEnableVertexAttribArray(myPosAttrib);
+	glVertexAttribPointer(myPosAttrib, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*) 0);
+
+	glEnableVertexAttribArray(myColAttrib);
+	glVertexAttribPointer(myColAttrib, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Vertex), (const void*) 12);
+
+	glEnableVertexAttribArray(myTexAttrib);
+	glVertexAttribPointer(myTexAttrib, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*) 16);
+}
+
+
 void PanningBar::initializeFirstContext(GlContext &ctx) {
 	GLuint shader = ctx.shaderHandle();
 
+	myPosAttrib = glGetAttribLocation(shader, "position");
+	myColAttrib = glGetAttribLocation(shader, "color");
+	myTexAttrib = glGetAttribLocation(shader, "texCoord");
+
+	Window &win = ctx.firstWindow();
+
+	glBindVertexArray(win.panningBarBackgroundVAO);
 	glGenBuffers(1, &myVertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, myVertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(ColoredVertex) * 4, nullptr, GL_STATIC_DRAW);
+	setupAttribArray();
 
-		float dim = 0.03f, bright = 0.3f
-			, dr = dim, dg = 0.0f, db = dim
-			, br = bright, bg = 0.0f, bb = bright
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * 4, nullptr, GL_STATIC_DRAW);
+
+		float dim = 0.03f, bright = 0.3f;
+		uint8_t dr = dim*255, dg = 0.0f, db = dim*255
+			, br = bright*255, bg = 0.0f, bb = bright*255
 		;
 
-		myBackgroundVertices[0].r = dr;
-		myBackgroundVertices[0].g = dg;
-		myBackgroundVertices[0].b = db;
-		myBackgroundVertices[0].a = 1.0f;
+	Color dimc   {0.03f,  0.0f, 0.03f}
+		, lightc {0.3f,   0.0f, 0.3f };
 
-		myBackgroundVertices[2].r = dr;
-		myBackgroundVertices[2].g = dg;
-		myBackgroundVertices[2].b = db;
-		myBackgroundVertices[2].a = 1.0f;
+	myBackgroundVertices[0].setColor(dimc);
+	myBackgroundVertices[2].setColor(dimc);
+	myBackgroundVertices[1].setColor(lightc);
+	myBackgroundVertices[3].setColor(lightc);
 
-		myBackgroundVertices[1].r = br;
-		myBackgroundVertices[1].g = bg;
-		myBackgroundVertices[1].b = bb;
-		myBackgroundVertices[1].a = 1.0f;
-		myBackgroundVertices[3].r = br;
-		myBackgroundVertices[3].g = bg;
-		myBackgroundVertices[3].b = bb;
-		myBackgroundVertices[3].a = 1.0f;
 
-		myBackgroundVertices[0].t = -1.0f;
-		myBackgroundVertices[1].t = -1.0f;
-		myBackgroundVertices[2].t = -1.0f;
-		myBackgroundVertices[3].t = -1.0f;
-
-		for (int i = 0; i < 4; ++i)
-			myBackgroundVertices[i].z = GlContext::getLayerValue(Layer::PB_background);
+	for (int i = 0; i < 4; ++i) {
+		myBackgroundVertices[i].t = -1.0f;
+		myBackgroundVertices[i].z = GlContext::getLayerValue(Layer::PB_background);
+	}
 
 
 		glGenBuffers(1, &myPanningBarBubbleVertexBuffer);
@@ -141,11 +149,11 @@ void PanningBar::draw(GlContext &ctx, WindowId winid, Workspace& wksp, Bubbles& 
 prepWindowOutline(win, wksp);
 //	glBindVertexArray(ctx.bubblesVAO);
 //glDrawArrays(GL_TRIANGLES, 0, 3);
-	glBindVertexArray(win.backgroundVAO);
+	glBindVertexArray(win.panningBarBackgroundVAO);
 
-	glBindBuffer(GL_ARRAY_BUFFER, myVertexBuffer);
 
 	if (wksp.sizeChanged()) {
+		glBindBuffer(GL_ARRAY_BUFFER, myVertexBuffer);
 		Point tl = wksp.topLeft()
 			, br = wksp.bottomRight();
 
@@ -160,25 +168,21 @@ prepWindowOutline(win, wksp);
 
 		cout<<myBackgroundVertices[0].z<<" mbvz"<<endl;
 
-		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(ColoredVertex)*4, &myBackgroundVertices);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex)*4, &myBackgroundVertices);
 
 		wksp.sizeHasNotChanged();
 	}
 
 
-	GLuint shader = ctx.shaderHandle();
-	int myPosAttrib = glGetAttribLocation(shader, "position");
-	int myColAttrib = glGetAttribLocation(shader, "color");
-	int myTexAttrib = glGetAttribLocation(shader, "texCoord");
 
-	glEnableVertexAttribArray(myPosAttrib);
-	glVertexAttribPointer(myPosAttrib, 3, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), (const void*) 0);
+	// glEnableVertexAttribArray(myPosAttrib);
+	// glVertexAttribPointer(myPosAttrib, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*) 0);
 
-	glEnableVertexAttribArray(myColAttrib);
-	glVertexAttribPointer(myColAttrib, 4, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), (const void*) 12);
+	// glEnableVertexAttribArray(myColAttrib);
+	// glVertexAttribPointer(myColAttrib, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Vertex), (const void*) 12);
 
-	glEnableVertexAttribArray(myTexAttrib);
-	glVertexAttribPointer(myTexAttrib, 2, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), (const void*) (7*4));
+	// glEnableVertexAttribArray(myTexAttrib);
+	// glVertexAttribPointer(myTexAttrib, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*) 16);
 
 /*
 scale to fit panning bar in window

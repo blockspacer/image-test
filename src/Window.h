@@ -28,7 +28,7 @@ class Window {
 public:
 	GLuint bubblesVAO {0}
 		,	textVAO {0}
-		,	backgroundVAO {0}
+		,	panningBarBackgroundVAO {0}
 		,	panningBarBubbleVAO {0}
 	;
 	Window(WindowId id);

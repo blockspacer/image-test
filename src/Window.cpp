@@ -9,7 +9,7 @@ void Window::setupVAOs() {
 	glGenVertexArrays(1, &bubblesVAO);
 	glGenVertexArrays(1, &textVAO);
 //	glBindVertexArray(    bubblesVAO);
-	glGenVertexArrays(1, &backgroundVAO);
+	glGenVertexArrays(1, &panningBarBackgroundVAO);
 	glGenVertexArrays(1, &panningBarBubbleVAO);
 }
 
