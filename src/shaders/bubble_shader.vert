@@ -92,10 +92,6 @@ void main() {
 		float w = texture(bubbleData, wDataPos).r;
 		float h = texture(bubbleData, hDataPos).r;
 
-// float x = -1000.0;
-// float y=-1000.0;
-// float w=2000.0;
-// float h=2000.0;
 		float o = 1.8;
 		float sm = min(w, h);
 		o = min(o, sm/2.0);

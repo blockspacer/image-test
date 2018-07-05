@@ -30,6 +30,8 @@ public:
 		,	textVAO {0}
 		,	panningBarBackgroundVAO {0}
 		,	panningBarBubbleVAO {0}
+		,	panningBarWindowOutlineVAO {0}
+		,	panningBarWindowViewAreaVAO {0}
 	;
 	Window(WindowId id);
 

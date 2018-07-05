@@ -75,14 +75,21 @@ void App::webCanvasResize(int w, int h) {
 void App::redrawCallback(GLFWwindow* pWin) {
 	draw();};
 
-void App::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+void App::keyCallback(GLFWwindow* pWin, int key, int scancode, int action, int mods) {
 cout<<".\n";
-	if (key==GLFW_KEY_F ) {
+	Window &win = myGlContext.window(pWin);
+	if (key==GLFW_KEY_J && action == GLFW_PRESS) {
+		WindowId parent = win.id();
+		// SHOW_TYPE(parent)
+		myRedrawQueue.newWindow(parent);
+
 #ifdef WEB
 		emscripten_resume_main_loop();
 #endif
-		cout<<"F\n";
+		cout<<"J\n";
 	}
+	else if (key==GLFW_KEY_Q)
+		exit(-1);
 }
 
 void App::windowPosCallback(GLFWwindow* pWin, int xpos, int ypos) {
@@ -112,8 +119,9 @@ void App::createWindow(WindowId parent) {
 	glfwGetWindowPos(win.glfwHandle(), &xpos, &ypos);
 	myGlContext.windowMoved(win.glfwHandle(), xpos, ypos, myRedrawQueue);	
 
-    myText   .setupSharedContext(myGlContext);
-	myBubbles.setupSharedContext(myGlContext, newId);
+    myText      .setupSharedContext(myGlContext);
+	myBubbles   .setupSharedContext(myGlContext, newId);
+	myPanningBar.setupSharedContext(myGlContext, newId);
 //	glBindVertexArray(win.bubblesVAO);
 	setCallbacks(win.glfwHandle());
 

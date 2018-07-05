@@ -6,11 +6,13 @@ Window::Window(WindowId id) {
 }
 
 void Window::setupVAOs() {
-	glGenVertexArrays(1, &bubblesVAO);
-	glGenVertexArrays(1, &textVAO);
-//	glBindVertexArray(    bubblesVAO);
-	glGenVertexArrays(1, &panningBarBackgroundVAO);
-	glGenVertexArrays(1, &panningBarBubbleVAO);
+	glGenVertexArrays(6, &bubblesVAO);
+	// glGenVertexArrays(1, &textVAO);
+	// glGenVertexArrays(1, &panningBarBackgroundVAO);
+	// glGenVertexArrays(1, &panningBarBubbleVAO);
+	// glGenVertexArrays(1, &panningBarWindowOutlineVAO);
+	// glGenVertexArrays(1, &panningBarWindowViewAreaVAO);
+
 }
 
 int Window::panningBarPixelHeight(Workspace& wksp) {

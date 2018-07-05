@@ -51,10 +51,10 @@ class PanningBar {
 	int myTexAttrib {0};
 
 	Vertex myBackgroundVertices[4];
-	ColoredVertex  myPanningBarBubbleVertices[8]
+	Vertex  myPanningBarBubbleVertices[8]
 				;
-	vector<ColoredVertex> myWindowOutlineVertices;
-	vector<ColoredVertex> myWindowViewAreaVertices;
+	vector<Vertex> myWindowOutlineVertices
+				,  myWindowViewAreaVertices;
 
 	Point myDragOffset {0,0}
 		, myMousePos {0,0};
@@ -63,7 +63,8 @@ class PanningBar {
 public:
 	void draw(GlContext &ctx, WindowId win, Workspace &wksp, Bubbles &bubbles);
 	void initializeFirstContext(GlContext &ctx);
-	void setupAttribArray();
+	void setupSharedContext(GlContext &ctx, WindowId newId);
+	void setupAttribArray(GLuint vaoHandle, GLuint bufferHandle = 0);
 
 	void prepWindowOutline(Window& win, Workspace& wksp);
 	PanningBar() {};

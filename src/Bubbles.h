@@ -132,7 +132,7 @@ class Bubbles {
 	vector<BubbleInfo>   myBubblePositions;
 
 	EnlargeableArrayBuffer myBubbleHalos {VERTICES_PER_BUBBLE * sizeof(BubbleVertex)};
-	EnlargeableDataTexture<BubbleInfo> myBubblePositionDataTex;
+	//EnlargeableDataTexture<BubbleInfo> myBubblePositionDataTex;
 
     size_t mySpaceAvailable {1};
 
