@@ -36,6 +36,7 @@ public:
 	Color(float r, float g, float b, float a = 1.0f) : red((uint8_t) (r*255)), green((uint8_t) (g*255)), blue((uint8_t) (b*255)), alpha ((uint8_t) (a*255)) {};
 	Color(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255) : red(r), green(g), blue(b), alpha(a) {};
 	Color() : red {255}, green {0}, blue {255}, alpha {255} {};
+	Color(float gray) : red (uint8_t(gray*255)), green (uint8_t(gray*255)), blue (uint8_t(gray*255)), alpha {255} {};
 	Color(const Color &c) : red(c.redInt()), green(c.greenInt()), blue(c.blueInt()), alpha(c.alphaInt()) {};
 
 };

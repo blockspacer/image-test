@@ -13,7 +13,7 @@ void App::cursorPositionCallback(GLFWwindow* window, double xpos, double ypos) {
 }
 
 void App::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
-	myMouseHandler.buttonInput(window, button, action, mods, myGlContext, myPanningBar, myRedrawQueue);
+	myMouseHandler.buttonInput(window, button, action, mods, myGlContext, myPanningBar, myWorkspace, myRedrawQueue);
 }
 
 void App::monitorCallback(GLFWmonitor* monitor, int event) {

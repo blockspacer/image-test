@@ -348,8 +348,11 @@ void GlContext::drawCurvedOutline(float leftX, float topY, float rightX, float b
 
 
 
+WindowId GlContext::myMouseOverWindow;
 
-
+// bool GlContext::mouseOverWindow(WindowId winId) { return winId == myMouseOverWindow; };
+// WindowId GlContext::mouseOverWindow() { return myMouseOverWindow; };
+// void GlContext::setMouseOverWindow(WindowId winId) { myMouseOverWindow = winId; };
 
 
 

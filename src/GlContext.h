@@ -76,6 +76,7 @@ class GlContext {
 	GLuint	myShaderProgramHandle {0};
 
 
+
     
 //	void enlargeBuffer(GLenum target, size_t oldSize, size_t newSize);
 
@@ -86,7 +87,14 @@ class GlContext {
 	static void drawCurvedOutlineCorner(Point center, Point xAxis, Point yAxis, float innerRadius, float outerRadius, size_t steps, std::function<void(Point v, float io)> func, float startAngle, float stopAngle);
 	static void drawCurvedOutlineSide(PointD center, PointD xAxis, PointD yAxis, Point innerEdgeStart, float innerEdgeSide, std::function<void(Point v, float io)> func, size_t steps, double distToCenter, double radius, double startAngle);
 
+	//todo: windows with focus is a separate concept from the mouse being over them (except on linux)
+	static WindowId myMouseOverWindow;
 public:
+
+	static bool mouseOverWindow(WindowId winId) {return winId == myMouseOverWindow; };
+	static WindowId mouseOverWindow() { return myMouseOverWindow; };
+	static void setMouseOverWindow(WindowId winId) { myMouseOverWindow = winId; };
+
 	GLuint shaderHandle() {return myShaderProgramHandle;};
 	GLuint spareHandle {0};
 

@@ -36,7 +36,7 @@ struct ColoredVertex {
 
 class PanningBar {
 	bool 	 myMouseOverMe {false};
-	bool 	 myMouseBeingDragged {false};
+	bool 	 myMouseButtonDown {false};
 	bool	 myMouseOverWindowOutline {false};
 	WindowId myMouseOverWindowId {0};
 	mat4    myTransformationMatrix;
@@ -57,7 +57,7 @@ class PanningBar {
 				,  myWindowViewAreaVertices;
 
 	Point myDragOffset {0,0}
-		, myMousePos {0,0};
+		, myMousePos {-190,-100};
 
 
 public:
@@ -66,12 +66,13 @@ public:
 	void setupSharedContext(GlContext &ctx, WindowId newId);
 	void setupAttribArray(GLuint vaoHandle, GLuint bufferHandle = 0);
 
-	void prepWindowOutline(Window& win, Workspace& wksp);
+	void drawWindowOutline(const Point &tl, const Point &br, const Window &win, Workspace& wksp, const Color &col, float outlineLayer, float viewAreaLayer);
+	void drawWindowOutline(Window& win, Workspace& wksp, const Color &c, float outlineLayer, float viewAreaLayer);
 	PanningBar() {};
 	bool mouseMotion(Point pos, Window &win, GlContext &ctx, Workspace &wksp, Bubbles &bubls, RedrawRequests &redrawReqests);
-	void mouseButtonInput(Window &win, int button, int action, int mods, GlContext &ctx, PanningBar &pBar, RedrawRequests &redrawQueue);
-	void mouseOverYou(RedrawRequests &redrawQueue)    { myMouseOverMe = true ; };
-	void mouseNotOverYou(RedrawRequests &redrawQueue) { myMouseOverMe = false; };
+	void mouseButtonInput(Window &win, int button, int action, int mods, GlContext &ctx, PanningBar &pBar, Workspace& wksp, RedrawRequests &redrawQueue);
+	void mouseIsOverYou(RedrawRequests &redrawQueue)    { myMouseOverMe = true ; };
+	void mouseIsNotOverYou(RedrawRequests &redrawQueue) { myMouseOverMe = false; };
 
 };
 

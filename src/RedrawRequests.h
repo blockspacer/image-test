@@ -40,6 +40,11 @@ public:
 		myChangedBubbleContents.clear();
 		myWindowViewportChanged.clear();
 	};
+
+	void redrawPanningBar(WindowId winId) {
+		// todo: only redraw this one window's panning bar
+		redrawAllWindows();
+	};
 };
 
 
