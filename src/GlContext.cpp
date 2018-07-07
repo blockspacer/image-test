@@ -254,8 +254,16 @@ void GlContext::drawCurvedOutline(float leftX, float topY, float rightX, float b
 	float &l = leftX, &t = topY, &r = rightX, &b = bottomY, &in = innerCornerRadius, &out = outerCornerRadius;
 	std::function<void(Point v, float io)> &func = vertexAccumulatorFunction;
 
-	if (r-l<2*in) r = l + 2*in;
-	if (b-t<2*in) b = t + 2*in;
+	if (r-l<2*in) {
+		float oout = out - in;
+		in = fmin(in, (r - l) / 2.0f);
+		out = oout + in;
+	}
+	if (b-t<2*in) {
+		float oout = out - in;
+		in = fmin(in, (b - t) / 2.0f);
+		out = oout + in;
+	}
 
 	float margin = 1.5; // times the corner circle radius
 	margin = fmax(1.01, margin);

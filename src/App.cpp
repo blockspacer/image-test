@@ -40,6 +40,11 @@ void App::framebufferSizeCallback(GLFWwindow* pWin, int w, int h) {
 	Window &win = myGlContext.window(pWin);
 
 	win.setPixelSize(w, h);
+
+	// todo what about high-res displays
+	#ifdef WEB
+		win.setScreenunitSize(w, h);
+	#endif
 	
 	myGlContext.changeCurrentContext(pWin);
 	glViewport(0, 0, w, h);

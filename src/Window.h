@@ -66,7 +66,7 @@ public:
 	int 	screenunitHeight() { return ::y(myScreenunitSize);};
 	float 	screenunitsPerCM() { return myScreenunitsPerCM   ;};
 	void 	setScreenunitsPerCM(float s) {myScreenunitsPerCM = s;};
-	int 	pixelsPerScreenunit() { return (!screenunitWidth()) ? 1 : pixelWidth() / screenunitWidth();};
+	int 	pixelsPerScreenunit() { return (! screenunitWidth()) ? 1 : pixelWidth() / screenunitWidth();};
 
 	Point 	viewportCenter() {return myViewportCentre;};
 	void 	setViewportCenter(const Point &p) {myViewportCentre = p;};

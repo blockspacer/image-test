@@ -3,9 +3,9 @@
 void MouseEvents::moved(GLFWwindow* window, double xpos, double ypos, GlContext &ctx, Workspace &wksp, PanningBar &panBar, Bubbles & bubls, RedrawRequests &redrawQueue) {
 
 
-	double x,y;
-	glfwGetCursorPos(window, &x, &y);
-	xpos = x; ypos = y;
+	// double x,y;
+	// glfwGetCursorPos(window, &x, &y);
+	// xpos = x; ypos = y;
 
 
 	Window &win = ctx.lookupWindow(window);
@@ -34,7 +34,23 @@ void MouseEvents::moved(GLFWwindow* window, double xpos, double ypos, GlContext 
 			redrawQueue.redrawPanningBar(win.id());
 		}
 		myMouseTarget = WorkArea;
-		cout<<"over workspace"<<endl;
+		
+		float x = ::x(pos), y = ::y(pos) - pbsuh;
+		x /= win.screenunitWidth();
+		y /= win.screenunitHeight() - pbsuh;
+
+		Point s = win.viewportCMsize(wksp);
+		// Point p {( ::x(pos)          /  win.screenunitWidth()          ) * ::x(s)
+		// 	,	 ((::y(pos) - pbsuh) / (win.screenunitHeight() - pbsuh)) * ::y(s) };
+
+		x *= ::x(s);
+		y *= ::y(s);
+
+		Point tlCorner = win.viewportCenter() - s/2.0f;
+
+		Point wkspPos = tlCorner + Point{x, y};
+		
+		cout<<"over workspace "<<wkspPos<<endl;
 	}
 
 	//check if it's over a menu?

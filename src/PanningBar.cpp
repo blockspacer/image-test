@@ -98,21 +98,20 @@ void PanningBar::drawWindowOutline(const Point &tl, const Point &br, const Windo
 		myWindowViewAreaVertices.emplace_back(x, y, viewAreaLayer, col2, -1.0f, 0.0f);
 	};
 
-
-	float mid = in / 2.0f;
+	float corner = in / 2.0f;
 
 	myWindowViewAreaVertices.clear();
-	tint(l      , t + mid);
-	tint(l      , t + mid); tint(::x(c), ::y(c));
-	tint(l + mid, t      ); tint(::x(c), ::y(c));
-	tint(r - mid, t      ); tint(::x(c), ::y(c));
-	tint(r      , t + mid); tint(::x(c), ::y(c));
-	tint(r      , b - mid); tint(::x(c), ::y(c));
-	tint(r - mid, b      ); tint(::x(c), ::y(c));
-	tint(l + mid, b      ); tint(::x(c), ::y(c));
-	tint(l      , b - mid); tint(::x(c), ::y(c));
-	tint(l      , t + mid);
-	tint(l      , t + mid);
+	tint(l         , t + corner);
+	tint(l         , t + corner); tint(::x(c), ::y(c));
+	tint(l + corner, t         ); tint(::x(c), ::y(c));
+	tint(r - corner, t         ); tint(::x(c), ::y(c));
+	tint(r         , t + corner); tint(::x(c), ::y(c));
+	tint(r         , b - corner); tint(::x(c), ::y(c));
+	tint(r - corner, b         ); tint(::x(c), ::y(c));
+	tint(l + corner, b         ); tint(::x(c), ::y(c));
+	tint(l         , b - corner); tint(::x(c), ::y(c));
+	tint(l         , t + corner);
+	tint(l         , t + corner);
 
 	glBindBuffer(GL_ARRAY_BUFFER, myWindowViewAreaBuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * myWindowViewAreaVertices.size(), &(myWindowViewAreaVertices[0]), GL_STATIC_DRAW);
@@ -127,17 +126,17 @@ void PanningBar::drawWindowOutline(const Point &tl, const Point &br, const Windo
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, myWindowOutlineVertices.size());
 }
 
-bool contains(const float x, const float min, const float max) {
-	return min <= x && x < max;
+bool contains(const float x, const float min, const float max, float margin = 0.0f) {
+	return min - margin <= x && x < max + margin;
 }
 
-bool contains(const Point &p, const Point &topLeft, const Point &bottomRight) {
-	return contains(::x(p), ::x(topLeft), ::x(bottomRight))
-		&& contains(::y(p), ::y(topLeft), ::y(bottomRight));
+bool contains(const Point &p, const Point &topLeft, const Point &bottomRight, float margin = 0.0f) {
+	return contains(::x(p), ::x(topLeft), ::x(bottomRight), margin)
+		&& contains(::y(p), ::y(topLeft), ::y(bottomRight), margin);
 }
 
-bool contains(const Point &p, Window &win, Workspace &wksp) {
-	return contains(p, win.topLeft(wksp), win. bottomRight(wksp));
+bool contains(const Point &p, Window &win, Workspace &wksp, float margin = 0.0f) {
+	return contains(p, win.topLeft(wksp), win. bottomRight(wksp), margin);
 }
 
 void PanningBar::draw(GlContext &ctx, WindowId winid, Workspace& wksp, Bubbles& bubbles) {
@@ -229,7 +228,7 @@ void PanningBar::draw(GlContext &ctx, WindowId winid, Workspace& wksp, Bubbles& 
 
 	}
 	else {
-		cout<<"no future"<<endl;
+//		cout<<"no future"<<endl;
 	}
 
 	glDisable(GL_SCISSOR_TEST);
@@ -253,8 +252,8 @@ check_gl_errors("draw");
 
 
 
-bool operator< (const Point &a, const Point &b) {return ::x(a) <::x(b)  && ::y(a) <::y(b);}
-bool operator> (const Point &a, const Point &b) {return ::x(a) >::x(b)  && ::y(a) >::y(b);}
+bool operator< (const Point &a, const Point &b) {return ::x(a) < ::x(b) && ::y(a) < ::y(b);}
+bool operator> (const Point &a, const Point &b) {return ::x(a) > ::x(b) && ::y(a) > ::y(b);}
 bool operator<=(const Point &a, const Point &b) {return ::x(a) <=::x(b) && ::y(a) <=::y(b);}
 bool operator>=(const Point &a, const Point &b) {return ::x(a) >=::x(b) && ::y(a) >=::y(b);}
 bool operator==(const Point &a, const Point &b) {return ::x(a) ==::x(b) && ::y(a) ==::y(b);}
@@ -273,19 +272,19 @@ bool PanningBar::mouseMotion(Point pos, Window &win, GlContext &ctx, Workspace &
 	else {
 		if (contains(pos, win, wksp)) {
 			// mouse is over 
-			myMouseOverWindowOutline = true;
-			myMouseOverWindowId = win.id();
+				myMouseOverWindowOutline = true;
+			// myMouseOverWindowId = win.id();
 		}
 		else {
-			bool foundOne = false;
-			auto lambda = [&](Window& potentialWin) {
-				if (potentialWin.id() != win.id() 
-					&& contains(pos, potentialWin, wksp)) {
-					foundOne = true;
-				}
-			};
-			ctx.forEachWindow(lambda);
-			myMouseOverWindowOutline = foundOne;
+			// bool foundOne = false;
+			// auto lambda = [&](Window& potentialWin) {
+			// 	if (potentialWin.id() != win.id() 
+			// 		&& contains(pos, potentialWin, wksp)) {
+			// 		foundOne = true;
+			// 	}
+			// };
+			// ctx.forEachWindow(lambda);
+			// myMouseOverWindowOutline = foundOne;
 		}
 	}
 
