@@ -45,6 +45,8 @@ class App {
 	static void redrawCallback(GLFWwindow*);
 	static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 	static void windowPosCallback(GLFWwindow* pWin, int xpos, int ypos);
+	static void windowFocusCallback(GLFWwindow* window, int focused);
+
 
 public:
 	GlContext      &glContext()   {return myGlContext;};

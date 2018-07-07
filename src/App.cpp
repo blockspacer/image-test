@@ -81,16 +81,16 @@ void App::redrawCallback(GLFWwindow* pWin) {
 	draw();};
 
 void App::keyCallback(GLFWwindow* pWin, int key, int scancode, int action, int mods) {
-cout<<".\n";
 	Window &win = myGlContext.window(pWin);
 	if (key==GLFW_KEY_J && action == GLFW_PRESS) {
 		WindowId parent = win.id();
 		// SHOW_TYPE(parent)
 		myRedrawQueue.newWindow(parent);
 
-#ifdef WEB
-		emscripten_resume_main_loop();
-#endif
+	#ifdef WEB
+			emscripten_resume_main_loop();
+	#endif
+	
 		cout<<"J\n";
 	}
 	else if (key==GLFW_KEY_Q)
@@ -101,6 +101,24 @@ void App::windowPosCallback(GLFWwindow* pWin, int xpos, int ypos) {
 	myGlContext.windowMoved(pWin, xpos, ypos, myRedrawQueue);
 }
 
+void App::windowFocusCallback(GLFWwindow* window, int focused)
+{
+	if (focused)
+	{
+		cout<<"focused "<<endl;
+		// The window gained input focus
+
+		// cout<<GLFW_PRESS<<endl;
+		// int s = glfwGetMouseButton 	(window, GLFW_MOUSE_BUTTON_1 );cout<<(int)s<<endl;;
+		//     s = glfwGetMouseButton 	(window, GLFW_MOUSE_BUTTON_2 );cout<<(int)s<<endl;;
+		//     s = glfwGetMouseButton 	(window, GLFW_MOUSE_BUTTON_3 );cout<<(int)s<<endl;;
+		//     s = glfwGetMouseButton 	(window, GLFW_MOUSE_BUTTON_4 );cout<<(int)s<<endl;;
+	}
+	else {
+		// The window lost input focus
+	}
+}
+
 
 void App::setCallbacks(GLFWwindow* pWin) {
 	glfwSetCursorPosCallback(pWin, cursorPositionCallback);
@@ -109,10 +127,11 @@ void App::setCallbacks(GLFWwindow* pWin) {
 	glfwSetFramebufferSizeCallback(pWin, framebufferSizeCallback);
 	glfwSetWindowSizeCallback(pWin, windowSizeCallback);
 	#ifdef __APPLE__
-	glfwSetWindowRefreshCallback(pWin, redrawCallback);
+		glfwSetWindowRefreshCallback(pWin, redrawCallback);
 	#endif
 	glfwSetKeyCallback(pWin, keyCallback);
 	glfwSetWindowPosCallback(pWin, windowPosCallback);
+	glfwSetWindowFocusCallback(pWin, windowFocusCallback);
 }
 
 // the first window is created in the `init` method, all other ones are made here, with the window they were requested from as their parent
@@ -170,6 +189,11 @@ void App::init() {
 //ctx.changeWindow(1);
 
 	monitorCallback(nullptr,0);
+
+	int xpos, ypos;
+	GLFWwindow* pWin = ctx.firstWindow().glfwHandle();
+	glfwGetWindowPos(pWin, &xpos, &ypos);
+	ctx.windowMoved(pWin, xpos, ypos, myRedrawQueue);
 //	myBubbles.uploadBubblePositionDataToContext();
 
 }

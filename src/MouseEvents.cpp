@@ -18,8 +18,8 @@ void MouseEvents::moved(GLFWwindow* window, double xpos, double ypos, GlContext 
 	float pbsuh = win.panningBarPixelHeight(wksp) / win.pixelsPerScreenunit();
 
 	// if mouse button is down and myMouseTarget isn't OverNothing then send it to that target
-
-	if (ypos <= pbsuh) {
+cout<<ypos<<endl;
+	if (0 <= ypos && ypos <= pbsuh && 0 <= xpos && xpos < win.screenunitWidth()) {
 		if (myMouseTarget != Panningbar) {
 			panBar.mouseIsOverYou(redrawQueue);
 		}
@@ -59,7 +59,7 @@ void MouseEvents::moved(GLFWwindow* window, double xpos, double ypos, GlContext 
 
 void MouseEvents::buttonInput(GLFWwindow* window, int button, int action, int mods, GlContext &ctx, PanningBar &panBar, Workspace& wksp, RedrawRequests &redrawQueue) {
 	Window &win = ctx.lookupWindow(window);
-
+cout<<"iii"<<endl;
 	bool handled = false;
 
 	if (myMouseTarget == Panningbar) {
