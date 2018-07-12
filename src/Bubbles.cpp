@@ -345,7 +345,32 @@ bool Bubbles::mouseMotion(Point pos, GlContext &ctx, Workspace &wksp, RedrawRequ
 
 
 
+bool contains(const float x, const float min, const float max, float margin) {
+	return min - margin <= x && x < max + margin;
+}
+
+bool contains(const Point &p, const Point &topLeft, const Point &bottomRight, float margin) {
+	return contains(::x(p), ::x(topLeft), ::x(bottomRight), margin)
+		&& contains(::y(p), ::y(topLeft), ::y(bottomRight), margin);
+}
+
+bool contains(const Point &p, float left, float top, float right, float bottom, float margin) {
+	return contains(::x(p), left, right , margin)
+		&& contains(::y(p), top , bottom, margin);
+}
 
 
+bool mouseOverBubbleContent(Point p, Bubble& bub) {
+	return contains(p, bub.x, bub.y, bub.x+bub.w, bub.y+bub.h);
+}
+
+bool mouseOverBubbleHalo(Point p, Bubble& bub) {
+	// if it's over one of the four cardinal directions, compute distance
+	// if it's over a corner, compute angle
+		// if it's still in he domain of one of the sides, compute distance
+		// elsewise, calc distance from corner
+
+	// consistency is the main thing
+}
 
 

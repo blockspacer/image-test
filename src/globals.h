@@ -112,6 +112,8 @@ static float y(Point p) {return imag(p);}
 static float x(PointD p) {return real(p);}
 static float y(PointD p) {return imag(p);}
 
+
+
 //const double PI  = 3.141592653589793238463;
 
 #define PI 3.14159265
@@ -121,10 +123,9 @@ static float y(PointD p) {return imag(p);}
 /* Item 4 of Effective Modern C++ by Scott Meyers suggests using Boost.TypeIndex and type_id_with_cvr<decltype(NAME_OF_THING_GOES_HERE)>().pretty_name() for the same purpose, but i found this first */
 
 // use it like:
-//    cout << "thing's type is: "<< type_name<decltype( thing )>() << '\n';
-// or possibly
 //    SHOW_TYPE( thing )
-// (see below)
+// or 
+//    cout << "thing's type is: "<< type_name<decltype( thing )>() << '\n';
 
 #include <type_traits>
 #include <typeinfo>

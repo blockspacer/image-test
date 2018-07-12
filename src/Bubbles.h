@@ -167,3 +167,6 @@ public:
 	bool mouseMotion(Point pos, GlContext &ctx, Workspace &wksp, RedrawRequests &redrawReqests);
 
 };
+bool contains(const float x, const float min, const float max, float margin = 0.0f);
+bool contains(const Point &p, const Point &topLeft, const Point &bottomRight, float margin = 0.0f);
+bool contains(const Point &p, float left, float top, float right, float bottom, float margin = 0.0f);

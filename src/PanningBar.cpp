@@ -126,15 +126,6 @@ void PanningBar::drawWindowOutline(const Point &tl, const Point &br, const Windo
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, myWindowOutlineVertices.size());
 }
 
-bool contains(const float x, const float min, const float max, float margin = 0.0f) {
-	return min - margin <= x && x < max + margin;
-}
-
-bool contains(const Point &p, const Point &topLeft, const Point &bottomRight, float margin = 0.0f) {
-	return contains(::x(p), ::x(topLeft), ::x(bottomRight), margin)
-		&& contains(::y(p), ::y(topLeft), ::y(bottomRight), margin);
-}
-
 bool contains(const Point &p, Window &win, Workspace &wksp, float margin = 0.0f) {
 	return contains(p, win.topLeft(wksp), win. bottomRight(wksp), margin);
 }
