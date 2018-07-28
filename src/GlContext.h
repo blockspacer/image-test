@@ -121,7 +121,7 @@ public:
 	void  swapBuffers() {glfwSwapBuffers(pCurrentContext);};
 
 	void setMatrix(mat4& m);
-	static void drawCurvedOutline(float leftX, float topY, float rightX, float bottomY, float innerCornerRadius, float outerCornerRadius, std::function<void(Point v, float io)> vertexAccumulatorFunction, size_t cornerSteps, size_t sideSteps = 0);
+	static void drawCurvedOutline(float leftX, float topY, float rightX, float bottomY, float innerCornerRadius, float outerCornerRadius, std::function<void(Point v, float io)> vertexAccumulatorFunction, size_t cornerSteps, size_t sideSteps = 0, float topLength = 0.0f, float sideLength = 0.0f, float topAngle = 0.0f, float sideAngle = 0.0f, double topRadius = 0.0, double sideRadius = 0.0, double topCenterDist = 0.0, double sideCenterDist = 0.0);
 	void forEachWindow(std::function<void(Window& win)>);
 	void callFromEachContext(std::function<void(Window& win)> callMe);
 

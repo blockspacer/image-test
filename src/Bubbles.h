@@ -40,6 +40,9 @@ struct Bubble {
 	BubbleGroupId groupId {0};
 	// pointer to contents...
 	float x, y, w, h;
+	double horizontal_side_radius {0.0}, horizontal_center_distance {0.0}
+		,    vertical_side_radius {0.0},   vertical_center_distance {0.0} ;
+	float  horizontal_cotangent   {0.0f},  vertical_cotangent {0.0f} ;
 
 	Bubble(float _x, float _y, float _w, float _h, BubbleId _id) :
 		x {_x}, y {_y}, w {_w}, h {_h}, id {_id} {};
@@ -58,7 +61,9 @@ struct BubbleVertex {
 
 enum BubbleInfoMembers {bubbleX, bubbleY,
 		bubbleW, bubbleH,
-		bubbleMouseOver,
+		// todo: make these two uniform variables? would avoid needing to reupload everything just for mouse wandering...
+		bubbleId,
+//		bubbleMouseOver,
 		BubblePositionInfoMemberCount
 	};
 
@@ -81,7 +86,7 @@ struct BubbleGroupInfo {
 struct BubbleInfo {
 	GLfloat x, y,
 		w, h,
-		mouseOver,
+		bubbleId,
 		groupId;
 
 	BubbleInfo(
@@ -90,14 +95,14 @@ struct BubbleInfo {
 		GLfloat w,
 		GLfloat h,
 
-		GLfloat mouseOver,
+		GLfloat	bubbleId,
 		GLfloat groupId
 		) :
 			x{x},
 			y{y},
 			w{w},
 			h{h},
-			mouseOver{mouseOver},
+			bubbleId{bubbleId},
 			groupId{groupId}
 		{};
 
@@ -110,7 +115,7 @@ struct BubbleInfo {
 			y{_y},
 			w{_w},
 			h{_h},
-			mouseOver{0.0f},
+			bubbleId{0.0f},
 			groupId{0.0f}
 		{};
 
@@ -119,7 +124,7 @@ struct BubbleInfo {
 			y{15.0f},
 			w{10.0f},
 			h{100.0f},
-			mouseOver{0.0f},
+			bubbleId{0.0f},
 			groupId{0.0f}
 		{};
 };
@@ -140,17 +145,27 @@ class Bubbles {
 		,	myBackgroundBuffer
 			;
 
-	int myPositionVarying {-1},
-		myBubbleIdVarying {-1},
-		myBubbleInfoTextureUniform {-1},
-		myBubbleInfoTextureWidthUniform {-1},
-		myDrawDepthUniform {-1}
+	BubbleId myHighlightedBubble {-1};
+
+	int myPositionVarying {-1}
+	,	myBubbleIdVarying {-1}
+	,	myBubbleInfoTextureUniform {-1}
+	,	myBubbleInfoTextureWidthUniform {-1}
+	,	myDrawDepthUniform {-1}
+	,	myHighlightedBubbleId   {-1}
+	,	myHighlightedBubbleArea {-1}
 		;
 	mat4 myTransformationMatrix;
 
 	void setupBuffers(GlContext &ctx);
 	void setupBuffersInOtherContexts(GlContext &ctx);
 	void enlargeBubbleBuffers(GlContext &ctx);
+
+	static float  cornerAngle(float length, float cornerRadius, float bulge);
+	static double sideRadius(float outerCornerRadius, float length, float angle);
+	static double centerDistance(float length, float angle);
+	static float  shrinkInnerCornerRadius(float inner, float l, float t, float r, float b);
+
 public:
 	Bubbles();
 	void initializeFirstContext(GlContext &ctx);

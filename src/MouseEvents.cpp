@@ -49,8 +49,9 @@ cout<<ypos<<endl;
 		Point tlCorner = win.viewportCenter() - s/2.0f;
 
 		Point wkspPos = tlCorner + Point{x, y};
-		
-		cout<<"over workspace "<<wkspPos<<endl;
+
+		bubls.mouseMotion(wkspPos, ctx, wksp, redrawQueue);
+//		cout<<"over workspace "<<wkspPos<<endl;
 	}
 
 	//check if it's over a menu?

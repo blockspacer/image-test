@@ -19,11 +19,44 @@ Bubbles::Bubbles() {
 
 }
 
+#define SIDE_BULGE 1.5f
+#define INNER_CORNER 0.3f
+#define OUTER_CORNER 2.5f
+
 // the x-coordinate of the texture passed to the shader, if negative, tells the shader program to do something other than texture a triangle
 // see shaders/bubble_shader.vert
 float encodeId(BubbleId id) {
 	return -100.0f - float(id);
 }
+
+float Bubbles::cornerAngle(float length, float cornerRadius, float bulge) {
+	bulge = fmax(1.01, bulge);
+
+	float angle = 2 * atan( ( length / (2 * cornerRadius * (bulge - 1))) );
+
+	if (angle > PI/2)
+		angle = PI - angle;
+
+	return fmin(angle, PI/4);
+}
+
+double Bubbles::sideRadius(float outerCornerRadius, float length, float angle) {
+	 return outerCornerRadius +  (length / (2 * sin (angle)));
+}
+
+double Bubbles::centerDistance(float length, float angle) {
+	return length / (2 * tan (angle));
+}
+
+float Bubbles::shrinkInnerCornerRadius(float inner, float l, float t, float r, float b) {
+	float in = inner;
+	if (r-l < 2*in)
+		in = fmin(in, (r - l) / 2.0f);
+	if (b-t < 2*in)
+		in = fmin(in, (b - t) / 2.0f);
+	return in;
+}
+
 
 BubbleId Bubbles::createBubble(GlContext &ctx, float x, float y, float w, float h) {
 	// run through bubbles and find first unused one
@@ -59,9 +92,28 @@ BubbleId Bubbles::createBubble(GlContext &ctx, float x, float y, float w, float 
 		myBubbleVertices.emplace_back(::x(p), ::y(p), encodeId(bubbleId), io);
 	};
 
-	float in = 0.3, out = 1;//8
+	float in = INNER_CORNER, out = OUTER_CORNER;//8
 
-	GlContext::drawCurvedOutline(0, 0, w, h, in, out, lam, STEPS_PER_BUBBLE_CORNER, STEPS_PER_BUBBLE_SIDE);
+	float l = 0, t = 0, r = w, b = h;
+
+	float oout = out - in;
+	in = shrinkInnerCornerRadius(in, l, t, r, b);
+	out = oout + in;
+
+	float  topLength = (r-l-2*in);
+	float sideLength = (b-t-2*in);
+
+	float  topAngle = cornerAngle( topLength, out, SIDE_BULGE);
+	float sideAngle = cornerAngle(sideLength, out, SIDE_BULGE);
+	
+	double  topRad = sideRadius(out,  topLength,  topAngle);
+	double sideRad = sideRadius(out, sideLength, sideAngle);
+
+	double  topCenterDist = centerDistance( topLength,  topAngle);
+	double sideCenterDist = centerDistance(sideLength, sideAngle);
+
+
+	GlContext::drawCurvedOutline(0, 0, w, h, in, out, lam, STEPS_PER_BUBBLE_CORNER, STEPS_PER_BUBBLE_SIDE, topLength, sideLength, topAngle, sideAngle, topRad, sideRad, topCenterDist, sideCenterDist);
 
 	// myBubbleVertices.emplace_back(0.0f, 0.0f, encodeId(bubbleId));
 	// float r = 1.0f;
@@ -75,6 +127,7 @@ BubbleId Bubbles::createBubble(GlContext &ctx, float x, float y, float w, float 
 	myBubblePositions[bubbleId].y = y;
 	myBubblePositions[bubbleId].w = w;
 	myBubblePositions[bubbleId].h = h;
+	myBubblePositions[bubbleId].bubbleId = bubbleId;
 	uploadBubblePositions();
 
 	return bubbleId;
@@ -296,8 +349,9 @@ void Bubbles::initializeFirstContext(GlContext &ctx) {
 
 	myBubbleInfoTextureUniform = glGetUniformLocation(shader, "bubbleData");
 	myBubbleInfoTextureWidthUniform = glGetUniformLocation(shader, "widthOfBubbleData");
-	myDrawDepthUniform = glGetUniformLocation(shader, "drawDepth");
-cout<<"bubbles first init'd"<<endl;
+	myDrawDepthUniform      = glGetUniformLocation(shader, "drawDepth");
+	myHighlightedBubbleId   = glGetUniformLocation(shader, "highlightedBubbleId");
+	myHighlightedBubbleArea = glGetUniformLocation(shader, "highlightedBubbleArea");
 
 }
 
@@ -323,6 +377,10 @@ void Bubbles::draw(GlContext &ctx, WindowId winId, Workspace& wksp) {
 
 	ctx.setMatrix(myTransformationMatrix);
 
+	// if this window has the focus and the mouse is over a bubble halo, 
+
+	glUniform1f(myHighlightedBubbleId, myHighlightedBubble);
+
 	glBindVertexArray(win.bubblesVAO);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, myBubbleHalos.count() * VERTICES_PER_BUBBLE);
 
@@ -332,16 +390,6 @@ void Bubbles::draw(GlContext &ctx, WindowId winId, Workspace& wksp) {
 
 
 
-
-bool Bubbles::mouseMotion(Point pos, GlContext &ctx, Workspace &wksp, RedrawRequests &redrawReqests) {
-	redrawReqests.redrawAllWindows();
-
-	// if going to or from a bubble's halo, or a different part of one, mark it for redrawing (for that window only?)
-	return true;
-
-	// if over a menu, highlight selected option if it's changed
-
-}
 
 
 
@@ -361,7 +409,12 @@ bool contains(const Point &p, float left, float top, float right, float bottom, 
 
 
 bool mouseOverBubbleContent(Point p, Bubble& bub) {
+	// todo: inner corners?
 	return contains(p, bub.x, bub.y, bub.x+bub.w, bub.y+bub.h);
+}
+
+bool mousePossiblyOverBubbleHalo(Point p, Bubble& bub) {
+	return contains(p, bub.x, bub.y, bub.x+bub.w, bub.y+bub.h, SIDE_BULGE*OUTER_CORNER);
 }
 
 bool mouseOverBubbleHalo(Point p, Bubble& bub) {
@@ -372,5 +425,64 @@ bool mouseOverBubbleHalo(Point p, Bubble& bub) {
 
 	// consistency is the main thing
 }
+
+
+
+
+
+
+bool Bubbles::mouseMotion(Point pos, GlContext &ctx, Workspace &wksp, RedrawRequests &redrawReqests) {
+	redrawReqests.redrawAllWindows();
+
+	// if a menu is open, highlight selected option if it's changed, or mouse has moved over menu
+
+	// if it's over bubble content, check if it's still over it
+		// pass on motion to contents controller
+
+	// if it's over halo
+		// check if it's over contents now
+		// if bubble is not part of group, check if it's still over halo
+
+	// go through all bubble groups, check for presence (may be over multiple)
+		// for each bubble in group, check if in possible contact
+			// if over halo, record bubble and distance
+
+	// if situation has changed, update changes, request redraw
+
+	myHighlightedBubble = -1;
+	for (auto bub : myBubbles) {
+		if ( ! mousePossiblyOverBubbleHalo(pos, bub))
+			continue;
+
+		if (contains(pos, bub.x, bub.y, bub.x+bub.w, bub.y+bub.h)) {
+			myHighlightedBubble = bub.id;
+			cout<<bub.id<<endl;
+		}
+
+	}
+
+	// if a menu is open, highlight selected option if it's changed, or mouse has moved over menu
+
+	// if it's over bubble content, check if it's still over it
+		// pass on motion to contents controller
+
+	// if it's over halo
+		// check if it's over contents now
+		// if bubble is not part of group, check if it's still over halo
+
+	// go through all bubble groups, check for presence (may be over multiple)
+		// for each bubble in group, check if in possible contact
+
+			// if over halo, record bubble and distance
+
+	// if situation has changed, update changes, request redraw
+
+cout<<"mp "<<pos<<endl;
+	return true;
+
+}
+
+
+
 
 

@@ -82,7 +82,7 @@ using std::cout;
 using std::endl;
 
 using BubbleGroupId = size_t;
-using BubbleId = GLuint;
+using BubbleId = GLint;
 using WindowId = size_t;
 
 static std::vector<GLubyte> gPixelMemory;

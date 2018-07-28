@@ -249,57 +249,54 @@ void GlContext::drawCurvedOutlineSide(PointD center, PointD xAxis, PointD yAxis,
 	}
 }
 
-void GlContext::drawCurvedOutline(float leftX, float topY, float rightX, float bottomY, float innerCornerRadius, float outerCornerRadius, std::function<void(Point v, float io)> vertexAccumulatorFunction, size_t cornerSteps, size_t sideSteps) {
+float bubbleCornerAngle(float length, float cornerRadius, float bulge) {
+	bulge = fmax(1.01, bulge);
 
+	float angle = 2 * atan( ( length / (2 * cornerRadius * (bulge - 1))) );
+
+	if (angle > PI/2)
+		angle = PI - angle;
+
+	return fmin(angle, PI/4);
+}
+
+double bubbleSideRadius(float outerCornerRadius, float length, float angle) {
+	 return outerCornerRadius +  (length / (2 * sin (angle)));
+}
+
+double bubbleCenterDistance(float length, float angle) {
+	return length / (2 * tan (angle));
+}
+
+float shrinkInnerCornerRadius(float inner, float l, float t, float r, float b) {
+	float in = inner;
+	if (r-l < 2*in)
+		in = fmin(in, (r - l) / 2.0f);
+	if (b-t < 2*in)
+		in = fmin(in, (b - t) / 2.0f);
+	return in;
+}
+
+void GlContext::drawCurvedOutline(float leftX, float topY, float rightX, float bottomY, float innerCornerRadius, float outerCornerRadius, std::function<void(Point v, float io)> vertexAccumulatorFunction, size_t cornerSteps, size_t sideSteps, float  topLength, float sideLength, float topAngle, float sideAngle, double topRadius, double sideRadius, double topCenterDist, double sideCenterDist) {
+	// `bulge` is how much the sides stick out, as a multiple of the corner's outer radius
+	
 	float &l = leftX, &t = topY, &r = rightX, &b = bottomY, &in = innerCornerRadius, &out = outerCornerRadius;
 	std::function<void(Point v, float io)> &func = vertexAccumulatorFunction;
 
-	if (r-l<2*in) {
-		float oout = out - in;
-		in = fmin(in, (r - l) / 2.0f);
-		out = oout + in;
-	}
-	if (b-t<2*in) {
-		float oout = out - in;
-		in = fmin(in, (b - t) / 2.0f);
-		out = oout + in;
-	}
 
-	float margin = 1.5; // times the corner circle radius
-	margin = fmax(1.01, margin);
 
-	float  topLength = 0.0f, sideLength = 0.0f, topAngle = 0.0f, sideAngle = 0.0f;
-	double topRadius = 0.0, sideRadius = 0.0, topCenterDist = 0.0, sideCenterDist = 0.0;
+	float oout = out - in;
+	in = shrinkInnerCornerRadius(in, l, t, r, b);
+	out = oout + in;
 
-	if (sideSteps) {
-		 topLength = (r-l-2*in);
-		sideLength = (b-t-2*in);
+	// topLength = (r-l-2*in);
+	// sideLength = (b-t-2*in);
 
-		 topAngle = 2 * atan( ( topLength / (2 * out * (margin - 1))) );
-		sideAngle = 2 * atan( (sideLength / (2 * out * (margin - 1))) );
+	const Point  up     { 0, -1}; const Point  left   {-1,  0};
+	const Point  down   { 0,  1}; const Point  right  { 1,  0};
 
-		if  (topAngle > PI/2)  topAngle = PI - topAngle;
-		if (sideAngle > PI/2) sideAngle = PI - sideAngle;
-
-		 topAngle = fmin( topAngle, PI/4);
-		sideAngle = fmin(sideAngle, PI/4);
-
-		 topRadius = out +  (topLength / (2 * sin (topAngle)));
-		sideRadius = out + (sideLength / (2 * sin(sideAngle)));
-
-		 topCenterDist =  topLength / (2 * tan (topAngle));
-		sideCenterDist = sideLength / (2 * tan(sideAngle));
-	}
-
-	const Point up    { 0, -1};
-	const Point down  { 0,  1};
-	const Point left  {-1,  0};
-	const Point right { 1,  0};
-
-	const PointD upD    { 0, -1};
-	const PointD downD  { 0,  1};
-	const PointD leftD  {-1,  0};
-	const PointD rightD { 1,  0};
+	const PointD upD    { 0, -1}; const PointD leftD  {-1,  0};
+	const PointD downD  { 0,  1}; const PointD rightD { 1,  0};
 
 	func(Point(r,b-in),0.0f); // double first point so it forms an infinitely thin triangle from the last one on the strip (which was drawing the last bubble)
 	drawCurvedOutlineCorner(Point(r-in,b-in), right, down, in, out, cornerSteps, func, sideAngle, topAngle);

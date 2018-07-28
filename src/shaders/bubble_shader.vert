@@ -15,6 +15,9 @@ layout(location = 3) in vec4 bgColor;
 //layout(location = 4) in float bubbleId;
 uniform float drawDepth;
 
+uniform float highlightedBubbleId;
+uniform float highlightedBubbleArea;
+
 uniform float widthOfBubbleData;
 // width of bubble group data
 // width of window data
@@ -34,8 +37,8 @@ const float bubbleX = 0.5;
 const float bubbleY = 1.5;
 const float bubbleW = 2.5;
 const float bubbleH = 3.5;
-const float bubbleMouseOver = 4.5;
-const float bubbleGroupId = 5.5;
+const float bubbleBubbleId = 4.5;
+const float bubbleGroupId  = 5.5;
 const float bubbleInfoMembers = 6.0;
 
 const float bubbleGroupGradientLeft       = 0.5;
@@ -125,6 +128,7 @@ void main() {
 		vec2 yDataPositionInTexture =
 			vec2(((bubbleId * bubbleInfoMembers) + bubbleY)/widthOfBubbleData, 0.5);
 
+
 		float xOffset = texture(bubbleData, xDataPositionInTexture).r;
 		float yOffset = texture(bubbleData, yDataPositionInTexture).r;
 
@@ -132,6 +136,12 @@ void main() {
 		// gl_Position = transformation * (position + vec4(-15.0, 0.0, 0.0f, 0.0f));
 
 		outColor = vec4(0.0, 1.0, 0.5, 1.0);
+
+		if (highlightedBubbleId == bubbleId) {
+
+			outColor = vec4(1.0, 0.0, 0.0, 1.0);
+
+		}
 		outTexCoord = texCoord;
 		return;
 	}

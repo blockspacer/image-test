@@ -168,7 +168,7 @@ void App::init() {
 	myPanningBar.initializeFirstContext(ctx);
 //	glBindVertexArray(ctx.window(0).bubblesVAO);
 
-	myBubbles.createBubble(ctx, 15.0f, 10.0f, 20.0f, 2.0f);
+	myBubbles.createBubble(ctx, 15.0f, 10.0f, 0.1f, 0.5f);
 
 	myBubbles.createBubble(ctx, 15.0f, 20.0f, 20.0f, 2.0f);
 	// myBubbles.createBubble(ctx, 10.0f, 20.0f, 20.0f, 20.0f);
