@@ -31,6 +31,9 @@ using glm::vec3;
 
 // drugs and wires playlist https://open.spotify.com/user/cryoclaire/playlist/7pSKHOUu7vRxFTPmrlghbB
 
+#define SIDE_BULGE 1.5f
+#define INNER_CORNER 0.3f
+#define OUTER_CORNER 2.5f
 
 
 struct Bubble {
@@ -61,8 +64,7 @@ struct BubbleVertex {
 
 enum BubbleInfoMembers {bubbleX, bubbleY,
 		bubbleW, bubbleH,
-		// todo: make these two uniform variables? would avoid needing to reupload everything just for mouse wandering...
-		bubbleId,
+		groupId,
 //		bubbleMouseOver,
 		BubblePositionInfoMemberCount
 	};
@@ -106,24 +108,24 @@ struct BubbleInfo {
 			groupId{groupId}
 		{};
 
-		BubbleInfo(
-		GLfloat _x,
-		GLfloat _y,
-		GLfloat _w,
-		GLfloat _h
-		) : x{_x},
-			y{_y},
-			w{_w},
-			h{_h},
-			bubbleId{0.0f},
-			groupId{0.0f}
-		{};
+		// BubbleInfo(
+		// GLfloat _x,
+		// GLfloat _y,
+		// GLfloat _w,
+		// GLfloat _h,
+		// ) : x{_x},
+		// 	y{_y},
+		// 	w{_w},
+		// 	h{_h},
+		// 	bubbleId{_id},
+		// 	groupId{_groupId}
+		// {};
 
 		BubbleInfo()
-		 : x{15.0f},
-			y{15.0f},
+		 : x{-15.0f},
+			y{-15.0f},
 			w{10.0f},
-			h{100.0f},
+			h{10.0f},
 			bubbleId{0.0f},
 			groupId{0.0f}
 		{};
@@ -137,7 +139,7 @@ class Bubbles {
 	vector<BubbleInfo>   myBubblePositions;
 
 	EnlargeableArrayBuffer myBubbleHalos {VERTICES_PER_BUBBLE * sizeof(BubbleVertex)};
-	//EnlargeableDataTexture<BubbleInfo> myBubblePositionDataTex;
+	EnlargeableDataTexture<BubbleGroupInfo> myBubbleGroupInfo;
 
     size_t mySpaceAvailable {1};
 
@@ -181,6 +183,7 @@ public:
 
 	bool mouseMotion(Point pos, GlContext &ctx, Workspace &wksp, RedrawRequests &redrawReqests);
 
+	void setGroupGradient(BubbleGroupId id, Point topLeft, Point bottomRight, Color topLeftColor, Color bottomRightColor);
 };
 bool contains(const float x, const float min, const float max, float margin = 0.0f);
 bool contains(const Point &p, const Point &topLeft, const Point &bottomRight, float margin = 0.0f);

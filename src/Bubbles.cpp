@@ -19,11 +19,7 @@ Bubbles::Bubbles() {
 
 }
 
-#define SIDE_BULGE 1.5f
-#define INNER_CORNER 0.3f
-#define OUTER_CORNER 2.5f
-
-// the x-coordinate of the texture passed to the shader, if negative, tells the shader program to do something other than texture a triangle
+// the texture x-coordinate passed to the shader, if negative, tells the shader program to do something other than texture a triangle
 // see shaders/bubble_shader.vert
 float encodeId(BubbleId id) {
 	return -100.0f - float(id);
@@ -64,8 +60,8 @@ BubbleId Bubbles::createBubble(GlContext &ctx, float x, float y, float w, float 
 
 	for (size_t i=0; i<myBubbles.size(); i++) {
 		if (myBubbles[i].unused) {
-			bubbleId = i;
 			myBubbles[i].unused = false;
+			bubbleId = i;
 			myBubbles[i].x = x;
 			myBubbles[i].y = y;
 			myBubbles[i].w = w;
@@ -128,6 +124,7 @@ BubbleId Bubbles::createBubble(GlContext &ctx, float x, float y, float w, float 
 	myBubblePositions[bubbleId].w = w;
 	myBubblePositions[bubbleId].h = h;
 	myBubblePositions[bubbleId].bubbleId = bubbleId;
+	myBubblePositions[bubbleId].groupId = bubbleId;
 	uploadBubblePositions();
 
 	return bubbleId;
@@ -157,8 +154,11 @@ void Bubbles::uploadBubblePositions() {
 	// 	myBubblePositions.data());
 }
 
-
-
+void Bubbles::setGroupGradient(BubbleGroupId id, Point topLeft, Point bottomRight, Color topLeftColor, Color bottomRightColor) {
+	myBubbleGroupInfo[id].gradientLeftRed   = topLeftColor.  redFloat();
+	myBubbleGroupInfo[id].gradientLeftGreen = topLeftColor.greenFloat();
+	myBubbleGroupInfo[id].gradientLeftBlue  = topLeftColor. blueFloat();
+}
 
 void Bubbles::enlargeBubbleBuffers(GlContext &ctx) {
 	size_t oldSpaceAvailable = mySpaceAvailable;
@@ -304,6 +304,10 @@ void Bubbles::initializeFirstContext(GlContext &ctx) {
 
 	GLuint shader = ctx.shaderHandle();
 
+	myBubbleGroupInfo.create(GL_TEXTURE1);
+
+	glActiveTexture(GL_TEXTURE0);
+
 	//create a dummy bubble positioned off screen, marked unused
 	// so the function to create new bubbles doesn't have to treat there being none as a special case
 	myBubbles.emplace_back(0.0f,0.0f,0.0f,0.0f,0.0f);
@@ -325,7 +329,7 @@ void Bubbles::initializeFirstContext(GlContext &ctx) {
 	myBubbleHalos.init(bubbleHaloSetupFunc);
 	myBubbleHalos.setup(ctx.firstWindow());
 
-	myBubblePositions.emplace_back(-0.5f, -0.0f, 3.0f, 3.0f);
+	myBubblePositions.emplace_back();
 
 	glGenTextures(1,            &myDataTexture);
 	glBindTexture(GL_TEXTURE_2D, myDataTexture);
@@ -357,7 +361,7 @@ void Bubbles::initializeFirstContext(GlContext &ctx) {
 
 void Bubbles::draw(GlContext &ctx, WindowId winId, Workspace& wksp) {
 	Window &win = ctx.window(winId);
-
+cout<<"val "<<myBubblePositions[1].groupId<<endl;
 	float wh    = win.pixelHeight()
 		, pbh   = win.panningBarPixelHeight(wksp)
 		, avail = pbh / wh ;

@@ -3,7 +3,7 @@
 
 
 void EnlargeableArrayBuffer::upload(size_t elementIdx, GlContext &ctx, void *data) {
-	if (elementIdx >= myElementCount) {
+		if (elementIdx >= myElementCount) {
 		size_t newSize = myElementCount * 2;
 		while (elementIdx >= newSize)
 			newSize *= 2;

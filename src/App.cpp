@@ -168,9 +168,14 @@ void App::init() {
 	myPanningBar.initializeFirstContext(ctx);
 //	glBindVertexArray(ctx.window(0).bubblesVAO);
 
-	myBubbles.createBubble(ctx, 15.0f, 10.0f, 0.1f, 0.5f);
+	myBubbles.createBubble(ctx, 5.0f, 13.0f, 10.0f, 0.5f);
 
-	myBubbles.createBubble(ctx, 15.0f, 20.0f, 20.0f, 2.0f);
+	myBubbles.createBubble(ctx, 25.0f, 5.0f, 2.0f, 20.0f);
+
+	myBubbles.setGroupGradient(0, Point {12,8}, Point{15,12}, Color {0.0f,0.0f,1.0f}, Color {0.0f,0.0f,1.0f});
+	myBubbles.setGroupGradient(1, Point {13,18}, Point{37,24}, Color {0.0f,1.0f,0.0f}, Color {0.0f,1.0f,0.0f});
+//	myBubbles.setGroupGradient(2, Point {12,8}, Point{15,12}, Color {1.0f,1.0f,0.0f}, Color {1.0f,1.0f,0.0f});
+
 	// myBubbles.createBubble(ctx, 10.0f, 20.0f, 20.0f, 20.0f);
 
 

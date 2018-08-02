@@ -46,12 +46,22 @@ class EnlargeableDataTexture {
 	// shader variable to tell it how wide it is
 	// 
 	vector<T> myElements;
+	GLint  myTextureUnit;
+	GLuint myTextureHandle;
+
+		// glActiveTexture(GL_TEXTURE0);
+
 public:
+	void create(GLint tu) {
+		myTextureUnit = tu;
+
+		glActiveTexture(myTextureUnit);
+
+		glGenTextures(1, &myTextureHandle);
+		glBindTexture(GL_TEXTURE_2D, myTextureHandle);
+	}
 	EnlargeableDataTexture() {
 		myElements.resize(1);
-		
-		// create texture
-		ensureSize(1);
 	};
 	~EnlargeableDataTexture() {};
 	void ensureSize(size_t idx) {
@@ -61,6 +71,7 @@ public:
 				newSize *= 2;
 			myElements.resize(newSize);
 
+			glActiveTexture(myTextureUnit);
 			glTexImage2D(GL_TEXTURE_2D, // target
 				0,		// mipmap level
 				GL_R32F,// internal format
@@ -87,7 +98,17 @@ cout<<"NON-ref ?? operator[]"<<endl;
 		return myElements[i];
 	};
 */
+	T& at(size_t i) {
+		ensureSize(i);
+		return myElements[i];}
+	      T& operator[](size_t idx)       { ensureSize(idx); return myElements[idx]; }
+	const T& operator[](size_t idx) const { ensureSize(idx); return myElements[idx]; }
+
+	size_t capacity() { return myElements.capacity();}
+	size_t elementSize() { return sizeof(T);}
+
 	void upload() {
+		glActiveTexture(myTextureUnit);
 		glTexSubImage2D(GL_TEXTURE_2D, //target
 			0, // mipmap level
 			0, // x offset
