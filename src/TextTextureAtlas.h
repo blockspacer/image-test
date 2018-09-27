@@ -18,23 +18,6 @@ using std::endl;
 #include <unordered_map>
 using std::unordered_map;
 
-#ifdef NATIVE
-	#include "SkImageInfo.h"
-	#include "SkSurface.h"
-
-	#include "SkData.h"
-
-	#include "SkImage.h"
-	#include "SkImageInfo.h"
-
-	#include "SkTypeface.h"
-
-	#include "SkStream.h"
-	#include "SkSurface.h"
-	#include "SkCanvas.h"
-	#include "SkGraphics.h"
-	#include "SkColor.h"
-#endif
 
 #include "tinyutf8.h"
 
@@ -94,9 +77,9 @@ class TextTextureAtlas {
 			myHighestUsedPage{1};
 
 	#ifdef NATIVE
-		SkCanvas *pMySkiaCanvas;
-		sk_sp<SkSurface> pMyDrawingSurface;
-		SkPaint myTextPaint;
+		// SkCanvas *pMySkiaCanvas;
+		// sk_sp<SkSurface> pMyDrawingSurface;
+		// SkPaint myTextPaint;
 	#else // web
 		GLubyte *myDrawingSurface;
 	#endif

@@ -19,6 +19,7 @@ uniform float highlightedBubbleId;
 uniform float highlightedBubbleArea;
 
 uniform float widthOfBubbleData;
+uniform float widthOfGroupData;
 // width of bubble group data
 // width of window data
 uniform sampler2D bubbleData;
@@ -57,6 +58,10 @@ const float bubbleGroupInfoMembers        = 10.0;
 const float PB_bubble_layer             = 0.5;
 const float bubbleHaloHighlighted_layer = 0.75;
 const float bubbleHalo_layer            = 0.6875;
+
+float groupInfo(float groupId, float member) {
+	return texture(bubbleGroupData, vec2(((groupId * bubbleGroupInfoMembers) + member)/widthOfGroupData, 0.5)).r;
+}
 
 
 void main() {
@@ -128,14 +133,33 @@ void main() {
 		vec2 yDataPositionInTexture =
 			vec2(((bubbleId * bubbleInfoMembers) + bubbleY)/widthOfBubbleData, 0.5);
 
-
 		float xOffset = texture(bubbleData, xDataPositionInTexture).r;
 		float yOffset = texture(bubbleData, yDataPositionInTexture).r;
 
 		gl_Position = transformation * (position + vec4(xOffset, yOffset, bubbleHalo_layer, 0.0f));
 		// gl_Position = transformation * (position + vec4(-15.0, 0.0, 0.0f, 0.0f));
 
-		outColor = vec4(0.0, 1.0, 0.5, 1.0);
+		vec2 groupDataPositionInTexture = 
+			vec2(((bubbleId * bubbleInfoMembers) + bubbleGroupId)/widthOfBubbleData, 0.5);
+
+		float group = texture(bubbleData, groupDataPositionInTexture).r;
+
+//		vec2 lrPos = vec2(((groupId * bubbleGroupInfoMembers) + bubbleGroupGradientLeftRed)/widthOfBubbleGroupData, 0.5);
+
+		if (group == 0.0)
+			outColor = vec4(1.0,0.5,0.5, 1.0);
+//		else if (group == 1.0)
+		else
+			outColor = vec4(0.0,group/2.0,0.0, 1.0);
+	//		outColor = vec4(group,0.5,0.5, 1.0);
+
+
+
+		float lr = groupInfo(group, bubbleGroupGradientLeftRed);
+		float lg = groupInfo(group, bubbleGroupGradientLeftGreen);
+		float lb = groupInfo(group, bubbleGroupGradientLeftBlue);
+
+		outColor = vec4(lr, lg, lb, 1.0);
 
 		if (highlightedBubbleId == bubbleId) {
 

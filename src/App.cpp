@@ -81,7 +81,9 @@ void App::redrawCallback(GLFWwindow* pWin) {
 	draw();};
 
 void App::keyCallback(GLFWwindow* pWin, int key, int scancode, int action, int mods) {
-	Window &win = myGlContext.window(pWin);
+	GlContext &ctx = myGlContext;
+	Window &win = ctx.window(pWin);
+
 	if (key==GLFW_KEY_J && action == GLFW_PRESS) {
 		WindowId parent = win.id();
 		// SHOW_TYPE(parent)
@@ -95,6 +97,13 @@ void App::keyCallback(GLFWwindow* pWin, int key, int scancode, int action, int m
 	}
 	else if (key==GLFW_KEY_Q)
 		exit(-1);
+	else if (key==GLFW_KEY_B && action == GLFW_PRESS) {
+		myBubbles.createBubble(ctx, 20.0f, 13.0f, 10.0f, 0.5f);
+		myBubbles.setGroupGradient(4, Point {12,8}, Point{15,12}, Color {1.0f,0.0f,1.0f}, Color {0.0f,0.0f,1.0f});
+		myRedrawQueue.redrawAllWindows();
+		// todo: redraw every parent
+	}
+
 }
 
 void App::windowPosCallback(GLFWwindow* pWin, int xpos, int ypos) {
@@ -172,8 +181,19 @@ void App::init() {
 
 	myBubbles.createBubble(ctx, 25.0f, 5.0f, 2.0f, 20.0f);
 
+	myBubbles.createBubble(ctx, 5.0f, 25.0f, 10.0f, 0.5f);
+
+		myBubbles.createBubble(ctx, 25.0f, 18.0f, 10.0f, 0.5f);
+
+
 	myBubbles.setGroupGradient(0, Point {12,8}, Point{15,12}, Color {0.0f,0.0f,1.0f}, Color {0.0f,0.0f,1.0f});
 	myBubbles.setGroupGradient(1, Point {13,18}, Point{37,24}, Color {0.0f,1.0f,0.0f}, Color {0.0f,1.0f,0.0f});
+	myBubbles.setGroupGradient(2, Point {13,18}, Point{37,24}, Color {1.0f,0.0f,0.0f}, Color {0.0f,1.0f,0.0f});
+
+		myBubbles.setGroupGradient(3, Point {12,8}, Point{15,12}, Color {0.0f,1.0f,1.0f}, Color {0.0f,1.0f,1.0f});
+
+
+
 //	myBubbles.setGroupGradient(2, Point {12,8}, Point{15,12}, Color {1.0f,1.0f,0.0f}, Color {1.0f,1.0f,0.0f});
 
 	// myBubbles.createBubble(ctx, 10.0f, 20.0f, 20.0f, 20.0f);

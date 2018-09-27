@@ -7,6 +7,11 @@ using std::endl;
 #include "GlContext.h"
 #include "TextTextureAtlas.h"
 
+#ifdef NATIVE
+	#include <ft2build.h>
+	#include FT_FREETYPE_H
+#endif
+
 struct TextSpriteVertex {
 	float x, y,
 		red, green, blue,
@@ -27,6 +32,10 @@ class TextLayout {
 			myVertexBuffer {0},
 			myVertexBufferSize {6}
 	;
+
+	#ifdef NATIVE
+		FT_Library myFreeTypeLibrary;
+	#endif
 
 	vector<TextSpriteVertex> myVertices;
 

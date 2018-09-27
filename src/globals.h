@@ -161,7 +161,8 @@ std::string type_name() {
 	return r;
 }
 
-// make terminals more colorful using special ANSI escape character control codes
+// make terminal text more colorful using special ANSI escape character control codes
+// https://en.wikipedia.org/wiki/ANSI_escape_code
 #ifdef __EMSCRIPTEN__
 	#define BOLD      "" << 
 	#define ITALIC    "" << 
@@ -172,6 +173,23 @@ std::string type_name() {
 	#define ITALICSTR    "" 
 	#define UNDERLINESTR "" 
 	#define NORMALSTR    "" 
+
+	#define BLACK   "" <<
+	#define RED     "" <<
+	#define GREEN   "" <<
+	#define YELLOW  "" <<
+	#define BLUE    "" <<
+	#define MAGENTA "" <<
+	#define CYAN    "" <<
+	#define WHITE   "" <<
+	#define BLACK_BG   "" <<
+	#define RED_BG     "" <<
+	#define GREEN_BG   "" <<
+	#define YELLOW_BG  "" <<
+	#define BLUE_BG    "" <<
+	#define MAGENTA_BG "" <<
+	#define CYAN_BG    "" <<
+	#define WHITE_BG   "" <<
 #else
 	#define BOLD      "\033[1m" << 
 	#define ITALIC    "\033[3m" << 
@@ -182,6 +200,24 @@ std::string type_name() {
 	#define ITALICSTR    "\033[3m" 
 	#define UNDERLINESTR "\033[4m" 
 	#define NORMALSTR    "\033[0m" 
+
+	#define BLACK   "\033[30m" <<
+	#define RED     "\033[31m" <<
+	#define GREEN   "\033[32m" <<
+	#define YELLOW  "\033[33m" <<
+	#define BLUE    "\033[34m" <<
+	#define MAGENTA "\033[35m" <<
+	#define CYAN    "\033[36m" <<
+	#define WHITE   "\033[37m" <<
+	#define BLACK_BG   "\033[40m" <<
+	#define RED_BG     "\033[41m" <<
+	#define GREEN_BG   "\033[42m" <<
+	#define YELLOW_BG  "\033[43m" <<
+	#define BLUE_BG    "\033[44m" <<
+	#define MAGENTA_BG "\033[45m" <<
+	#define CYAN_BG    "\033[46m" <<
+	#define WHITE_BG   "\033[47m" <<
+
 #endif
 
 #pragma GCC diagnostic push
@@ -232,4 +268,5 @@ static void complain(string s, char *c_s) {
 
 ENABLE_WARNING(unused-function, unused-function, unused-function)
 
+DISABLE_WARNING(unused-parameter, unused-parameter, unused-parameter)
 

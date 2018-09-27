@@ -15,6 +15,8 @@
 DISABLE_WARNING(unused-parameter,unused-parameter,unused-parameter)
 DISABLE_WARNING(reorder, reorder, reorder) 
 
+#include <iostream>
+
 #include "GlContext.h"
 #include "Bubbles.h"
 #include "TextLayout.h"
@@ -49,6 +51,9 @@ class App {
 
 
 public:
+
+App() {std::cout<<"IN APP"<<std::endl;}
+
 	GlContext      &glContext()   {return myGlContext;};
 	RedrawRequests &redrawQueue() {return myRedrawQueue;};
 static	void init();

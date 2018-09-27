@@ -11,6 +11,8 @@
 
 #include <GLFW/glfw3.h>
 
+#include <iostream>
+
 class EnlargeableArrayBuffer{
 	GLuint myBuffer {0}
 		,  mySpareBufferHandle;
@@ -22,16 +24,16 @@ class EnlargeableArrayBuffer{
 
 
 public:
-	EnlargeableArrayBuffer(size_t elementByteSize) : myElementSize(elementByteSize) {}
+	EnlargeableArrayBuffer(size_t elementByteSize) : myElementSize(elementByteSize) {std::cout<<"CONSTRUCTING EAB"<<std::endl;}
 	void init(std::function<void(Window &win)> VAOsetupFunc) {
 		myVAOsetupFunc = VAOsetupFunc;
 		glGenBuffers(1, &myBuffer);
 		bindBuffer();
 		glBufferData(GL_ARRAY_BUFFER, myElementSize * myElementCount, nullptr, GL_STATIC_DRAW);
 	};
-	~EnlargeableArrayBuffer() { glDeleteBuffers(1, &myBuffer); };
+	~EnlargeableArrayBuffer() {std::cout<<"DECONSTRUCTING EAB"<<std::endl; glDeleteBuffers(1, &myBuffer); };
 	void bindBuffer() { glBindBuffer(GL_ARRAY_BUFFER, myBuffer); 
-		cout<<"mybuffer "<<myBuffer<<endl;
+//		cout<<"mybuffer "<<myBuffer<<endl;
 	};
 	void upload(size_t element, GlContext &ctx, void *data);
 	size_t count()       { return myElementCount; };
@@ -46,36 +48,60 @@ class EnlargeableDataTexture {
 	// shader variable to tell it how wide it is
 	// 
 	vector<T> myElements;
-	GLint  myTextureUnit;
+	size_t myCapacity {1};
+	GLint  myTextureUnitIndex
+		,  myWidthUniformHandle;
 	GLuint myTextureHandle;
 
 		// glActiveTexture(GL_TEXTURE0);
-
+	size_t elementWidthInTexels() {return sizeof(T) / 4;}
 public:
-	void create(GLint tu) {
-		myTextureUnit = tu;
+void bind() {
+	glActiveTexture(GL_TEXTURE0 + myTextureUnitIndex);
+	glBindTexture(GL_TEXTURE_2D, myTextureHandle);
 
-		glActiveTexture(myTextureUnit);
+}
+	void setWidthUniform() {
+		glUniform1f(myWidthUniformHandle, float(myCapacity * elementWidthInTexels()));
+	}
+	void setupSubsequentContexts() {
+		glActiveTexture(GL_TEXTURE0 + myTextureUnitIndex);
+		glBindTexture(GL_TEXTURE_2D, myTextureHandle);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+	}
+	void initFirstTime(const GLint tu, const int widthUniform) {
+		myTextureUnitIndex = tu;
+		myWidthUniformHandle = widthUniform;
 
 		glGenTextures(1, &myTextureHandle);
-		glBindTexture(GL_TEXTURE_2D, myTextureHandle);
+		setupSubsequentContexts();
+		setWidthUniform();
+//		glBufferData(GL_ARRAY_BUFFER, myCapacity * 4, nullptr, GL_STATIC_DRAW);
 	}
 	EnlargeableDataTexture() {
 		myElements.resize(1);
 	};
 	~EnlargeableDataTexture() {};
 	void ensureSize(size_t idx) {
-		if (idx >= myElements.capacity()) {
-			size_t newSize = myElements.capacity() * 2;
+
+		if (idx >= myCapacity) {
+			size_t newSize = myCapacity * 2;
 			while (idx >= newSize)
 				newSize *= 2;
 			myElements.resize(newSize);
 
-			glActiveTexture(myTextureUnit);
+			myCapacity = newSize;
+			setWidthUniform();
+
+			glActiveTexture(GL_TEXTURE0 + myTextureUnitIndex);
+
+			glBindTexture(GL_TEXTURE_2D, myTextureHandle);
+
 			glTexImage2D(GL_TEXTURE_2D, // target
 				0,		// mipmap level
 				GL_R32F,// internal format
-				newSize * sizeof(T)/sizeof(float),// width
+				myCapacity * elementWidthInTexels(),// width
 				1,		// height
 				0,		// border -- unused
 				GL_RED,	// format
@@ -104,16 +130,19 @@ cout<<"NON-ref ?? operator[]"<<endl;
 	      T& operator[](size_t idx)       { ensureSize(idx); return myElements[idx]; }
 	const T& operator[](size_t idx) const { ensureSize(idx); return myElements[idx]; }
 
-	size_t capacity() { return myElements.capacity();}
+	size_t capacity() { return myCapacity;}
 	size_t elementSize() { return sizeof(T);}
 
 	void upload() {
-		glActiveTexture(myTextureUnit);
+		glActiveTexture(GL_TEXTURE0 + myTextureUnitIndex);
+		glBindTexture(GL_TEXTURE_2D, myTextureHandle);
+
 		glTexSubImage2D(GL_TEXTURE_2D, //target
 			0, // mipmap level
 			0, // x offset
 			0, // y offset
-			myElements.capacity() * sizeof(T)/sizeof(float),// width
+			//myElements.size()
+			myCapacity * elementWidthInTexels(),// width
 			1,		// height
 			GL_RED,	// format
 			GL_FLOAT,// type

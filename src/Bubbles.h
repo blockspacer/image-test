@@ -52,6 +52,10 @@ struct Bubble {
 	void markUnused();
 };
 
+struct Boop {
+	
+};
+
 struct BubbleGroup {
 	vector<BubbleId> members;
 	float x,y,w,h;
@@ -64,17 +68,9 @@ struct BubbleVertex {
 
 enum BubbleInfoMembers {bubbleX, bubbleY,
 		bubbleW, bubbleH,
+		bubbeId,
 		groupId,
-//		bubbleMouseOver,
 		BubblePositionInfoMemberCount
-	};
-
-enum BubbleGroupInfoMembers {
-		bubbleGradientLeft, bubbleGradientRight,
-		bubbleGradientYIntercept, bubbleGradientGradient,
-		bubbleGradientLeftRed, bubbleGradientLeftGreen, bubbleGradientLeftBlue,
-		bubbleGradientRightRed, bubbleGradientRightGreen, bubbleGradientRightBlue,
-		BubbleGroupInfoMembersCount
 	};
 
 struct BubbleGroupInfo {
@@ -139,7 +135,7 @@ class Bubbles {
 	vector<BubbleInfo>   myBubblePositions;
 
 	EnlargeableArrayBuffer myBubbleHalos {VERTICES_PER_BUBBLE * sizeof(BubbleVertex)};
-	EnlargeableDataTexture<BubbleGroupInfo> myBubbleGroupInfo;
+	EnlargeableDataTexture<BubbleGroupInfo> myBubbleGroupInfoTexture;
 
     size_t mySpaceAvailable {1};
 
@@ -153,6 +149,7 @@ class Bubbles {
 	,	myBubbleIdVarying {-1}
 	,	myBubbleInfoTextureUniform {-1}
 	,	myBubbleInfoTextureWidthUniform {-1}
+	,	myBubbleGroupInfoTextureUniform {-1}
 	,	myDrawDepthUniform {-1}
 	,	myHighlightedBubbleId   {-1}
 	,	myHighlightedBubbleArea {-1}

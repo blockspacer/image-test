@@ -5,14 +5,14 @@
 
 void TextTextureAtlas::drawCrosshairs(int x, int y, int len) {
 #ifdef NATIVE
-	SkPaint paint;
-    paint.setStyle(SkPaint::kFill_Style);
-    paint.setColor(SK_ColorGREEN);
-    SkRect rect = SkRect::MakeXYWH(x-len, y, 2*len+1, 1);
+	// SkPaint paint;
+ //    paint.setStyle(SkPaint::kFill_Style);
+ //    paint.setColor(SK_ColorGREEN);
+ //    SkRect rect = SkRect::MakeXYWH(x-len, y, 2*len+1, 1);
     
-	pMySkiaCanvas->drawRect(rect, paint);
-	rect = SkRect::MakeXYWH(x, y-len, 1, 2*len+1);
-    pMySkiaCanvas->drawRect(rect, paint);
+	// pMySkiaCanvas->drawRect(rect, paint);
+	// rect = SkRect::MakeXYWH(x, y-len, 1, 2*len+1);
+ //    pMySkiaCanvas->drawRect(rect, paint);
 #else
     EM_ASM_({
 		var x = $0;
@@ -31,11 +31,6 @@ void TextTextureAtlas::drawCrosshairs(int x, int y, int len) {
 	}, x, y, len);
 #endif
 }
-
-#ifdef NATIVE
-	#include "SkFontMgr.h"
-#endif
-//#include ""
 
 
 #include <iostream>
@@ -61,7 +56,7 @@ void TextTextureAtlas::setTextStyle(int pixelSize, FontFaceTypes face) {
 #ifdef NATIVE
 	if (myTextSize != pixelSize) {
 		myTextSize = pixelSize;
-		myTextPaint.setTextSize(float(pixelSize));
+//		myTextPaint.setTextSize(float(pixelSize));
 	}
 	if (face != myCurrentFont) {
 		myCurrentFont = face;
@@ -78,7 +73,7 @@ void TextTextureAtlas::setTextStyle(int pixelSize, FontFaceTypes face) {
 		#endif
 
 		auto weight = 400;
-		auto slant  = SkFontStyle::kUpright_Slant;
+		auto slant  = 0;//SkFontStyle::kUpright_Slant;
 
 		switch(face) {
 			case 0:
@@ -87,11 +82,11 @@ void TextTextureAtlas::setTextStyle(int pixelSize, FontFaceTypes face) {
 				weight = 700;
 				break;
 			case 2:
-				slant = SkFontStyle::kItalic_Slant;
+				slant = 0;//SkFontStyle::kItalic_Slant;
 				break;
 			case 3:
 				weight = 700;
-				slant = SkFontStyle::kItalic_Slant;
+				slant = 0;//SkFontStyle::kItalic_Slant;
 				break;
 			case 4:
 				font = "Mono";
@@ -99,7 +94,7 @@ void TextTextureAtlas::setTextStyle(int pixelSize, FontFaceTypes face) {
 			}
 
 		//todo: maybe try experimenting with condensed text?
-		myTextPaint.setTypeface(SkTypeface::MakeFromName(font.c_str(), SkFontStyle (weight, 5,  slant)));
+//		myTextPaint.setTypeface(SkTypeface::MakeFromName(font.c_str(), SkFontStyle (weight, 5,  slant)));
 	}
 #else
 	if (face != myCurrentFont || myTextSize != pixelSize) {
@@ -157,17 +152,17 @@ void TextTextureAtlas::drawBox(const SpritePosition &pos) {
 #else
 //    myTextPaint.setStyle(SkPaint::kFill_Style);
 
-	SkRect rect = SkRect::MakeXYWH(pos.left, pos.top, pos.width, 1);
-	pMySkiaCanvas->drawRect(rect, myTextPaint);
+	// SkRect rect = SkRect::MakeXYWH(pos.left, pos.top, pos.width, 1);
+	// pMySkiaCanvas->drawRect(rect, myTextPaint);
 
-	rect = SkRect::MakeXYWH(pos.left, pos.top + pos.height, pos.width, 1);
-	pMySkiaCanvas->drawRect(rect, myTextPaint);
+	// rect = SkRect::MakeXYWH(pos.left, pos.top + pos.height, pos.width, 1);
+	// pMySkiaCanvas->drawRect(rect, myTextPaint);
 
-	rect = SkRect::MakeXYWH(pos.left, pos.top, 1, pos.height);
-	pMySkiaCanvas->drawRect(rect, myTextPaint);
+	// rect = SkRect::MakeXYWH(pos.left, pos.top, 1, pos.height);
+	// pMySkiaCanvas->drawRect(rect, myTextPaint);
 
-	rect = SkRect::MakeXYWH(pos.left + pos.width, pos.top, 1, pos.height);
-	pMySkiaCanvas->drawRect(rect, myTextPaint);
+	// rect = SkRect::MakeXYWH(pos.left + pos.width, pos.top, 1, pos.height);
+	// pMySkiaCanvas->drawRect(rect, myTextPaint);
 
 #endif
 }
@@ -186,111 +181,111 @@ void TextTextureAtlas::drawBox(const SpritePosition &pos) {
 // this tries to draw text but and return the width, but returns -1 if it wouldn't fit on that row of the texture sheet
 float TextTextureAtlas::attemptToDraw(utf8_string str, uint32_t *unicodeChar, float widthSoFar, bool abort_allowed) {
 
-	float newWidth;
-	if (unicodeChar == 0) {
-		newWidth = myTextPaint.measureText(str.c_str(), str.size());
-		if (widthSoFar==0.0f)
-			cout<<"world width "<<newWidth<<endl;
-		if (newWidth == 0) {
-			cout<<"UNICHAHAH \n";
-		}
-	}
-	else
-		newWidth = myTextPaint.measureText(unicodeChar, 4);
+	// float newWidth;
+	// if (unicodeChar == 0) {
+	// 	newWidth = myTextPaint.measureText(str.c_str(), str.size());
+	// 	if (widthSoFar==0.0f)
+	// 		cout<<"world width "<<newWidth<<endl;
+	// 	if (newWidth == 0) {
+	// 		cout<<"UNICHAHAH \n";
+	// 	}
+	// }
+	// else
+	// 	newWidth = myTextPaint.measureText(unicodeChar, 4);
 
-	if (abort_allowed && myCurrentRowLeft + widthSoFar + newWidth > ATLAS_SIZE) {
-		// start over
-		myCurrentRowLeft = 0;
-		myCurrentRowTop += myCurrentRowHeight;
-		myCurrentRowHeight = myTextSize;
-		return -1.0f;
-	}
+	// if (abort_allowed && myCurrentRowLeft + widthSoFar + newWidth > ATLAS_SIZE) {
+	// 	// start over
+	// 	myCurrentRowLeft = 0;
+	// 	myCurrentRowTop += myCurrentRowHeight;
+	// 	myCurrentRowHeight = myTextSize;
+	// 	return -1.0f;
+	// }
 
-	myTextPaint.setColor(SK_ColorBLACK);
-	SkRect rect = SkRect::MakeXYWH(myCurrentRowLeft + widthSoFar, myCurrentRowTop, newWidth, myTextSize);
-	pMySkiaCanvas->drawRect(rect, myTextPaint);
+	// myTextPaint.setColor(SK_ColorBLACK);
+	// SkRect rect = SkRect::MakeXYWH(myCurrentRowLeft + widthSoFar, myCurrentRowTop, newWidth, myTextSize);
+	// pMySkiaCanvas->drawRect(rect, myTextPaint);
 
-	myTextPaint.setColor(SK_ColorWHITE);
-	if (unicodeChar == 0) {
-		pMySkiaCanvas->drawText(str.c_str(), str.size(), myCurrentRowLeft + widthSoFar, myCurrentRowTop + myTextSize * 0.8f, myTextPaint);
-	}
-	else
-		pMySkiaCanvas->drawText(unicodeChar, 4, myCurrentRowLeft + widthSoFar, myCurrentRowTop + myTextSize * 0.8f, myTextPaint);
+	// myTextPaint.setColor(SK_ColorWHITE);
+	// if (unicodeChar == 0) {
+	// 	pMySkiaCanvas->drawText(str.c_str(), str.size(), myCurrentRowLeft + widthSoFar, myCurrentRowTop + myTextSize * 0.8f, myTextPaint);
+	// }
+	// else
+	// 	pMySkiaCanvas->drawText(unicodeChar, 4, myCurrentRowLeft + widthSoFar, myCurrentRowTop + myTextSize * 0.8f, myTextPaint);
 
-	return newWidth;
+	// return newWidth;
 }
 
 SpritePosition TextTextureAtlas::drawSkiaString(const utf8_string str, bool abort_allowed, int measure_char_count) {
-	float widthSoFar = 0.0f;
+// 	float widthSoFar = 0.0f;
 
-	float x   = myCurrentRowLeft,
-			y = myCurrentRowTop,
-			h = myTextSize;
+// 	float x   = myCurrentRowLeft,
+// 			y = myCurrentRowTop,
+// 			h = myTextSize;
 
-	// collect spans of ascii text to measure
-	utf8_string span;
-	uint32_t unicodeString[1] = {0x0};
-	auto i = str.begin();
-	while (i != str.end()) {
-		char32_t chr = *i;
-		if (int(chr) < 128) {
-			// ASCII char
-			span.append(chr);
-		}
-		else {
-			// Unicode char
-			if (span.size() > 0 && abort_allowed) {
-//				draw and measure
-				float w = attemptToDraw(span, 0, widthSoFar, abort_allowed);
-				if (w == -1.0f) {
-cout<<"overlap, forced to wrap"<<endl;
-					return drawSkiaString(str, false);
-				}
+// 	// collect spans of ascii text to measure
+// 	utf8_string span;
+// 	uint32_t unicodeString[1] = {0x0};
+// 	auto i = str.begin();
+// 	while (i != str.end()) {
+// 		char32_t chr = *i;
+// 		if (int(chr) < 128) {
+// 			// ASCII char
+// 			span.append(chr);
+// 		}
+// 		else {
+// 			// Unicode char
+// 			if (span.size() > 0 && abort_allowed) {
+// //				draw and measure
+// 				float w = attemptToDraw(span, 0, widthSoFar, abort_allowed);
+// 				if (w == -1.0f) {
+// cout<<"overlap, forced to wrap"<<endl;
+// 					return drawSkiaString(str, false);
+// 				}
 
-				widthSoFar += w;
-				span = "";
-			}
+// 				widthSoFar += w;
+// 				span = "";
+// 			}
 
-			sk_sp<SkFontMgr> mgr(SkFontMgr::RefDefault());
-	//		uint32_t utf32string[] = { 0x1F310 };
-			sk_sp<SkTypeface> tf(
-				mgr->matchFamilyStyleCharacter(
-					nullptr, SkFontStyle(), nullptr, 0, chr));
-			if (tf) {
-//				unicodeString.(chr);
-				myTextPaint.setTypeface(tf);
+// 			sk_sp<SkFontMgr> mgr(SkFontMgr::RefDefault());
+// 	//		uint32_t utf32string[] = { 0x1F310 };
+// 			sk_sp<SkTypeface> tf(
+// 				mgr->matchFamilyStyleCharacter(
+// 					nullptr, SkFontStyle(), nullptr, 0, chr));
+// 			if (tf) {
+// //				unicodeString.(chr);
+// 				myTextPaint.setTypeface(tf);
 
-		        myTextPaint.setTextEncoding(SkPaint::kUTF32_TextEncoding);
-		        unicodeString[0] = chr;
+// 		        myTextPaint.setTextEncoding(SkPaint::kUTF32_TextEncoding);
+// 		        unicodeString[0] = chr;
 
-				float w = attemptToDraw(span, unicodeString, widthSoFar, abort_allowed);
-				if (w == -1.0f) {
-cout<<"FORCED 2"<<endl;
-					return drawSkiaString(str, false);
+// 				float w = attemptToDraw(span, unicodeString, widthSoFar, abort_allowed);
+// 				if (w == -1.0f) {
+// cout<<"FORCED 2"<<endl;
+// 					return drawSkiaString(str, false);
 
-				}
+// 				}
 
-				widthSoFar += w;
+// 				widthSoFar += w;
 
-				FontFaceTypes font = myCurrentFont;
-				myCurrentFont = fontFaceTypesCount;
-		        myTextPaint.setTextEncoding(SkPaint::kUTF8_TextEncoding);
-				setTextStyle(myTextSize, font);
-		    }
-		}
-		i++;
-	}
-	if (span.size() != 0) {
-//		draw and measure
-		float w = attemptToDraw(span, 0, widthSoFar, abort_allowed);
-		if (w == -1.0f) {
-cout<<"FORCEDDD 3"<<endl;
-			return drawSkiaString(str, false);
-		}
-		widthSoFar += w;
-	}
-	myCurrentRowLeft += widthSoFar;
-	return SpritePosition(x, y, widthSoFar, h);
+// 				FontFaceTypes font = myCurrentFont;
+// 				myCurrentFont = fontFaceTypesCount;
+// 		        myTextPaint.setTextEncoding(SkPaint::kUTF8_TextEncoding);
+// 				setTextStyle(myTextSize, font);
+// 		    }
+// 		}
+// 		i++;
+// 	}
+// 	if (span.size() != 0) {
+// //		draw and measure
+// 		float w = attemptToDraw(span, 0, widthSoFar, abort_allowed);
+// 		if (w == -1.0f) {
+// cout<<"FORCEDDD 3"<<endl;
+// 			return drawSkiaString(str, false);
+// 		}
+// 		widthSoFar += w;
+// 	}
+// 	myCurrentRowLeft += widthSoFar;
+// 	return SpritePosition(x, y, widthSoFar, h);
 }
 #endif
 
@@ -380,7 +375,7 @@ void TextTextureAtlas::test() {
 #else
 	setTextStyle(32, bolditalic);
 	auto sp = drawText(utf8_string("🌍 M∀xx ∃!🌍 ol🌐leH"));
-myTextPaint.setColor(SK_ColorRED);
+// myTextPaint.setColor(SK_ColorRED);
 
 	drawBox(sp);
 	drawText(utf8_string("boop"));
@@ -394,17 +389,17 @@ myTextPaint.setColor(SK_ColorRED);
 	// drawCrosshairs(myCurrentRowLeft,myCurrentRowTop+myTextSize);
 
 	setTextStyle(24, bolditalic);
-    SkPaint paint;
-    paint.setStyle(SkPaint::kFill_Style);
-    paint.setAntiAlias(true);
-    paint.setStrokeWidth(4);
-    paint.setColor(0xffFE938C);
+    // SkPaint paint;
+    // paint.setStyle(SkPaint::kFill_Style);
+    // paint.setAntiAlias(true);
+    // paint.setStrokeWidth(4);
+    // paint.setColor(0xffFE938C);
 
-    SkPaint paint1;
-    paint1.setTextSize(32.0f);
-    paint1.setAntiAlias(true);
-    paint1.setColor(0x8142ffA4);
-    paint1.setStyle(SkPaint::kFill_Style);
+    // SkPaint paint1;
+    // paint1.setTextSize(32.0f);
+    // paint1.setAntiAlias(true);
+    // paint1.setColor(0x8142ffA4);
+    // paint1.setStyle(SkPaint::kFill_Style);
 
 	const string font = "Ubuntu";
 //	paint.setTypeface(SkTypeface::MakeFromName(font.c_str(), SkFontStyle (400, 5,  SkFontStyle::kUpright_Slant)));
@@ -414,27 +409,27 @@ myTextPaint.setColor(SK_ColorRED);
     // SkRect rect = SkRect::MakeXYWH(10, 10, 100, 160);
     // pMySkiaCanvas->drawRect(rect, paint);
 
-    pMySkiaCanvas->drawText(text, strlen(text), 130, 120, myTextPaint);
-    drawCrosshairs(131, 121);
+//    pMySkiaCanvas->drawText(text, strlen(text), 130, 120, myTextPaint);
+//     drawCrosshairs(131, 121);
 
-tiny();
+// tiny();
 
 
-    sk_sp<SkFontMgr> mgr(SkFontMgr::RefDefault());
-    uint32_t utf32string[] = { 0x1F310 };
-    sk_sp<SkTypeface> tf(
-            mgr->matchFamilyStyleCharacter(
-                    nullptr, SkFontStyle(), nullptr, 0, utf32string[0]));
-    if (tf) {
-	SkPaint paint;
-	paint.setTextSize(64.0f);
-        paint.setAntiAlias(true);
-	paint.setColor(0xff4281A4);
-	paint.setStyle(SkPaint::kFill_Style);
-        paint.setTypeface(tf);
-        paint.setTextEncoding(SkPaint::kUTF32_TextEncoding);
-        pMySkiaCanvas->drawText(utf32string, sizeof(utf32string), 200.0f, 264.0f, paint);
-    }
+//     sk_sp<SkFontMgr> mgr(SkFontMgr::RefDefault());
+//     uint32_t utf32string[] = { 0x1F310 };
+//     sk_sp<SkTypeface> tf(
+//             mgr->matchFamilyStyleCharacter(
+//                     nullptr, SkFontStyle(), nullptr, 0, utf32string[0]));
+//     if (tf) {
+// 	SkPaint paint;
+// 	paint.setTextSize(64.0f);
+//         paint.setAntiAlias(true);
+// 	paint.setColor(0xff4281A4);
+// 	paint.setStyle(SkPaint::kFill_Style);
+//         paint.setTypeface(tf);
+//         paint.setTextEncoding(SkPaint::kUTF32_TextEncoding);
+//         pMySkiaCanvas->drawText(utf32string, sizeof(utf32string), 200.0f, 264.0f, paint);
+//     }
 
 #endif
 
@@ -590,49 +585,49 @@ void TextTextureAtlas::initOnFirstContext(GlContext &ctx) {
 	}, ATLAS_SIZE);
 #else 
 
-	SkGraphics::Init();
+	// SkGraphics::Init();
 
-	myTextPaint.setTextSize(20.0f);
-	myTextPaint.setAntiAlias(true);
-	myTextPaint.setColor(0xffffffff);
-	myTextPaint.setStyle(SkPaint::kFill_Style);
+	// myTextPaint.setTextSize(20.0f);
+	// myTextPaint.setAntiAlias(true);
+	// myTextPaint.setColor(0xffffffff);
+	// myTextPaint.setStyle(SkPaint::kFill_Style);
 
-	// my linux machine refuses to create RGBA skia surfaces, but will allow BGRA ones
-	// my macbook is the opposite
-	// i have no idea if i'm compiling skia wrong or it's about endianness or what
+	// // my linux machine refuses to create RGBA skia surfaces, but will allow BGRA ones
+	// // my macbook is the opposite
+	// // i have no idea if i'm compiling skia wrong or it's about endianness or what
 
-	// it doesn't matter to OpenGL, though, as all text is rendered white and colored in the shader
+	// // it doesn't matter to OpenGL, though, as all text is rendered white and colored in the shader
 
 
-	SkImageInfo drawingSurfaceInfo = SkImageInfo::Make(ATLAS_SIZE, ATLAS_SIZE,
-	// kN32_SkColorType, // crash linux, safe mac
-	kRGBA_8888_SkColorType,  // crash linux, safe mac
-	// kBGRA_8888_SkColorType,    //safe linux, mac crash
+	// SkImageInfo drawingSurfaceInfo = SkImageInfo::Make(ATLAS_SIZE, ATLAS_SIZE,
+	// // kN32_SkColorType, // crash linux, safe mac
+	// kRGBA_8888_SkColorType,  // crash linux, safe mac
+	// // kBGRA_8888_SkColorType,    //safe linux, mac crash
 
-	kPremul_SkAlphaType
-	// kOpaque_SkAlphaType
-	);
+	// kPremul_SkAlphaType
+	// // kOpaque_SkAlphaType
+	// );
 
-	pMyDrawingSurface = 
-		SkSurface::MakeRasterDirect(drawingSurfaceInfo, &gPixelMemory[0], ATLAS_SIZE * 4);
+	// pMyDrawingSurface = 
+	// 	SkSurface::MakeRasterDirect(drawingSurfaceInfo, &gPixelMemory[0], ATLAS_SIZE * 4);
 
-	if (pMyDrawingSurface == 0) {
+	// if (pMyDrawingSurface == 0) {
 
-		cout << "Couldn't make an RGBA Skia drawing surface :("<<endl;
+	// 	cout << "Couldn't make an RGBA Skia drawing surface :("<<endl;
 
-		drawingSurfaceInfo = SkImageInfo::Make(ATLAS_SIZE, ATLAS_SIZE, 
-			kBGRA_8888_SkColorType,    //safe linux, mac crash
-			kPremul_SkAlphaType
-		);
+	// 	drawingSurfaceInfo = SkImageInfo::Make(ATLAS_SIZE, ATLAS_SIZE, 
+	// 		kBGRA_8888_SkColorType,    //safe linux, mac crash
+	// 		kPremul_SkAlphaType
+	// 	);
 
-		pMyDrawingSurface = 
-			SkSurface::MakeRasterDirect(drawingSurfaceInfo, &gPixelMemory[0], ATLAS_SIZE * 4);
-	}
+	// 	pMyDrawingSurface = 
+	// 		SkSurface::MakeRasterDirect(drawingSurfaceInfo, &gPixelMemory[0], ATLAS_SIZE * 4);
+	// }
 
-	if (pMyDrawingSurface == 0)
-		cout << "Neither BGRA now RGBA drawing surfaces can be created >:O" << endl;
-	else
-		pMySkiaCanvas = pMyDrawingSurface->getCanvas();
+	// if (pMyDrawingSurface == 0)
+	// 	cout << "Neither BGRA now RGBA drawing surfaces can be created >:O" << endl;
+	// else
+	// 	pMySkiaCanvas = pMyDrawingSurface->getCanvas();
 #endif
 }
 

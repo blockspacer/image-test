@@ -49,6 +49,8 @@
 	#pragma GCC diagnostic ignored "-Wimplicit-fallthrough="
 #endif
 
+#pragma GCC diagnostic ignored "-Wclass-memaccess"
+
 namespace detail
 {
 	// Used for tag dispatching in constructor

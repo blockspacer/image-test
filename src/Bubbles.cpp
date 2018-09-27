@@ -58,6 +58,7 @@ BubbleId Bubbles::createBubble(GlContext &ctx, float x, float y, float w, float 
 	// run through bubbles and find first unused one
 	BubbleId bubbleId  = myBubbles.size();
 
+
 	for (size_t i=0; i<myBubbles.size(); i++) {
 		if (myBubbles[i].unused) {
 			myBubbles[i].unused = false;
@@ -66,6 +67,7 @@ BubbleId Bubbles::createBubble(GlContext &ctx, float x, float y, float w, float 
 			myBubbles[i].y = y;
 			myBubbles[i].w = w;
 			myBubbles[i].h = h;
+			myBubbles[i].groupId = i;
 
 			break;
 		}
@@ -79,14 +81,8 @@ BubbleId Bubbles::createBubble(GlContext &ctx, float x, float y, float w, float 
 		myBubbles[bubbleId].unused = false;
 	}
 
-	myBubbleVertices.clear();
-
 
 	Color col {0.0f, 0.6f, 1.0f, 1.0f};
-
-	auto lam = [&](Point p, float io) {
-		myBubbleVertices.emplace_back(::x(p), ::y(p), encodeId(bubbleId), io);
-	};
 
 	float in = INNER_CORNER, out = OUTER_CORNER;//8
 
@@ -108,14 +104,12 @@ BubbleId Bubbles::createBubble(GlContext &ctx, float x, float y, float w, float 
 	double  topCenterDist = centerDistance( topLength,  topAngle);
 	double sideCenterDist = centerDistance(sideLength, sideAngle);
 
+	myBubbleVertices.clear();
+	auto lam = [&](Point p, float io) {
+		myBubbleVertices.emplace_back(::x(p), ::y(p), encodeId(bubbleId), io);
+	};
 
 	GlContext::drawCurvedOutline(0, 0, w, h, in, out, lam, STEPS_PER_BUBBLE_CORNER, STEPS_PER_BUBBLE_SIDE, topLength, sideLength, topAngle, sideAngle, topRad, sideRad, topCenterDist, sideCenterDist);
-
-	// myBubbleVertices.emplace_back(0.0f, 0.0f, encodeId(bubbleId));
-	// float r = 1.0f;
-	// for (int i = 0; i < VERTICES_PER_BUBBLE - 1; i++) {
-	// 	myBubbleVertices.emplace_back(float(r * cos((2.0*PI / VERTICES_PER_BUBBLE) * i)), float(r * sin((2.0*PI / VERTICES_PER_BUBBLE) * i)), encodeId(bubbleId));
-	// }
 
 	myBubbleHalos.upload(bubbleId, ctx, myBubbleVertices.data());
 
@@ -155,10 +149,13 @@ void Bubbles::uploadBubblePositions() {
 }
 
 void Bubbles::setGroupGradient(BubbleGroupId id, Point topLeft, Point bottomRight, Color topLeftColor, Color bottomRightColor) {
-	myBubbleGroupInfo[id].gradientLeftRed   = topLeftColor.  redFloat();
-	myBubbleGroupInfo[id].gradientLeftGreen = topLeftColor.greenFloat();
-	myBubbleGroupInfo[id].gradientLeftBlue  = topLeftColor. blueFloat();
+	myBubbleGroupInfoTexture[id].gradientLeftRed   = topLeftColor.  redFloat();
+	myBubbleGroupInfoTexture[id].gradientLeftGreen = topLeftColor.greenFloat();
+	myBubbleGroupInfoTexture[id].gradientLeftBlue  = topLeftColor. blueFloat();
+
+cout<<"rgb "<<topLeftColor.  redFloat()<<", "<<topLeftColor.greenFloat()<<", "<<topLeftColor. blueFloat()<<", "<<endl;
 }
+
 
 void Bubbles::enlargeBubbleBuffers(GlContext &ctx) {
 	size_t oldSpaceAvailable = mySpaceAvailable;
@@ -196,6 +193,8 @@ void Bubbles::enlargeBubbleBuffers(GlContext &ctx) {
 
 	setupBuffersInOtherContexts(ctx);
 //	create new texture
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, myDataTexture);
 	glTexImage2D(GL_TEXTURE_2D, // target
 		0,		// mipmap level
 		GL_R32F,// internal format
@@ -251,6 +250,12 @@ void Bubbles::setupBuffers(GlContext &ctx) {
 
 	glUniform1f(myBubbleInfoTextureWidthUniform, float(mySpaceAvailable * BubblePositionInfoMemberCount));
 
+
+	glUniform1i(myBubbleInfoTextureUniform, 0);
+	glUniform1i(myBubbleGroupInfoTextureUniform, 1);
+
+	myBubbleGroupInfoTexture.setWidthUniform();
+
 	//
 }
 
@@ -274,6 +279,7 @@ void Bubbles::setupBuffersInOtherContexts(GlContext &ctx) {
 }
 
 void Bubbles::commonSetup() {
+
 	glUniform1i(myBubbleInfoTextureUniform, 0);
 	glUniform1f(myBubbleInfoTextureWidthUniform, float(mySpaceAvailable * BubblePositionInfoMemberCount));
 
@@ -282,9 +288,13 @@ void Bubbles::commonSetup() {
 	glBindTexture(GL_TEXTURE_2D, myDataTexture);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-	// bubble group data
-
 	glBufferData(GL_ARRAY_BUFFER, mySpaceAvailable * VERTICES_PER_BUBBLE * sizeof(BubbleVertex), nullptr, GL_STATIC_DRAW);
+
+	myBubbleGroupInfoTexture.setupSubsequentContexts();
+	glUniform1i(myBubbleGroupInfoTextureUniform, 1);
+
+
+	// bubble group data
 }
 
 void Bubbles::setupSharedContext(GlContext &ctx, WindowId winid) {
@@ -304,9 +314,6 @@ void Bubbles::initializeFirstContext(GlContext &ctx) {
 
 	GLuint shader = ctx.shaderHandle();
 
-	myBubbleGroupInfo.create(GL_TEXTURE1);
-
-	glActiveTexture(GL_TEXTURE0);
 
 	//create a dummy bubble positioned off screen, marked unused
 	// so the function to create new bubbles doesn't have to treat there being none as a special case
@@ -314,6 +321,17 @@ void Bubbles::initializeFirstContext(GlContext &ctx) {
 
 	myPositionVarying = glGetAttribLocation(shader, "position");
 	myBubbleIdVarying = glGetAttribLocation(shader, "texCoord");
+
+	myBubbleInfoTextureUniform = glGetUniformLocation(shader, "bubbleData");
+	myBubbleInfoTextureWidthUniform = glGetUniformLocation(shader, "widthOfBubbleData");
+	myDrawDepthUniform      = glGetUniformLocation(shader, "drawDepth");
+	myHighlightedBubbleId   = glGetUniformLocation(shader, "highlightedBubbleId");
+	myHighlightedBubbleArea = glGetUniformLocation(shader, "highlightedBubbleArea");
+
+	myBubbleGroupInfoTexture.initFirstTime(1, glGetUniformLocation(shader, "widthOfGroupData"));
+
+	myBubbleGroupInfoTextureUniform = glGetUniformLocation(shader, "bubbleGroupData");
+
 
 	auto bubbleHaloSetupFunc = [&](Window& win) {
 		myBubbleHalos.bindBuffer();
@@ -331,7 +349,10 @@ void Bubbles::initializeFirstContext(GlContext &ctx) {
 
 	myBubblePositions.emplace_back();
 
+	glActiveTexture(GL_TEXTURE0);
+
 	glGenTextures(1,            &myDataTexture);
+
 	glBindTexture(GL_TEXTURE_2D, myDataTexture);
 
 	glTexImage2D(GL_TEXTURE_2D, // target
@@ -348,15 +369,6 @@ void Bubbles::initializeFirstContext(GlContext &ctx) {
 	setupBuffers(ctx);
 
 	commonSetup();
-
-
-
-	myBubbleInfoTextureUniform = glGetUniformLocation(shader, "bubbleData");
-	myBubbleInfoTextureWidthUniform = glGetUniformLocation(shader, "widthOfBubbleData");
-	myDrawDepthUniform      = glGetUniformLocation(shader, "drawDepth");
-	myHighlightedBubbleId   = glGetUniformLocation(shader, "highlightedBubbleId");
-	myHighlightedBubbleArea = glGetUniformLocation(shader, "highlightedBubbleArea");
-
 }
 
 void Bubbles::draw(GlContext &ctx, WindowId winId, Workspace& wksp) {
@@ -385,7 +397,18 @@ cout<<"val "<<myBubblePositions[1].groupId<<endl;
 
 	glUniform1f(myHighlightedBubbleId, myHighlightedBubble);
 
+	myBubbleGroupInfoTexture.upload();
+
+	cout<<" g "<<myBubbleGroupInfoTexture[0].gradientLeftGreen<<endl;
+	cout<<" g "<<myBubbleGroupInfoTexture[1].gradientLeftGreen<<endl;
+
+	cout<<myBubblePositions[0].groupId<<endl;
+	cout<<myBubblePositions[1].groupId<<endl;
+
 	glBindVertexArray(win.bubblesVAO);
+
+myBubbleGroupInfoTexture.bind();
+
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, myBubbleHalos.count() * VERTICES_PER_BUBBLE);
 
 	check_gl_errors("Bubble draw.");
@@ -481,7 +504,6 @@ bool Bubbles::mouseMotion(Point pos, GlContext &ctx, Workspace &wksp, RedrawRequ
 
 	// if situation has changed, update changes, request redraw
 
-cout<<"mp "<<pos<<endl;
 	return true;
 
 }

@@ -56,6 +56,27 @@ check_gl_errors("post texture drawing");
 TextTextureAtlas TextLayout::myTextAtlas;
 
 void TextLayout::initializeFirstContext(GlContext &ctx) {
+	#ifdef NATIVE
+		int error = FT_Init_FreeType( &myFreeTypeLibrary );
+		if ( error ) {
+			cout << BOLD RED "An error occurred during FreeType library initialization, error code: " << error << NORMAL endl;
+		}
+
+		FT_Face face;
+
+		error = FT_New_Face(myFreeTypeLibrary, "/usr/share/fonts/TTF/Roboto-Regular.ttf",
+			0,
+			&face);
+
+		if ( error == FT_Err_Unknown_File_Format )
+			cout << BOLD RED "Font file in unknown format" << NORMAL endl;
+		else if (error)
+			cout << BOLD RED "An error occurred during font loading, error code: " << error << NORMAL endl;
+
+		cout << CYAN "Num glyphs "<<face->size <<NORMAL endl;
+
+	#endif
+
 	myTextAtlas.initOnFirstContext(ctx);
 
 	myTextAtlas.test();
