@@ -1,0 +1,6 @@
+#!/bin/bash
+
+export PKG_CONFIG_PATH=/usr/local/lib64/pkgconfig/
+echo $PKG_CONFIG_PATH
+g++ -Wall -std=c++11 TestBuffer.h  `pkg-config --cflags --libs gtest gmock gtest_main` -o test
+
