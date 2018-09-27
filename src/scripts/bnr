@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# builds the native version
+make -f makefile_for_native_release
+
+buildresult=$?
+
+if [[ buildresult -eq 0 ]]; then
+	echo -e "\n\e[32m   BUILD SUCCESS !\e[0m"
+	echo -e "   RUNNING...\n"
+	../native_version/juxt_edit
+else
+	echo -e "\e[31m   BUILD FAILED, NOT RUNNING"
+fi
